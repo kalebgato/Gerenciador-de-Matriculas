@@ -1,0 +1,20 @@
+info:
+  name: Delete by Id
+  type: http
+  seq: 11
+
+http:
+  method: DELETE
+  url: http://localhost:3000/api/courses/{{course_id}}
+  auth: inherit
+
+runtime:
+  variables:
+    - name: course_id
+      value: 96e87b0f-260f-47ad-86bb-75283d610bab
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

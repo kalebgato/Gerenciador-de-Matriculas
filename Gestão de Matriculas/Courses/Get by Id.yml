@@ -1,0 +1,20 @@
+info:
+  name: Get by Id
+  type: http
+  seq: 8
+
+http:
+  method: GET
+  url: http://localhost:3000/api/courses/{{course_id}}
+  auth: inherit
+
+runtime:
+  variables:
+    - name: course_id
+      value: 08847499-f2e2-4b79-bdc7-5f8f49101709
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

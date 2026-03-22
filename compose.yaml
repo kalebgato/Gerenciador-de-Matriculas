@@ -1,0 +1,19 @@
+name: "matriculas"
+
+x-environments:
+  # Variáveis comuns
+  env_db: &db-env
+    POSTGRES_DB: db
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+
+
+services:
+  db:
+    image: postgres:18
+    container_name: db_psql
+    restart: always
+    environment:
+      <<: *db-env
+    ports:
+      - "5432:5432"

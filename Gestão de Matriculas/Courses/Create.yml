@@ -1,0 +1,23 @@
+info:
+  name: Create
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: http://localhost:3000/api/courses
+  body:
+    type: json
+    data: |-
+      {
+        "name": "TURMA 2",
+        "schedule": "Segunda e quarta de 10h às 11:30",
+        "price": "120.15"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
