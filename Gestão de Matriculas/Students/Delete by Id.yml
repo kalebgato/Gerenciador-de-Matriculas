@@ -1,0 +1,20 @@
+info:
+  name: Delete by Id
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: http://localhost:3000/api/students/{{student_id}}
+  auth: inherit
+
+runtime:
+  variables:
+    - name: student_id
+      value: 78528cab-1e41-44d7-9cb3-fb4982f2ea35
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

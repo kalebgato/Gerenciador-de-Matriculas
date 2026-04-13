@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../server/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Student {
+  id    String  @id @default(uuid())
+  name  String  @db.VarChar(255)
+  cpf   String  @unique
+  email String? @db.VarChar(255)
+  phone String?
+
+  enrollments Enrollment[]
+
+  createdAt DateTime @default(now())
+
+  @@map("students")
+}
+
+model Course {
+  id          String  @id @default(uuid())
+  name        String  @db.VarChar(255)
+  description String?
+  price       Decimal @db.Decimal(10, 2)
+
+  teams Team[]
+
+  createdAt DateTime @default(now())
+
+  @@map("courses")
+}
+
+model Team {
+  id       String  @id @default(uuid())
+  name     String  @db.VarChar(255)
+  schedule String?
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id])
+
+  enrollments Enrollment[]
+
+  createdAt DateTime @default(now())
+
+  @@map("teams")
+}
+
+model Enrollment {
+  id String @id @default(uuid())
+
+  studentId String
+  teamId    String
+
+  startDate DateTime @default(now())
+  active    Boolean  @default(true)
+
+  student Student @relation(fields: [studentId], references: [id])
+  team    Team    @relation(fields: [teamId], references: [id])
+
+  charges Charge[]
+
+  @@index([studentId])
+  @@index([teamId])
+  @@map("enrollments")
+}
+
+model Charge {
+  id           String @id @default(uuid())
+  enrollmentId String
+
+  year  Int
+  month Int
+
+  amount  Decimal  @db.Decimal(10, 2)
+  dueDate DateTime
+
+  status ChargeStatus @default(PENDING)
+
+  payments Payment[]
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id])
+
+  @@unique([enrollmentId, year, month])
+  @@map("charges")
+}
+
+model Payment {
+  id String @id @default(uuid())
+
+  chargeId String
+  amount   Decimal       @db.Decimal(10, 2)
+  method   PaymentMethod
+  paidAt   DateTime      @default(now())
+
+  charge Charge @relation(fields: [chargeId], references: [id])
+
+  @@map("payments")
+}
+
+enum ChargeStatus {
+  PENDING
+  PAID
+  LATE
+}
+
+enum PaymentMethod {
+  PIX
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+}
