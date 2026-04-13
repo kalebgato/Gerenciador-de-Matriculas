@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     try {
         return await enrollmentService.enroll({
             studentId: body.studentId,
-            classId: body.classId,
+            teamId: body.classId,
         });
     } catch (err: any) {
         throw createError({ statusCode: 400, statusMessage: err.message });

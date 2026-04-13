@@ -1,7 +1,7 @@
 import { courseRepository } from "./course.repository";
 import type { CourseCreateInput, CourseUpdateInput } from "#server/generated/models";
 
-export const courseService = {
+ export const courseService = {
     async create(data: CourseCreateInput) {
         // Validações de negócio podem ser adicionadas aqui
         return courseRepository.create(data);
