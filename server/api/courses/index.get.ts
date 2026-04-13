@@ -1,5 +1,5 @@
-import { classService } from "#server/modules/course/course.service";
+import { courseService } from "#server/modules/course/course.service";
 
 export default defineEventHandler(async (event) => {
-    return classService.list();
+    return courseService.list();
 });

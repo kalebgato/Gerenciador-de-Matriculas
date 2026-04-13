@@ -1,7 +1,7 @@
 import { enrollmentService } from "#server/modules/enrollment/enrollment.service";
 
 export default defineEventHandler(async (event) => {
-    const { studentId } = event.context.params as { id: string };
+    const { id: studentId } = event.context.params as { id: string };
 
     if (!studentId) {
         throw createError({ statusCode: 400, statusMessage: "ID do aluno obrigatório" });

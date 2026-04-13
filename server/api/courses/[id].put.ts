@@ -1,4 +1,4 @@
-import { classService } from "#server/modules/course/course.service";
+import { courseService } from "#server/modules/course/course.service";
 import type { CourseUpdateInput } from "#server/generated/models";
 
 export default defineEventHandler(async (event) => {
@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody<CourseUpdateInput>(event);
 
     try {
-        return await classService.update(id, body);
+        return await courseService.update(id, body);
     } catch (err: any) {
         throw createError({ statusCode: 404, statusMessage: err.message });
     }
