@@ -8,6 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "typecheck": "nuxi typecheck",
+    "sync:opencollection": "tsx scripts/sync-opencollection.ts",
     "postinstall": "prisma generate && nuxt prepare"
   },
   "dependencies": {
@@ -22,7 +23,8 @@
     "nuxt": "^4.4.2",
     "pg": "^8.20.0",
     "vue": "^3.5.30",
-    "vue-router": "^5.0.3"
+    "vue-router": "^5.0.3",
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@vue/language-core": "^3.2.6",

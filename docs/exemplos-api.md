@@ -1,5 +1,14 @@
 # Exemplos de API
 
+## Objetivo da Pagina
+
+Fornecer exemplos diretos de chamadas para validar comportamento do backend local.
+
+## Escopo
+
+- Inclui cenarios comuns de sucesso e erro de validacao.
+- Nao inclui autenticacao por token (ainda nao implementada no backend).
+
 Guia rapido de chamadas HTTP para testar o backend localmente.
 
 Base URL padrao:
@@ -159,3 +168,9 @@ curl -i -X POST http://localhost:3000/api/billing \
 - Consulte IDs reais primeiro em `/api/students`, `/api/teams`, `/api/enrollments`.
 - Se o banco estiver vazio, rode o seed antes dos testes.
 - Se receber HTTP 400, confira se os campos obrigatorios foram enviados com o nome correto.
+
+## Referencias
+
+- [docs/README.md](docs/README.md)
+- [docs/rotas.md](docs/rotas.md)
+- [docs/troubleshooting.md](docs/troubleshooting.md)

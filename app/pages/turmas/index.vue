@@ -8,7 +8,7 @@
       <nav>
         <p @click="goDashboard">Dashboard</p>
         <p class="active">Turmas</p>
-        <p @click="logout">Logout</p>
+        <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
     </aside>
 
@@ -92,12 +92,12 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from "vue";
+<script setup lang='ts'>
+import { ref, computed } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
 const filtroProfessor = ref("");
-const turmaSelecionada = ref(null);
+const turmaSelecionada = ref<any>(null);
 const loading = ref(false);
 
 
@@ -132,7 +132,7 @@ const turmasFiltradas = computed(() => {
   return turmas.filter(t => t.professor === filtroProfessor.value);
 });
 
-function selecionarTurma(turma) {
+function selecionarTurma(turma: any) {
   turmaSelecionada.value = turma;
   loading.value = false;
 }
@@ -159,24 +159,12 @@ onBeforeRouteLeave(() => {
   turmaSelecionada.value = null;
 });
 
-function logout() {
-  localStorage.removeItem("auth");
-  navigateTo("/login");
-}
-
 function goDashboard() {
   navigateTo("/dashboard");
 }
-
-onMounted(() => {
-  if (process.client) {
-    const isLogged = localStorage.getItem("auth");
-    if (!isLogged) navigateTo("/login");
-  }
-});
 </script>
 
-<style>
+<style scoped>
 .dashboard {
   display: flex;
 }

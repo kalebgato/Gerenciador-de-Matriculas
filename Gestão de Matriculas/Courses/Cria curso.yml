@@ -1,21 +1,18 @@
 info:
-  name: Create
+  name: Cria curso
   type: http
-  seq: 9
-
+  seq: 2
 http:
   method: POST
   url: http://localhost:3000/api/courses
+  auth: inherit
   body:
     type: json
     data: |-
       {
-        "name": "TURMA 2",
-        "schedule": "Segunda e quarta de 10h às 11:30",
-        "price": "120.15"
+        "title": "string",
+        "active": true
       }
-  auth: inherit
-
 settings:
   encodeUrl: true
   timeout: 0

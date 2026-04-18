@@ -1,5 +1,14 @@
 # Projeto
 
+## Objetivo da Pagina
+
+Consolidar escopo funcional, stack, recursos e estado atual do produto.
+
+## Escopo
+
+- Inclui visao de dominio, recursos e maturidade do sistema.
+- Nao inclui detalhes de rotas endpoint por endpoint.
+
 ## Objetivo
 
 O Gerenciador de Matriculas e uma aplicacao para controle academico e financeiro de uma operacao baseada em cursos e turmas. O sistema cobre o cadastro de estudantes, organizacao de cursos, definicao de turmas, matriculas, geracao de cobrancas recorrentes e registro de pagamentos.
@@ -92,3 +101,9 @@ O projeto ja possui uma base backend utilizavel, mas o frontend ainda esta em tr
 - A pagina de login atual nao consulta o backend.
 - O frontend usa localStorage para simular sessao.
 - Algumas paginas usam dados mockados, enquanto o backend ja expone endpoints reais.
+
+## Referencias
+
+- [docs/README.md](docs/README.md)
+- [docs/arquitetura.md](docs/arquitetura.md)
+- [docs/rotas.md](docs/rotas.md)

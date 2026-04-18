@@ -1,5 +1,14 @@
 # Arquitetura
 
+## Objetivo da Pagina
+
+Documentar as camadas da aplicacao, a organizacao de diretorios e os principais fluxos.
+
+## Escopo
+
+- Inclui frontend, backend HTTP, dominio e persistencia.
+- Nao inclui guia operacional de deploy.
+
 ## Visao Geral
 
 O projeto segue uma arquitetura em camadas, com separacao simples entre interface, rotas HTTP, regras de negocio e persistencia.
@@ -38,7 +47,7 @@ package "Persistencia" {
 @enduml
 ```
 
-Fonte do diagrama: [docs/arquitetura-geral.puml](docs/arquitetura-geral.puml).
+Fonte do diagrama: [docs/plantuml/arquitetura-geral.puml](docs/plantuml/arquitetura-geral.puml).
 
 ## Camadas
 
@@ -92,7 +101,7 @@ O schema do banco fica em prisma/schema.prisma. O client gerado sai em server/ge
 @endmindmap
 ```
 
-Fonte do diagrama: [docs/organizacao-diretorios.puml](docs/organizacao-diretorios.puml).
+Fonte do diagrama: [docs/plantuml/organizacao-diretorios.puml](docs/plantuml/organizacao-diretorios.puml).
 
 ## Responsabilidade por Diretorio
 
@@ -160,7 +169,7 @@ Api --> Client: 200 OK
 @enduml
 ```
 
-Fonte do diagrama: [docs/fluxo-matricula.puml](docs/fluxo-matricula.puml).
+Fonte do diagrama: [docs/plantuml/fluxo-matricula.puml](docs/plantuml/fluxo-matricula.puml).
 
 ### Fluxo de cobranca
 
@@ -196,7 +205,7 @@ end
 @enduml
 ```
 
-Fonte do diagrama: [docs/fluxo-cobranca.puml](docs/fluxo-cobranca.puml).
+Fonte do diagrama: [docs/plantuml/fluxo-cobranca.puml](docs/plantuml/fluxo-cobranca.puml).
 
 ## Observacoes de Arquitetura
 
@@ -204,3 +213,9 @@ Fonte do diagrama: [docs/fluxo-cobranca.puml](docs/fluxo-cobranca.puml).
 - A autenticacao atual e apenas simulada no cliente.
 - A pasta server/generated nao deve ser editada manualmente.
 - O arquivo [docs/db_relations.wsd](docs/db_relations.wsd) representa o modelo relacional de referencia.
+
+## Referencias
+
+- [docs/README.md](docs/README.md)
+- [docs/projeto.md](docs/projeto.md)
+- [docs/rotas.md](docs/rotas.md)

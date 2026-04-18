@@ -1,7 +1,6 @@
 opencollection: 1.0.0
-
 info:
-  name: Gestão de Matriculas
+  name: Gerenciador de Matriculas API
 config:
   proxy:
     inherit: true

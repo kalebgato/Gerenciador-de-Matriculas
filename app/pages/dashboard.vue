@@ -7,7 +7,7 @@
       <nav>
         <p class="active">Dashboard</p>
         <p @click="goTurmas">Turmas</p>
-        <p @click="logout">Logout</p>
+        <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
     </aside>
 
@@ -16,9 +16,7 @@
       <header class="topbar">
         <h1>Dashboard</h1>
 
-        <button class="logout-btn" @click="logout">
-          Sair
-        </button>
+        <AuthLogoutAction class="logout-btn" text="Sair" loading-text="Saindo..." />
       </header>
 
       <section class="cards">
@@ -81,31 +79,19 @@
   </div>
 </template>
 
-<script setup>
-import { onMounted } from "vue";
-
+<script setup lang='ts'>
 const alunos = [
   { nome: "Ana Souza", turma: "Tecido Acrobático", status: "Pago" },
   { nome: "Camila Santos", turma: "Tecido Acrobático", status: "Pendente" },
   { nome: "Carlos Lima", turma: "Tecido Acrobático", status: "Pago" },
 ];
 
-onMounted(() => {
-  const isLogged = localStorage.getItem("auth");
-  if (!isLogged) navigateTo("/login");
-});
-
-function logout() {
-  localStorage.removeItem("auth");
-  navigateTo("/login");
-}
-
 function goTurmas() {
   navigateTo("/turmas");
 }
 </script>
 
-<style>
+<style scoped>
 .dashboard {
   display: flex;
   height: 100vh;
@@ -147,15 +133,6 @@ function goTurmas() {
   align-items: center;
 }
 
-.logout-btn {
-  background: #d32f2f;
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
 .cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -167,28 +144,6 @@ function goTurmas() {
   padding: 20px;
   border-radius: 12px;
   color: white;
-}
-
-.blue {
-  background: linear-gradient(135deg, #4f8ef7, #3a6edc);
-}
-
-.green {
-  background: linear-gradient(135deg, #34c38f, #2a9d6f);
-}
-
-.red {
-  background: linear-gradient(135deg, #f46a6a, #d9534f);
-}
-
-.orange {
-  background: linear-gradient(135deg, #f7b84b, #d98c1f);
-}
-
-.table-section {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
 }
 
 .table {
@@ -217,12 +172,4 @@ function goTurmas() {
   background: #f46a6a;
 }
 
-.btn {
-  background: #d32f2f;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
 </style>

@@ -1,0 +1,20 @@
+info:
+  name: Atualiza curso
+  type: http
+  seq: 4
+http:
+  method: PUT
+  url: http://localhost:3000/api/courses/00000000-0000-0000-0000-000000000000
+  auth: inherit
+  body:
+    type: json
+    data: |-
+      {
+        "title": "string",
+        "active": true
+      }
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

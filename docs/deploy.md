@@ -1,5 +1,14 @@
 # Implantacao e Deploy
 
+## Objetivo da Pagina
+
+Descrever os requisitos e o fluxo tecnico de execucao local e publicacao da aplicacao.
+
+## Escopo
+
+- Inclui ambiente, banco, migration, seed, build e validacao.
+- Nao inclui pipeline CI/CD especifica.
+
 ## Requisitos
 
 - Bun instalado para executar scripts locais.
@@ -27,6 +36,10 @@ Exemplo:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/db?schema=public
+AUTH_ENABLED=true
+AUTH_SECRET=troque-essa-chave-em-producao
+AUTH_ADMIN_EMAIL=admin@admin.com
+AUTH_ADMIN_PASSWORD=123
 ```
 
 O arquivo [prisma.config.ts](prisma.config.ts) carrega o .env com override. Isso garante que a URL local do projeto prevaleca sobre variaveis exportadas no shell.
@@ -99,3 +112,9 @@ Hoje o projeto esta preparado principalmente para execucao em ambiente Node com 
 - As migrations ficam em prisma/migrations.
 - O typecheck depende de `vue-tsc` e `@vue/language-core` declarados no projeto.
 - O frontend ainda contem paginas com dados mockados; isso nao bloqueia o deploy tecnico, mas limita a aderencia funcional da interface ao backend.
+
+## Referencias
+
+- [docs/README.md](docs/README.md)
+- [docs/quickstart.md](docs/quickstart.md)
+- [docs/troubleshooting.md](docs/troubleshooting.md)

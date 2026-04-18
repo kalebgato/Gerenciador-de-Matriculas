@@ -1,5 +1,14 @@
 # Rotas
 
+## Objetivo da Pagina
+
+Catalogar rotas de paginas e endpoints HTTP disponiveis no estado atual do projeto.
+
+## Escopo
+
+- Inclui rotas frontend e backend com payloads principais.
+- Nao inclui contratos OpenAPI formais.
+
 ## Rotas de Pagina
 
 As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/pages.
@@ -21,6 +30,33 @@ As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/page
 - Nao ha middleware de autenticacao efetiva no backend.
 
 ## Rotas de API
+
+### Swagger
+
+- UI interativa: `/api/docs`
+- JSON OpenAPI: `/api/docs/openapi`
+- YAML OpenAPI: `/api/docs/openapi.yaml`
+
+Para sincronizar a colecao Bruno/OpenCollection com a especificacao Swagger:
+
+```bash
+bun run sync:opencollection
+```
+
+### Autenticacao
+
+| Metodo | Rota | Arquivo | Comportamento |
+| --- | --- | --- | --- |
+| POST | `/api/auth/login` | [server/api/auth/login.post.ts](server/api/auth/login.post.ts) | cria sessao via cookie httpOnly |
+| POST | `/api/auth/logout` | [server/api/auth/logout.post.ts](server/api/auth/logout.post.ts) | remove sessao atual |
+| GET | `/api/auth/me` | [server/api/auth/me.get.ts](server/api/auth/me.get.ts) | retorna usuario da sessao |
+
+Quando a autenticacao esta habilitada, os endpoints de negocio em `/api/*` exigem sessao valida e retornam 401 sem cookie de autenticacao.
+
+Toggle rapido da autenticacao:
+
+- `AUTH_ENABLED=true`: autenticacao habilitada.
+- `AUTH_ENABLED=false`: autenticacao desabilitada no backend e no app.
 
 ### Cursos
 
@@ -207,3 +243,9 @@ UC4 ..> API4
 ## Execucao Pratica
 
 Para exemplos de requisicoes reais com curl, incluindo cenarios de erro e validacao de negocio, consulte [docs/exemplos-api.md](docs/exemplos-api.md).
+
+## Referencias
+
+- [docs/README.md](docs/README.md)
+- [docs/exemplos-api.md](docs/exemplos-api.md)
+- [docs/troubleshooting.md](docs/troubleshooting.md)
