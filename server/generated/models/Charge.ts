@@ -40,31 +40,34 @@ export type ChargeSumAggregateOutputType = {
 
 export type ChargeMinAggregateOutputType = {
   id: string | null
-  enrollmentId: string | null
+  enrollment_id: string | null
   year: number | null
   month: number | null
   amount: runtime.Decimal | null
-  dueDate: Date | null
+  due_date: Date | null
+  paid: boolean | null
   status: $Enums.ChargeStatus | null
 }
 
 export type ChargeMaxAggregateOutputType = {
   id: string | null
-  enrollmentId: string | null
+  enrollment_id: string | null
   year: number | null
   month: number | null
   amount: runtime.Decimal | null
-  dueDate: Date | null
+  due_date: Date | null
+  paid: boolean | null
   status: $Enums.ChargeStatus | null
 }
 
 export type ChargeCountAggregateOutputType = {
   id: number
-  enrollmentId: number
+  enrollment_id: number
   year: number
   month: number
   amount: number
-  dueDate: number
+  due_date: number
+  paid: number
   status: number
   _all: number
 }
@@ -84,31 +87,34 @@ export type ChargeSumAggregateInputType = {
 
 export type ChargeMinAggregateInputType = {
   id?: true
-  enrollmentId?: true
+  enrollment_id?: true
   year?: true
   month?: true
   amount?: true
-  dueDate?: true
+  due_date?: true
+  paid?: true
   status?: true
 }
 
 export type ChargeMaxAggregateInputType = {
   id?: true
-  enrollmentId?: true
+  enrollment_id?: true
   year?: true
   month?: true
   amount?: true
-  dueDate?: true
+  due_date?: true
+  paid?: true
   status?: true
 }
 
 export type ChargeCountAggregateInputType = {
   id?: true
-  enrollmentId?: true
+  enrollment_id?: true
   year?: true
   month?: true
   amount?: true
-  dueDate?: true
+  due_date?: true
+  paid?: true
   status?: true
   _all?: true
 }
@@ -201,11 +207,12 @@ export type ChargeGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 
 export type ChargeGroupByOutputType = {
   id: string
-  enrollmentId: string
+  enrollment_id: string
   year: number
   month: number
   amount: runtime.Decimal
-  dueDate: Date
+  due_date: Date
+  paid: boolean
   status: $Enums.ChargeStatus
   _count: ChargeCountAggregateOutputType | null
   _avg: ChargeAvgAggregateOutputType | null
@@ -214,7 +221,7 @@ export type ChargeGroupByOutputType = {
   _max: ChargeMaxAggregateOutputType | null
 }
 
-type GetChargeGroupByPayload<T extends ChargeGroupByArgs> = Prisma.PrismaPromise<
+export type GetChargeGroupByPayload<T extends ChargeGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ChargeGroupByOutputType, T['by']> &
       {
@@ -234,11 +241,12 @@ export type ChargeWhereInput = {
   OR?: Prisma.ChargeWhereInput[]
   NOT?: Prisma.ChargeWhereInput | Prisma.ChargeWhereInput[]
   id?: Prisma.StringFilter<"Charge"> | string
-  enrollmentId?: Prisma.StringFilter<"Charge"> | string
+  enrollment_id?: Prisma.StringFilter<"Charge"> | string
   year?: Prisma.IntFilter<"Charge"> | number
   month?: Prisma.IntFilter<"Charge"> | number
   amount?: Prisma.DecimalFilter<"Charge"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFilter<"Charge"> | Date | string
+  due_date?: Prisma.DateTimeFilter<"Charge"> | Date | string
+  paid?: Prisma.BoolFilter<"Charge"> | boolean
   status?: Prisma.EnumChargeStatusFilter<"Charge"> | $Enums.ChargeStatus
   payments?: Prisma.PaymentListRelationFilter
   enrollment?: Prisma.XOR<Prisma.EnrollmentScalarRelationFilter, Prisma.EnrollmentWhereInput>
@@ -246,11 +254,12 @@ export type ChargeWhereInput = {
 
 export type ChargeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  enrollmentId?: Prisma.SortOrder
+  enrollment_id?: Prisma.SortOrder
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  dueDate?: Prisma.SortOrder
+  due_date?: Prisma.SortOrder
+  paid?: Prisma.SortOrder
   status?: Prisma.SortOrder
   payments?: Prisma.PaymentOrderByRelationAggregateInput
   enrollment?: Prisma.EnrollmentOrderByWithRelationInput
@@ -258,27 +267,29 @@ export type ChargeOrderByWithRelationInput = {
 
 export type ChargeWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  enrollmentId_year_month?: Prisma.ChargeEnrollmentIdYearMonthCompoundUniqueInput
+  enrollment_id_year_month?: Prisma.ChargeEnrollment_idYearMonthCompoundUniqueInput
   AND?: Prisma.ChargeWhereInput | Prisma.ChargeWhereInput[]
   OR?: Prisma.ChargeWhereInput[]
   NOT?: Prisma.ChargeWhereInput | Prisma.ChargeWhereInput[]
-  enrollmentId?: Prisma.StringFilter<"Charge"> | string
+  enrollment_id?: Prisma.StringFilter<"Charge"> | string
   year?: Prisma.IntFilter<"Charge"> | number
   month?: Prisma.IntFilter<"Charge"> | number
   amount?: Prisma.DecimalFilter<"Charge"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFilter<"Charge"> | Date | string
+  due_date?: Prisma.DateTimeFilter<"Charge"> | Date | string
+  paid?: Prisma.BoolFilter<"Charge"> | boolean
   status?: Prisma.EnumChargeStatusFilter<"Charge"> | $Enums.ChargeStatus
   payments?: Prisma.PaymentListRelationFilter
   enrollment?: Prisma.XOR<Prisma.EnrollmentScalarRelationFilter, Prisma.EnrollmentWhereInput>
-}, "id" | "enrollmentId_year_month">
+}, "id" | "enrollment_id_year_month">
 
 export type ChargeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  enrollmentId?: Prisma.SortOrder
+  enrollment_id?: Prisma.SortOrder
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  dueDate?: Prisma.SortOrder
+  due_date?: Prisma.SortOrder
+  paid?: Prisma.SortOrder
   status?: Prisma.SortOrder
   _count?: Prisma.ChargeCountOrderByAggregateInput
   _avg?: Prisma.ChargeAvgOrderByAggregateInput
@@ -292,11 +303,12 @@ export type ChargeScalarWhereWithAggregatesInput = {
   OR?: Prisma.ChargeScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ChargeScalarWhereWithAggregatesInput | Prisma.ChargeScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Charge"> | string
-  enrollmentId?: Prisma.StringWithAggregatesFilter<"Charge"> | string
+  enrollment_id?: Prisma.StringWithAggregatesFilter<"Charge"> | string
   year?: Prisma.IntWithAggregatesFilter<"Charge"> | number
   month?: Prisma.IntWithAggregatesFilter<"Charge"> | number
   amount?: Prisma.DecimalWithAggregatesFilter<"Charge"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeWithAggregatesFilter<"Charge"> | Date | string
+  due_date?: Prisma.DateTimeWithAggregatesFilter<"Charge"> | Date | string
+  paid?: Prisma.BoolWithAggregatesFilter<"Charge"> | boolean
   status?: Prisma.EnumChargeStatusWithAggregatesFilter<"Charge"> | $Enums.ChargeStatus
 }
 
@@ -305,7 +317,8 @@ export type ChargeCreateInput = {
   year: number
   month: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate: Date | string
+  due_date: Date | string
+  paid?: boolean
   status?: $Enums.ChargeStatus
   payments?: Prisma.PaymentCreateNestedManyWithoutChargeInput
   enrollment: Prisma.EnrollmentCreateNestedOneWithoutChargesInput
@@ -313,11 +326,12 @@ export type ChargeCreateInput = {
 
 export type ChargeUncheckedCreateInput = {
   id?: string
-  enrollmentId: string
+  enrollment_id: string
   year: number
   month: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate: Date | string
+  due_date: Date | string
+  paid?: boolean
   status?: $Enums.ChargeStatus
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutChargeInput
 }
@@ -327,7 +341,8 @@ export type ChargeUpdateInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumChargeStatusFieldUpdateOperationsInput | $Enums.ChargeStatus
   payments?: Prisma.PaymentUpdateManyWithoutChargeNestedInput
   enrollment?: Prisma.EnrollmentUpdateOneRequiredWithoutChargesNestedInput
@@ -335,22 +350,24 @@ export type ChargeUpdateInput = {
 
 export type ChargeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  enrollmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  enrollment_id?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumChargeStatusFieldUpdateOperationsInput | $Enums.ChargeStatus
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutChargeNestedInput
 }
 
 export type ChargeCreateManyInput = {
   id?: string
-  enrollmentId: string
+  enrollment_id: string
   year: number
   month: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate: Date | string
+  due_date: Date | string
+  paid?: boolean
   status?: $Enums.ChargeStatus
 }
 
@@ -359,17 +376,19 @@ export type ChargeUpdateManyMutationInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumChargeStatusFieldUpdateOperationsInput | $Enums.ChargeStatus
 }
 
 export type ChargeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  enrollmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  enrollment_id?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumChargeStatusFieldUpdateOperationsInput | $Enums.ChargeStatus
 }
 
@@ -383,19 +402,20 @@ export type ChargeOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ChargeEnrollmentIdYearMonthCompoundUniqueInput = {
-  enrollmentId: string
+export type ChargeEnrollment_idYearMonthCompoundUniqueInput = {
+  enrollment_id: string
   year: number
   month: number
 }
 
 export type ChargeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  enrollmentId?: Prisma.SortOrder
+  enrollment_id?: Prisma.SortOrder
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  dueDate?: Prisma.SortOrder
+  due_date?: Prisma.SortOrder
+  paid?: Prisma.SortOrder
   status?: Prisma.SortOrder
 }
 
@@ -407,21 +427,23 @@ export type ChargeAvgOrderByAggregateInput = {
 
 export type ChargeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  enrollmentId?: Prisma.SortOrder
+  enrollment_id?: Prisma.SortOrder
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  dueDate?: Prisma.SortOrder
+  due_date?: Prisma.SortOrder
+  paid?: Prisma.SortOrder
   status?: Prisma.SortOrder
 }
 
 export type ChargeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  enrollmentId?: Prisma.SortOrder
+  enrollment_id?: Prisma.SortOrder
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  dueDate?: Prisma.SortOrder
+  due_date?: Prisma.SortOrder
+  paid?: Prisma.SortOrder
   status?: Prisma.SortOrder
 }
 
@@ -486,6 +508,10 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type DateTimeFieldUpdateOperationsInput = {
+  set?: Date | string
+}
+
 export type EnumChargeStatusFieldUpdateOperationsInput = {
   set?: $Enums.ChargeStatus
 }
@@ -509,7 +535,8 @@ export type ChargeCreateWithoutEnrollmentInput = {
   year: number
   month: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate: Date | string
+  due_date: Date | string
+  paid?: boolean
   status?: $Enums.ChargeStatus
   payments?: Prisma.PaymentCreateNestedManyWithoutChargeInput
 }
@@ -519,7 +546,8 @@ export type ChargeUncheckedCreateWithoutEnrollmentInput = {
   year: number
   month: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate: Date | string
+  due_date: Date | string
+  paid?: boolean
   status?: $Enums.ChargeStatus
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutChargeInput
 }
@@ -555,11 +583,12 @@ export type ChargeScalarWhereInput = {
   OR?: Prisma.ChargeScalarWhereInput[]
   NOT?: Prisma.ChargeScalarWhereInput | Prisma.ChargeScalarWhereInput[]
   id?: Prisma.StringFilter<"Charge"> | string
-  enrollmentId?: Prisma.StringFilter<"Charge"> | string
+  enrollment_id?: Prisma.StringFilter<"Charge"> | string
   year?: Prisma.IntFilter<"Charge"> | number
   month?: Prisma.IntFilter<"Charge"> | number
   amount?: Prisma.DecimalFilter<"Charge"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFilter<"Charge"> | Date | string
+  due_date?: Prisma.DateTimeFilter<"Charge"> | Date | string
+  paid?: Prisma.BoolFilter<"Charge"> | boolean
   status?: Prisma.EnumChargeStatusFilter<"Charge"> | $Enums.ChargeStatus
 }
 
@@ -568,18 +597,20 @@ export type ChargeCreateWithoutPaymentsInput = {
   year: number
   month: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate: Date | string
+  due_date: Date | string
+  paid?: boolean
   status?: $Enums.ChargeStatus
   enrollment: Prisma.EnrollmentCreateNestedOneWithoutChargesInput
 }
 
 export type ChargeUncheckedCreateWithoutPaymentsInput = {
   id?: string
-  enrollmentId: string
+  enrollment_id: string
   year: number
   month: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate: Date | string
+  due_date: Date | string
+  paid?: boolean
   status?: $Enums.ChargeStatus
 }
 
@@ -604,18 +635,20 @@ export type ChargeUpdateWithoutPaymentsInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumChargeStatusFieldUpdateOperationsInput | $Enums.ChargeStatus
   enrollment?: Prisma.EnrollmentUpdateOneRequiredWithoutChargesNestedInput
 }
 
 export type ChargeUncheckedUpdateWithoutPaymentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  enrollmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  enrollment_id?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumChargeStatusFieldUpdateOperationsInput | $Enums.ChargeStatus
 }
 
@@ -624,7 +657,8 @@ export type ChargeCreateManyEnrollmentInput = {
   year: number
   month: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate: Date | string
+  due_date: Date | string
+  paid?: boolean
   status?: $Enums.ChargeStatus
 }
 
@@ -633,7 +667,8 @@ export type ChargeUpdateWithoutEnrollmentInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumChargeStatusFieldUpdateOperationsInput | $Enums.ChargeStatus
   payments?: Prisma.PaymentUpdateManyWithoutChargeNestedInput
 }
@@ -643,7 +678,8 @@ export type ChargeUncheckedUpdateWithoutEnrollmentInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumChargeStatusFieldUpdateOperationsInput | $Enums.ChargeStatus
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutChargeNestedInput
 }
@@ -653,7 +689,8 @@ export type ChargeUncheckedUpdateManyWithoutEnrollmentInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumChargeStatusFieldUpdateOperationsInput | $Enums.ChargeStatus
 }
 
@@ -690,11 +727,12 @@ export type ChargeCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types
 
 export type ChargeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  enrollmentId?: boolean
+  enrollment_id?: boolean
   year?: boolean
   month?: boolean
   amount?: boolean
-  dueDate?: boolean
+  due_date?: boolean
+  paid?: boolean
   status?: boolean
   payments?: boolean | Prisma.Charge$paymentsArgs<ExtArgs>
   enrollment?: boolean | Prisma.EnrollmentDefaultArgs<ExtArgs>
@@ -703,37 +741,40 @@ export type ChargeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 
 export type ChargeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  enrollmentId?: boolean
+  enrollment_id?: boolean
   year?: boolean
   month?: boolean
   amount?: boolean
-  dueDate?: boolean
+  due_date?: boolean
+  paid?: boolean
   status?: boolean
   enrollment?: boolean | Prisma.EnrollmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["charge"]>
 
 export type ChargeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  enrollmentId?: boolean
+  enrollment_id?: boolean
   year?: boolean
   month?: boolean
   amount?: boolean
-  dueDate?: boolean
+  due_date?: boolean
+  paid?: boolean
   status?: boolean
   enrollment?: boolean | Prisma.EnrollmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["charge"]>
 
 export type ChargeSelectScalar = {
   id?: boolean
-  enrollmentId?: boolean
+  enrollment_id?: boolean
   year?: boolean
   month?: boolean
   amount?: boolean
-  dueDate?: boolean
+  due_date?: boolean
+  paid?: boolean
   status?: boolean
 }
 
-export type ChargeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "enrollmentId" | "year" | "month" | "amount" | "dueDate" | "status", ExtArgs["result"]["charge"]>
+export type ChargeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "enrollment_id" | "year" | "month" | "amount" | "due_date" | "paid" | "status", ExtArgs["result"]["charge"]>
 export type ChargeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payments?: boolean | Prisma.Charge$paymentsArgs<ExtArgs>
   enrollment?: boolean | Prisma.EnrollmentDefaultArgs<ExtArgs>
@@ -754,11 +795,12 @@ export type $ChargePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    enrollmentId: string
+    enrollment_id: string
     year: number
     month: number
     amount: runtime.Decimal
-    dueDate: Date
+    due_date: Date
+    paid: boolean
     status: $Enums.ChargeStatus
   }, ExtArgs["result"]["charge"]>
   composites: {}
@@ -1186,11 +1228,12 @@ export interface Prisma__ChargeClient<T, Null = never, ExtArgs extends runtime.T
  */
 export interface ChargeFieldRefs {
   readonly id: Prisma.FieldRef<"Charge", 'String'>
-  readonly enrollmentId: Prisma.FieldRef<"Charge", 'String'>
+  readonly enrollment_id: Prisma.FieldRef<"Charge", 'String'>
   readonly year: Prisma.FieldRef<"Charge", 'Int'>
   readonly month: Prisma.FieldRef<"Charge", 'Int'>
   readonly amount: Prisma.FieldRef<"Charge", 'Decimal'>
-  readonly dueDate: Prisma.FieldRef<"Charge", 'DateTime'>
+  readonly due_date: Prisma.FieldRef<"Charge", 'DateTime'>
+  readonly paid: Prisma.FieldRef<"Charge", 'Boolean'>
   readonly status: Prisma.FieldRef<"Charge", 'ChargeStatus'>
 }
     

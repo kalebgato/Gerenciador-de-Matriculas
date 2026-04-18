@@ -1,19 +1,26 @@
 import { billingRepository } from "./billing.repository";
-import type { ChargeCreateInput, PaymentCreateInput } from "#server/generated/models";
 import { ChargeStatus, PaymentMethod } from "#server/generated/enums";
 
 export const billingService = {
     async generateMonthlyCharges(data: { enrollmentId: string; amount: number; year: number }) {
         const { enrollmentId, amount, year } = data;
 
+        if (amount <= 0) throw new Error("Valor da cobrança deve ser maior que zero");
+
+        const existingCharges = await billingRepository.countChargesByEnrollmentAndYear(enrollmentId, year);
+        if (existingCharges > 0) {
+            throw new Error("Cobranças desse ano já foram geradas para esta matrícula");
+        }
+
         for (let month = 1; month <= 12; month++) {
-            const chargeData: ChargeCreateInput = {
-                enrollment: { connect: { id: enrollmentId } },
+            const chargeData = {
+                enrollment_id: enrollmentId,
                 amount: amount,
                 year: year,
                 month: month,
-                dueDate: new Date(year, month - 1, 10),
+                due_date: new Date(year, month - 1, 10),
                 status: ChargeStatus.PENDING,
+                paid: false,
             };
 
             await billingRepository.createCharge(chargeData);
@@ -25,16 +32,20 @@ export const billingService = {
         const charge = await billingRepository.findCharge(chargeId);
 
         if (!charge) throw new Error("Cobrança não encontrada");
+        if (amount <= 0) throw new Error("Valor do pagamento deve ser maior que zero");
+        if (charge.status === ChargeStatus.PAID || charge.paid) {
+            throw new Error("Cobrança já está quitada");
+        }
 
-        // Cria o pagamento
-        const dataPayment: PaymentCreateInput = {
-            charge: { connect: { id: chargeId } },
+        const dataPayment = {
+            charge_id: chargeId,
+            enrollment_id: charge.enrollment_id,
             amount: amount,
-            method: method
+            method: method,
+            payment_date: new Date(),
         };
         await billingRepository.createPayment(dataPayment);
 
-        // Recalcula total pago incluindo o pagamento recém-criado
         const payments = [...charge.payments, { amount }];
         const totalPaid = payments.reduce((acc, p) => acc + Number(p.amount), 0);
 
@@ -44,6 +55,7 @@ export const billingService = {
     },
 
     async getLatePayments() {
+        await billingRepository.markOverdueCharges();
         return billingRepository.listLateCharges();
     },
 };

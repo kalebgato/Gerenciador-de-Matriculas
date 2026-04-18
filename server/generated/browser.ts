@@ -47,3 +47,8 @@ export type Charge = Prisma.ChargeModel
  * 
  */
 export type Payment = Prisma.PaymentModel
+/**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel

@@ -12,17 +12,17 @@
 export const ChargeStatus = {
   PENDING: 'PENDING',
   PAID: 'PAID',
-  LATE: 'LATE'
+  OVERDUE: 'OVERDUE'
 } as const
 
 export type ChargeStatus = (typeof ChargeStatus)[keyof typeof ChargeStatus]
 
 
 export const PaymentMethod = {
-  PIX: 'PIX',
-  CASH: 'CASH',
   CREDIT_CARD: 'CREDIT_CARD',
-  DEBIT_CARD: 'DEBIT_CARD'
+  DEBIT_CARD: 'DEBIT_CARD',
+  BOLETO: 'BOLETO',
+  PIX: 'PIX'
 } as const
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]

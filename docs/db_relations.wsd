@@ -1,0 +1,105 @@
+@startuml db_relations
+
+title Database Relations for Course Management System
+
+' Curso '
+entity "Course" {
+    * id : uuid
+    title : string
+    active : boolean
+}
+
+' Turma '
+entity "Team" {
+    * id : uuid
+    course_id : uuid
+    title : string
+    team_leader_id : uuid
+    start_date : date
+    end_date : date
+    horary : string
+    days_of_week : string
+    active : boolean
+    payment_date : date
+    price : decimal
+}
+
+' Estudantes '
+entity "Student" {
+    * id : uuid
+    name : string
+    cpf: string
+    email: string
+    dn: date
+    phone: string
+    responsable_name: string
+    responsable_phone: string
+    active: boolean
+}
+
+' Matricula '
+entity "Enrollment" {
+    * id : uuid
+    team_id : uuid
+    student_id : uuid
+}
+' Cobrança '
+entity "Charge" {
+    * id : uuid
+    enrollment_id : uuid
+    year : int
+    month : int
+    amount : decimal
+    due_date : date
+    status: ChargeStatus default PENDING
+    payments: list[Payment]
+    paid : boolean
+}
+
+' Pagamento '
+entity "Payment" {
+    * id : uuid
+    enrollment_id : uuid
+    amount : decimal
+    payment_date : date
+    method : PaymentMethod
+    payment_date: date
+}
+
+' Usuario '
+entity "User" {
+    * id : uuid
+    name : string
+    email : string
+    password : string
+    active : boolean
+}
+
+' ENUMS'
+
+enum "ChargeStatus" {
+    PENDING
+    PAID
+    OVERDUE
+}
+
+enum "PaymentMethod" {
+    CREDIT_CARD
+    DEBIT_CARD
+    BOLETO
+    PIX
+}
+
+' Relationships '
+
+Course ||--o{ Team : has
+Team ||--o{ Enrollment : has
+Student ||--o{ Enrollment : has
+Enrollment ||--o{ Charge : has
+Charge ||--o{ Payment : has
+
+' Relations Enums '
+ChargeStatus ||--o Charge : has
+PaymentMethod ||--o Payment : has
+
+@enduml

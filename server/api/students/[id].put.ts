@@ -1,12 +1,17 @@
 import { studentService } from "#server/modules/student/student.service";
-import type {
-    StudentUpdateInput,
-    StudentUncheckedUpdateInput,
-} from "#server/generated/models";
 
 export default defineEventHandler(async (event) => {
     const { id } = event.context.params as { id: string };
-    const body = await readBody<StudentUpdateInput | StudentUncheckedUpdateInput>(event);
+    const body = await readBody<{
+        name?: string;
+        cpf?: string;
+        email?: string;
+        dn?: Date;
+        phone?: string;
+        responsable_name?: string;
+        responsable_phone?: string;
+        active?: boolean;
+    }>(event);
 
     try {
         return await studentService.update(id, body);

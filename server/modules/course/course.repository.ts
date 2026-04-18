@@ -1,12 +1,11 @@
 import { prisma } from "#server/lib/prisma";
-import type { CourseCreateInput, CourseUpdateInput } from "#server/generated/models";
 
 export const courseRepository = {
-    create(data: CourseCreateInput) {
+    create(data: { title: string; active?: boolean }) {
         return prisma.course.create({ data });
     },
 
-    update(id: string, data: CourseUpdateInput) {
+    update(id: string, data: { title?: string; active?: boolean }) {
         return prisma.course.update({
             where: { id },
             data,
@@ -22,7 +21,7 @@ export const courseRepository = {
 
     list() {
         return prisma.course.findMany({
-            include: { teams: true }, // opcional
+            include: { teams: true },
         });
     },
 

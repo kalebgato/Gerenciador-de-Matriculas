@@ -1,12 +1,16 @@
 import { studentRepository } from "./student.repository";
-import type {
-    StudentCreateInput,
-    StudentUpdateInput,
-    StudentUncheckedUpdateInput,
-} from "#server/generated/models";
 
 export const studentService = {
-    async create(data: StudentCreateInput) {
+    async create(data: {
+        name: string;
+        cpf: string;
+        email?: string;
+        dn?: Date;
+        phone?: string;
+        responsable_name?: string;
+        responsable_phone?: string;
+        active?: boolean;
+    }) {
         const exists = await studentRepository.findByCPF(data.cpf);
 
         if (exists) {
@@ -28,14 +32,29 @@ export const studentService = {
         return student;
     },
 
-    async update(id: string, data: StudentUpdateInput | StudentUncheckedUpdateInput) {
+    async update(id: string, data: {
+        name?: string;
+        cpf?: string;
+        email?: string;
+        dn?: Date;
+        phone?: string;
+        responsable_name?: string;
+        responsable_phone?: string;
+        active?: boolean;
+    }) {
         const student = await studentRepository.findById(id);
         if (!student) {
             throw new Error("Aluno não encontrado");
         }
 
-        // Aqui você pode decidir se usa update ou updateUnchecked dependendo do tipo de data
-        return studentRepository.update(id, data as StudentUpdateInput);
+        if (data.cpf && data.cpf !== student.cpf) {
+            const existingStudent = await studentRepository.findByCPF(data.cpf);
+            if (existingStudent) {
+                throw new Error("CPF já cadastrado");
+            }
+        }
+
+        return studentRepository.update(id, data);
     },
 
     async delete(id: string) {

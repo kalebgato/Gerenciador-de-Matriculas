@@ -1,5 +1,5 @@
 import { billingService } from "#server/modules/billing/billing.service";
-import { ChargeStatus, PaymentMethod } from "#server/generated/enums";
+import { PaymentMethod } from "#server/generated/enums";
 
 export default defineEventHandler(async (event) => {
     const body = await readBody<{
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
         enrollmentId?: string;
         year?: number;
         amount: number;
-        chargeId?: string;
+        charge_id?: string;
         method?: string;
     }>(event);
 
@@ -25,16 +25,15 @@ export default defineEventHandler(async (event) => {
         }
 
         if (body.action === "pay") {
-            if (!body.chargeId || !body.method) {
+            if (!body.charge_id || !body.method) {
                 throw new Error("Parâmetros inválidos para pagamento");
             }
 
-            // Converte string para enum PaymentMethod
             const methodEnum = PaymentMethod[body.method.toUpperCase() as keyof typeof PaymentMethod];
             if (!methodEnum) throw new Error("Método de pagamento inválido");
 
             await billingService.payCharge({
-                chargeId: body.chargeId,
+                chargeId: body.charge_id,
                 amount: body.amount,
                 method: methodEnum,
             });

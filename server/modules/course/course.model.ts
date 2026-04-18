@@ -1,6 +1,5 @@
 export interface Course {
   id: string
-  name: string
-  description?: string
-  price: number
+  title: string
+  active: boolean
 }

@@ -1,22 +1,25 @@
 import { teamRepository } from "./team.repository";
 import { courseRepository } from "#server/modules/course/course.repository"; 
-import type { TeamCreateInput, TeamUpdateInput } from "#server/generated/models";
 
 export const teamService = {
-    async create(data: { name: string; schedule?: string; price: number; courseId: string }) {
-        const { name, schedule, price, courseId } = data;
+    async create(data: {
+        course_id: string;
+        title: string;
+        team_leader_id?: string;
+        start_date?: Date;
+        end_date?: Date;
+        horary?: string;
+        days_of_week?: string;
+        active?: boolean;
+        payment_date?: Date;
+        price: number;
+    }) {
+        const { course_id } = data;
 
-        // Verifica se o curso existe
-        const course = await courseRepository.findById(courseId);
+        const course = await courseRepository.findById(course_id);
         if (!course) throw new Error("Curso não encontrado");
 
-        const teamData: TeamCreateInput = {
-            name,
-            schedule,
-            course: { connect: { id: courseId } },
-        };
-
-        return teamRepository.create(teamData);
+        return teamRepository.create(data);
     },
 
     async getById(id: string) {
@@ -26,7 +29,6 @@ export const teamService = {
     },
 
     async listByCourse(courseId: string) {
-        // Verifica se o curso existe
         const course = await courseRepository.findById(courseId);
         if (!course) throw new Error("Curso não encontrado");
 
@@ -37,12 +39,27 @@ export const teamService = {
         return teamRepository.listAll();
     },
 
-    async update(id: string, data: Partial<TeamUpdateInput>) {
-        // Não atualiza courseId por enquanto
+    async update(id: string, data: {
+        title?: string;
+        team_leader_id?: string;
+        start_date?: Date;
+        end_date?: Date;
+        horary?: string;
+        days_of_week?: string;
+        active?: boolean;
+        payment_date?: Date;
+        price?: number;
+    }) {
+        const team = await teamRepository.findById(id);
+        if (!team) throw new Error("Turma não encontrada");
+
         return teamRepository.update(id, data);
     },
 
     async delete(id: string) {
+        const team = await teamRepository.findById(id);
+        if (!team) throw new Error("Turma não encontrada");
+
         return teamRepository.delete(id);
     },
 };

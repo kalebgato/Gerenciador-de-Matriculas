@@ -1,8 +1,7 @@
 import { courseService } from "#server/modules/course/course.service";
-import type { CourseCreateInput } from "#server/generated/models";
 
 export default defineEventHandler(async (event) => {
-    const body = await readBody<CourseCreateInput>(event);
+    const body = await readBody<{ title: string; active?: boolean }>(event);
     try {
         return await courseService.create(body);
     } catch (err: any) {

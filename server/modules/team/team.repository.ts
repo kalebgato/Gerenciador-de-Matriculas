@@ -1,8 +1,18 @@
 import { prisma } from "#server/lib/prisma";
-import type { TeamCreateInput, TeamUpdateInput } from "#server/generated/models";
 
 export const teamRepository = {
-    create(data: TeamCreateInput) {
+    create(data: {
+        course_id: string;
+        title: string;
+        team_leader_id?: string;
+        start_date?: Date;
+        end_date?: Date;
+        horary?: string;
+        days_of_week?: string;
+        active?: boolean;
+        payment_date?: Date;
+        price: number;
+    }) {
         return prisma.team.create({ data });
     },
 
@@ -15,7 +25,7 @@ export const teamRepository = {
 
     listByCourse(courseId: string) {
         return prisma.team.findMany({
-            where: { courseId },
+            where: { course_id: courseId },
             include: { course: true },
         });
     },
@@ -26,7 +36,17 @@ export const teamRepository = {
         });
     },
 
-    update(id: string, data: Partial<TeamUpdateInput>) {
+    update(id: string, data: {
+        title?: string;
+        team_leader_id?: string;
+        start_date?: Date;
+        end_date?: Date;
+        horary?: string;
+        days_of_week?: string;
+        active?: boolean;
+        payment_date?: Date;
+        price?: number;
+    }) {
         return prisma.team.update({
             where: { id },
             data,

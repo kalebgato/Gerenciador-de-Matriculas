@@ -1,15 +1,19 @@
 export interface Charge {
     id: string
-    enrollmentId: string
+    enrollment_id: string
     year: number
     month: number
     amount: number
-    status: "PENDING" | "PAID" | "LATE"
+    due_date: Date
+    paid: boolean
+    status: "PENDING" | "PAID" | "OVERDUE"
 }
 
 export interface Payment {
     id: string
-    chargeId: string
+    charge_id: string
+    enrollment_id: string
     amount: number
-    method: "PIX" | "CASH" | "CREDIT_CARD" | "DEBIT_CARD"
+    payment_date: Date
+    method: "PIX" | "BOLETO" | "CREDIT_CARD" | "DEBIT_CARD"
   }
