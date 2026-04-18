@@ -1,0 +1,25 @@
+@startmindmap
+* Gerenciador de Matriculas
+** app
+*** pages
+*** components
+*** layouts
+*** composables
+*** middleware
+*** assets
+** server
+*** api
+*** modules
+*** lib
+*** generated
+** prisma
+*** schema.prisma
+*** migrations
+*** seed.ts
+** docs
+*** markdowns tecnicos
+*** diagramas PlantUML
+** compose.yaml
+** nuxt.config.ts
+** package.json
+@endmindmap
