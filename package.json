@@ -19,6 +19,7 @@
     "@nuxtjs/color-mode": "4.0.0",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
+    "@tailwindcss/vite": "^4.2.2",
     "@types/swagger-ui-dist": "^3.30.6",
     "nuxt": "^4.4.2",
     "pg": "^8.20.0",
