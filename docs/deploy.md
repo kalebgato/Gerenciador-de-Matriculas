@@ -123,6 +123,6 @@ Hoje o projeto esta preparado principalmente para execucao em ambiente Node com 
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/quickstart.md](docs/quickstart.md)
-- [docs/troubleshooting.md](docs/troubleshooting.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/quickstart.md](/docs/quickstart.md)
+- [/docs/troubleshooting.md](/docs/troubleshooting.md)

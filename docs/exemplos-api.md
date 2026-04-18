@@ -171,6 +171,6 @@ curl -i -X POST http://localhost:3000/api/billing \
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/rotas.md](docs/rotas.md)
-- [docs/troubleshooting.md](docs/troubleshooting.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/rotas.md](/docs/rotas.md)
+- [/docs/troubleshooting.md](/docs/troubleshooting.md)

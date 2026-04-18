@@ -15,18 +15,18 @@ As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/page
 
 | Rota | Arquivo | Descricao |
 | --- | --- | --- |
-| `/` | [app/pages/index.vue](app/pages/index.vue) | tela inicial atualmente com layout de turmas em modo prototipo |
-| `/login` | [app/pages/login.vue](app/pages/login.vue) | login via backend com criacao de sessao |
-| `/dashboard` | [app/pages/dashboard.vue](app/pages/dashboard.vue) | dashboard visual com indicadores mockados |
-| `/turmas` | [app/pages/turmas/index.vue](app/pages/turmas/index.vue) | lista de turmas em modo prototipo |
-| `/turmas/:id` | [app/pages/turmas/[id].vue](app/pages/turmas/%5Bid%5D.vue) | detalhe de turma e alunos em modo prototipo |
+| `/` | [/app/pages/index.vue](/app/pages/index.vue) | tela inicial atualmente com layout de turmas em modo prototipo |
+| `/login` | [/app/pages/login.vue](/app/pages/login.vue) | login via backend com criacao de sessao |
+| `/dashboard` | [/app/pages/dashboard.vue](/app/pages/dashboard.vue) | dashboard visual com indicadores mockados |
+| `/turmas` | [/app/pages/turmas/index.vue](/app/pages/turmas/index.vue) | lista de turmas em modo prototipo |
+| `/turmas/:id` | [/app/pages/turmas/[id].vue](/app/pages/turmas/%5Bid%5D.vue) | detalhe de turma e alunos em modo prototipo |
 
 ## Observacoes Sobre o Frontend
 
-- [app/pages/login.vue](app/pages/login.vue) usa o endpoint `POST /api/auth/login`.
-- [app/pages/dashboard.vue](app/pages/dashboard.vue) usa cards e lista de alunos mockados.
-- [app/pages/index.vue](app/pages/index.vue) e [app/pages/turmas/index.vue](app/pages/turmas/index.vue) hoje possuem fluxos prototipados de turmas.
-- [app/pages/turmas/[id].vue](app/pages/turmas/%5Bid%5D.vue) usa dados mockados para os alunos.
+- [/app/pages/login.vue](/app/pages/login.vue) usa o endpoint `POST /api/auth/login`.
+- [/app/pages/dashboard.vue](/app/pages/dashboard.vue) usa cards e lista de alunos mockados.
+- [/app/pages/index.vue](/app/pages/index.vue) e [/app/pages/turmas/index.vue](/app/pages/turmas/index.vue) hoje possuem fluxos prototipados de turmas.
+- [/app/pages/turmas/[id].vue](/app/pages/turmas/%5Bid%5D.vue) usa dados mockados para os alunos.
 - O frontend usa middleware global de autenticacao e o backend protege endpoints via cookie de sessao.
 
 ## Rotas de API
@@ -47,9 +47,9 @@ bun run sync:opencollection
 
 | Metodo | Rota | Arquivo | Comportamento |
 | --- | --- | --- | --- |
-| POST | `/api/auth/login` | [server/api/auth/login.post.ts](server/api/auth/login.post.ts) | cria sessao via cookie httpOnly |
-| POST | `/api/auth/logout` | [server/api/auth/logout.post.ts](server/api/auth/logout.post.ts) | remove sessao atual |
-| GET | `/api/auth/me` | [server/api/auth/me.get.ts](server/api/auth/me.get.ts) | retorna usuario da sessao |
+| POST | `/api/auth/login` | [/server/api/auth/login.post.ts](/server/api/auth/login.post.ts) | cria sessao via cookie httpOnly |
+| POST | `/api/auth/logout` | [/server/api/auth/logout.post.ts](/server/api/auth/logout.post.ts) | remove sessao atual |
+| GET | `/api/auth/me` | [/server/api/auth/me.get.ts](/server/api/auth/me.get.ts) | retorna usuario da sessao |
 
 Quando a autenticacao esta habilitada, os endpoints de negocio em `/api/*` exigem sessao valida e retornam 401 sem cookie de autenticacao.
 
@@ -64,11 +64,11 @@ Alteracoes nesse valor requerem rebuild da aplicacao.
 
 | Metodo | Rota | Arquivo | Comportamento |
 | --- | --- | --- | --- |
-| GET | `/api/courses` | [server/api/courses/index.get.ts](server/api/courses/index.get.ts) | lista cursos com turmas |
-| POST | `/api/courses` | [server/api/courses/index.post.ts](server/api/courses/index.post.ts) | cria curso |
-| GET | `/api/courses/:id` | [server/api/courses/[id].get.ts](server/api/courses/%5Bid%5D.get.ts) | busca curso por id |
-| PUT | `/api/courses/:id` | [server/api/courses/[id].put.ts](server/api/courses/%5Bid%5D.put.ts) | atualiza curso |
-| DELETE | `/api/courses/:id` | [server/api/courses/[id].delete.ts](server/api/courses/%5Bid%5D.delete.ts) | remove curso |
+| GET | `/api/courses` | [/server/api/courses/index.get.ts](/server/api/courses/index.get.ts) | lista cursos com turmas |
+| POST | `/api/courses` | [/server/api/courses/index.post.ts](/server/api/courses/index.post.ts) | cria curso |
+| GET | `/api/courses/:id` | [/server/api/courses/[id].get.ts](/server/api/courses/%5Bid%5D.get.ts) | busca curso por id |
+| PUT | `/api/courses/:id` | [/server/api/courses/[id].put.ts](/server/api/courses/%5Bid%5D.put.ts) | atualiza curso |
+| DELETE | `/api/courses/:id` | [/server/api/courses/[id].delete.ts](/server/api/courses/%5Bid%5D.delete.ts) | remove curso |
 
 #### Payload principal de curso
 
@@ -83,11 +83,11 @@ Alteracoes nesse valor requerem rebuild da aplicacao.
 
 | Metodo | Rota | Arquivo | Comportamento |
 | --- | --- | --- | --- |
-| GET | `/api/students` | [server/api/students/index.get.ts](server/api/students/index.get.ts) | lista estudantes |
-| POST | `/api/students` | [server/api/students/index.post.ts](server/api/students/index.post.ts) | cria estudante |
-| GET | `/api/students/:id` | [server/api/students/[id].get.ts](server/api/students/%5Bid%5D.get.ts) | busca por id |
-| PUT | `/api/students/:id` | [server/api/students/[id].put.ts](server/api/students/%5Bid%5D.put.ts) | atualiza estudante |
-| DELETE | `/api/students/:id` | [server/api/students/[id].delete.ts](server/api/students/%5Bid%5D.delete.ts) | remove estudante |
+| GET | `/api/students` | [/server/api/students/index.get.ts](/server/api/students/index.get.ts) | lista estudantes |
+| POST | `/api/students` | [/server/api/students/index.post.ts](/server/api/students/index.post.ts) | cria estudante |
+| GET | `/api/students/:id` | [/server/api/students/[id].get.ts](/server/api/students/%5Bid%5D.get.ts) | busca por id |
+| PUT | `/api/students/:id` | [/server/api/students/[id].put.ts](/server/api/students/%5Bid%5D.put.ts) | atualiza estudante |
+| DELETE | `/api/students/:id` | [/server/api/students/[id].delete.ts](/server/api/students/%5Bid%5D.delete.ts) | remove estudante |
 
 #### Payload principal de estudante
 
@@ -108,12 +108,12 @@ Alteracoes nesse valor requerem rebuild da aplicacao.
 
 | Metodo | Rota | Arquivo | Comportamento |
 | --- | --- | --- | --- |
-| GET | `/api/teams` | [server/api/teams/index.get.ts](server/api/teams/index.get.ts) | lista todas as turmas |
-| GET | `/api/teams?course_id=...` | [server/api/teams/index.get.ts](server/api/teams/index.get.ts) | filtra turmas por curso |
-| POST | `/api/teams` | [server/api/teams/index.post.ts](server/api/teams/index.post.ts) | cria turma |
-| GET | `/api/teams/:id` | [server/api/teams/[id].get.ts](server/api/teams/%5Bid%5D.get.ts) | busca turma por id |
-| PUT | `/api/teams/:id` | [server/api/teams/[id].put.ts](server/api/teams/%5Bid%5D.put.ts) | atualiza turma |
-| DELETE | `/api/teams/:id` | [server/api/teams/[id].delete.ts](server/api/teams/%5Bid%5D.delete.ts) | remove turma |
+| GET | `/api/teams` | [/server/api/teams/index.get.ts](/server/api/teams/index.get.ts) | lista todas as turmas |
+| GET | `/api/teams?course_id=...` | [/server/api/teams/index.get.ts](/server/api/teams/index.get.ts) | filtra turmas por curso |
+| POST | `/api/teams` | [/server/api/teams/index.post.ts](/server/api/teams/index.post.ts) | cria turma |
+| GET | `/api/teams/:id` | [/server/api/teams/[id].get.ts](/server/api/teams/%5Bid%5D.get.ts) | busca turma por id |
+| PUT | `/api/teams/:id` | [/server/api/teams/[id].put.ts](/server/api/teams/%5Bid%5D.put.ts) | atualiza turma |
+| DELETE | `/api/teams/:id` | [/server/api/teams/[id].delete.ts](/server/api/teams/%5Bid%5D.delete.ts) | remove turma |
 
 #### Payload principal de turma
 
@@ -136,10 +136,10 @@ Alteracoes nesse valor requerem rebuild da aplicacao.
 
 | Metodo | Rota | Arquivo | Comportamento |
 | --- | --- | --- | --- |
-| GET | `/api/enrollments` | [server/api/enrollments/index.get.ts](server/api/enrollments/index.get.ts) | lista matriculas com student e team |
-| POST | `/api/enrollments` | [server/api/enrollments/index.post.ts](server/api/enrollments/index.post.ts) | cria matricula |
-| GET | `/api/enrollments/:id` | [server/api/enrollments/[id].get.ts](server/api/enrollments/%5Bid%5D.get.ts) | busca matricula por id |
-| GET | `/api/enrollments/student/:id` | [server/api/enrollments/student/[id].get.ts](server/api/enrollments/student/%5Bid%5D.get.ts) | lista matriculas de um estudante |
+| GET | `/api/enrollments` | [/server/api/enrollments/index.get.ts](/server/api/enrollments/index.get.ts) | lista matriculas com student e team |
+| POST | `/api/enrollments` | [/server/api/enrollments/index.post.ts](/server/api/enrollments/index.post.ts) | cria matricula |
+| GET | `/api/enrollments/:id` | [/server/api/enrollments/[id].get.ts](/server/api/enrollments/%5Bid%5D.get.ts) | busca matricula por id |
+| GET | `/api/enrollments/student/:id` | [/server/api/enrollments/student/[id].get.ts](/server/api/enrollments/student/%5Bid%5D.get.ts) | lista matriculas de um estudante |
 
 #### Payload principal de matricula
 
@@ -160,8 +160,8 @@ Alteracoes nesse valor requerem rebuild da aplicacao.
 
 | Metodo | Rota | Arquivo | Comportamento |
 | --- | --- | --- | --- |
-| POST | `/api/billing` | [server/api/billing/index.post.ts](server/api/billing/index.post.ts) | gera cobrancas ou registra pagamento |
-| GET | `/api/billing/late` | [server/api/billing/late.get.ts](server/api/billing/late.get.ts) | lista cobrancas atrasadas |
+| POST | `/api/billing` | [/server/api/billing/index.post.ts](/server/api/billing/index.post.ts) | gera cobrancas ou registra pagamento |
+| GET | `/api/billing/late` | [/server/api/billing/late.get.ts](/server/api/billing/late.get.ts) | lista cobrancas atrasadas |
 
 #### Acao generate
 
@@ -244,12 +244,12 @@ UC4 ..> API4
 
 ## Execucao Pratica
 
-Para exemplos de requisicoes reais com curl, incluindo cenarios de erro e validacao de negocio, consulte [docs/exemplos-api.md](docs/exemplos-api.md).
+Para exemplos de requisicoes reais com curl, incluindo cenarios de erro e validacao de negocio, consulte [/docs/exemplos-api.md](/docs/exemplos-api.md).
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/exemplos-api.md](docs/exemplos-api.md)
-- [docs/troubleshooting.md](docs/troubleshooting.md)
-- [docs/autenticacao.md](docs/autenticacao.md)
-- [docs/composables.md](docs/composables.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/exemplos-api.md](/docs/exemplos-api.md)
+- [/docs/troubleshooting.md](/docs/troubleshooting.md)
+- [/docs/autenticacao.md](/docs/autenticacao.md)
+- [/docs/composables.md](/docs/composables.md)

@@ -83,10 +83,10 @@ curl -s http://localhost:3000/api/enrollments
 curl -s http://localhost:3000/api/billing/late
 ```
 
-Para exemplos detalhados, consulte [docs/exemplos-api.md](docs/exemplos-api.md).
+Para exemplos detalhados, consulte [/docs/exemplos-api.md](/docs/exemplos-api.md).
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/deploy.md](docs/deploy.md)
-- [docs/troubleshooting.md](docs/troubleshooting.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/deploy.md](/docs/deploy.md)
+- [/docs/troubleshooting.md](/docs/troubleshooting.md)

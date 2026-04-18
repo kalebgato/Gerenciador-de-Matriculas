@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     }
   },
 
-  css: ['~/assets/css/main.css'],
+  css: ['~/app/assets/css/main.css'],
 
   modules: [
     '@nuxt/a11y',

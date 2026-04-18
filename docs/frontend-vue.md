@@ -13,12 +13,12 @@ Documentar como os arquivos `.vue` do frontend estao organizados e quais convenc
 
 O frontend fica em [app](app) e esta organizado principalmente assim:
 
-- [app/pages](app/pages): paginas roteaveis do Nuxt.
-- [app/components](app/components): componentes reutilizaveis.
-- [app/composables](app/composables): estado e integracao com backend.
-- [app/middleware](app/middleware): protecao e regras de navegacao.
-- [app/assets/css/main.css](app/assets/css/main.css): estilos globais.
-- [app/types](app/types): contratos tipados usados pelo app.
+- [/app/pages](/app/pages): paginas roteaveis do Nuxt.
+- [/app/components](/app/components): componentes reutilizaveis.
+- [/app/composables](/app/composables): estado e integracao com backend.
+- [/app/middleware](/app/middleware): protecao e regras de navegacao.
+- [/app/assets/css/main.css](/app/assets/css/main.css): estilos globais.
+- [/app/types](/app/types): contratos tipados usados pelo app.
 
 ## Convencao dos Arquivos .vue
 
@@ -44,7 +44,7 @@ Objetivo:
 
 Regra adotada no projeto:
 
-- estilos base e exclusivos podem ir para [app/assets/css/main.css](app/assets/css/main.css);
+- estilos base e exclusivos podem ir para [/app/assets/css/main.css](/app/assets/css/main.css);
 - estilos com nomes comuns como `card`, `title`, `table`, `status`, `main`, `sidebar` devem permanecer locais em `<style scoped>` para evitar conflito entre paginas.
 
 ### Integracao com backend
@@ -59,7 +59,7 @@ Paginas e componentes devem preferir:
 
 ### AuthLogoutAction
 
-Arquivo: [app/components/AuthLogoutAction.vue](app/components/AuthLogoutAction.vue)
+Arquivo: [/app/components/AuthLogoutAction.vue](/app/components/AuthLogoutAction.vue)
 
 Papel:
 
@@ -69,7 +69,7 @@ Papel:
 
 ## Middleware de Navegacao
 
-Arquivo principal: [app/middleware/auth.global.ts](app/middleware/auth.global.ts)
+Arquivo principal: [/app/middleware/auth.global.ts](/app/middleware/auth.global.ts)
 
 Papel:
 
@@ -79,11 +79,11 @@ Papel:
 
 ## Paginas Atuais
 
-- [app/pages/login.vue](app/pages/login.vue): login com backend.
-- [app/pages/dashboard.vue](app/pages/dashboard.vue): painel inicial.
-- [app/pages/index.vue](app/pages/index.vue): listagem/prototipo de turmas.
-- [app/pages/turmas/index.vue](app/pages/turmas/index.vue): navegacao de turmas.
-- [app/pages/turmas/[id].vue](app/pages/turmas/%5Bid%5D.vue): detalhe de uma turma.
+- [/app/pages/login.vue](/app/pages/login.vue): login com backend.
+- [/app/pages/dashboard.vue](/app/pages/dashboard.vue): painel inicial.
+- [/app/pages/index.vue](/app/pages/index.vue): listagem/prototipo de turmas.
+- [/app/pages/turmas/index.vue](/app/pages/turmas/index.vue): navegacao de turmas.
+- [/app/pages/turmas/[id].vue](/app/pages/turmas/%5Bid%5D.vue): detalhe de uma turma.
 
 ## Regras de Evolucao
 
@@ -147,7 +147,7 @@ const handleClick = async () => {
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/composables.md](docs/composables.md)
-- [docs/autenticacao.md](docs/autenticacao.md)
-- [docs/arquitetura.md](docs/arquitetura.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/composables.md](/docs/composables.md)
+- [/docs/autenticacao.md](/docs/autenticacao.md)
+- [/docs/arquitetura.md](/docs/arquitetura.md)

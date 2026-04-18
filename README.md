@@ -30,16 +30,16 @@ Aplicacao local padrao: `http://localhost:3000`
 
 ## Documentacao
 
-Toda a documentacao detalhada foi centralizada em [docs/README.md](docs/README.md).
+Toda a documentacao detalhada foi centralizada em [/docs/README.md](/docs/README.md).
 
 Leituras recomendadas:
 
-- [docs/quickstart.md](docs/quickstart.md)
-- [docs/projeto.md](docs/projeto.md)
-- [docs/arquitetura.md](docs/arquitetura.md)
-- [docs/rotas.md](docs/rotas.md)
-- [docs/deploy.md](docs/deploy.md)
-- [docs/troubleshooting.md](docs/troubleshooting.md)
+- [/docs/quickstart.md](/docs/quickstart.md)
+- [/docs/projeto.md](/docs/projeto.md)
+- [/docs/arquitetura.md](/docs/arquitetura.md)
+- [/docs/rotas.md](/docs/rotas.md)
+- [/docs/deploy.md](/docs/deploy.md)
+- [/docs/troubleshooting.md](/docs/troubleshooting.md)
 
 ## Estado Atual
 

@@ -17,18 +17,18 @@ O projeto usa autenticacao simples baseada em cookie httpOnly assinado. O backen
 
 ### Backend
 
-- [server/lib/auth.ts](server/lib/auth.ts): assinatura e verificacao do token de sessao.
-- [server/middleware/auth.ts](server/middleware/auth.ts): protege rotas `/api/*` quando a autenticacao esta ligada.
-- [server/api/auth/login.post.ts](server/api/auth/login.post.ts): autentica usuario administrativo e cria cookie.
-- [server/api/auth/logout.post.ts](server/api/auth/logout.post.ts): invalida a sessao atual.
-- [server/api/auth/me.get.ts](server/api/auth/me.get.ts): informa ao frontend se existe sessao valida.
+- [/server/lib/auth.ts](/server/lib/auth.ts): assinatura e verificacao do token de sessao.
+- [/server/middleware/auth.ts](/server/middleware/auth.ts): protege rotas `/api/*` quando a autenticacao esta ligada.
+- [/server/api/auth/login.post.ts](/server/api/auth/login.post.ts): autentica usuario administrativo e cria cookie.
+- [/server/api/auth/logout.post.ts](/server/api/auth/logout.post.ts): invalida a sessao atual.
+- [/server/api/auth/me.get.ts](/server/api/auth/me.get.ts): informa ao frontend se existe sessao valida.
 
 ### Frontend
 
-- [app/composables/useAuth.ts](app/composables/useAuth.ts): estado compartilhado da sessao e operacoes de login/logout.
-- [app/middleware/auth.global.ts](app/middleware/auth.global.ts): aplica protecao padrao nas paginas.
-- [app/pages/login.vue](app/pages/login.vue): formulario de login que chama o backend.
-- [app/components/AuthLogoutAction.vue](app/components/AuthLogoutAction.vue): acao de logout reutilizavel.
+- [/app/composables/useAuth.ts](/app/composables/useAuth.ts): estado compartilhado da sessao e operacoes de login/logout.
+- [/app/middleware/auth.global.ts](/app/middleware/auth.global.ts): aplica protecao padrao nas paginas.
+- [/app/pages/login.vue](/app/pages/login.vue): formulario de login que chama o backend.
+- [/app/components/AuthLogoutAction.vue](/app/components/AuthLogoutAction.vue): acao de logout reutilizavel.
 
 ## Modo de Funcionamento
 
@@ -85,7 +85,7 @@ Em producao, o correto e sobrescrever isso por ambiente.
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/fluxo-autenticacao.md](docs/fluxo-autenticacao.md)
-- [docs/rotas.md](docs/rotas.md)
-- [docs/deploy.md](docs/deploy.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/fluxo-autenticacao.md](/docs/fluxo-autenticacao.md)
+- [/docs/rotas.md](/docs/rotas.md)
+- [/docs/deploy.md](/docs/deploy.md)

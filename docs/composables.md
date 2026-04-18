@@ -11,7 +11,7 @@ Documentar a camada de composables do frontend, deixando claro o papel de cada c
 
 ## Visao Geral
 
-Os composables do projeto ficam em [app/composables](app/composables) e concentram duas responsabilidades:
+Os composables do projeto ficam em [/app/composables](/app/composables) e concentram duas responsabilidades:
 
 1. estado compartilhado de frontend;
 2. integracao tipada com os endpoints do backend.
@@ -20,7 +20,7 @@ Os composables do projeto ficam em [app/composables](app/composables) e concentr
 
 ### useAuth
 
-Arquivo: [app/composables/useAuth.ts](app/composables/useAuth.ts)
+Arquivo: [/app/composables/useAuth.ts](/app/composables/useAuth.ts)
 
 Responsabilidade:
 
@@ -43,7 +43,7 @@ Estado exposto:
 
 ### useApiClient
 
-Arquivo: [app/composables/useApiClient.ts](app/composables/useApiClient.ts)
+Arquivo: [/app/composables/useApiClient.ts](/app/composables/useApiClient.ts)
 
 Responsabilidade:
 
@@ -61,7 +61,7 @@ Metodos:
 
 ### useCourses
 
-Arquivo: [app/composables/useCourses.ts](app/composables/useCourses.ts)
+Arquivo: [/app/composables/useCourses.ts](/app/composables/useCourses.ts)
 
 Responsabilidade:
 
@@ -77,7 +77,7 @@ Metodos:
 
 ### useStudents
 
-Arquivo: [app/composables/useStudents.ts](app/composables/useStudents.ts)
+Arquivo: [/app/composables/useStudents.ts](/app/composables/useStudents.ts)
 
 Responsabilidade:
 
@@ -93,7 +93,7 @@ Metodos:
 
 ### useTeams
 
-Arquivo: [app/composables/useTeams.ts](app/composables/useTeams.ts)
+Arquivo: [/app/composables/useTeams.ts](/app/composables/useTeams.ts)
 
 Responsabilidade:
 
@@ -110,7 +110,7 @@ Metodos:
 
 ### useEnrollments
 
-Arquivo: [app/composables/useEnrollments.ts](app/composables/useEnrollments.ts)
+Arquivo: [/app/composables/useEnrollments.ts](/app/composables/useEnrollments.ts)
 
 Responsabilidade:
 
@@ -125,7 +125,7 @@ Metodos:
 
 ### useBilling
 
-Arquivo: [app/composables/useBilling.ts](app/composables/useBilling.ts)
+Arquivo: [/app/composables/useBilling.ts](/app/composables/useBilling.ts)
 
 Responsabilidade:
 
@@ -138,7 +138,7 @@ Metodos:
 
 ## Types Compartilhados
 
-Os contratos usados pelos composables ficam em [app/types/api.ts](app/types/api.ts).
+Os contratos usados pelos composables ficam em [/app/types/api.ts](/app/types/api.ts).
 
 Esse arquivo concentra:
 
@@ -209,6 +209,6 @@ await ensureSession();
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/frontend-vue.md](docs/frontend-vue.md)
-- [docs/autenticacao.md](docs/autenticacao.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/frontend-vue.md](/docs/frontend-vue.md)
+- [/docs/autenticacao.md](/docs/autenticacao.md)

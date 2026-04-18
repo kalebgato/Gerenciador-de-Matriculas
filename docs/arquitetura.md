@@ -24,7 +24,7 @@ package "Frontend" {
 }
 
 package "Backend HTTP" {
-  [server/api]
+  [/server/api]
 }
 
 package "Regra de Negocio" {
@@ -37,17 +37,17 @@ package "Persistencia" {
   [PostgreSQL]
 }
 
-[Pages] --> [server/api]
+[Pages] --> [/server/api]
 [Components] --> [Pages]
 [Composables] --> [Pages]
-[server/api] --> [Services]
+[/server/api] --> [Services]
 [Services] --> [Repositories]
 [Repositories] --> [Prisma Client]
 [Prisma Client] --> [PostgreSQL]
 @enduml
 ```
 
-Fonte do diagrama: [docs/plantuml/arquitetura-geral.puml](docs/plantuml/arquitetura-geral.puml).
+Fonte do diagrama: [/docs/plantuml/arquitetura-geral.puml](/docs/plantuml/arquitetura-geral.puml).
 
 ## Camadas
 
@@ -101,7 +101,7 @@ O schema do banco fica em prisma/schema.prisma. O client gerado sai em server/ge
 @endmindmap
 ```
 
-Fonte do diagrama: [docs/plantuml/organizacao-diretorios.puml](docs/plantuml/organizacao-diretorios.puml).
+Fonte do diagrama: [/docs/plantuml/organizacao-diretorios.puml](/docs/plantuml/organizacao-diretorios.puml).
 
 ## Responsabilidade por Diretorio
 
@@ -169,7 +169,7 @@ Api --> Client: 200 OK
 @enduml
 ```
 
-Fonte do diagrama: [docs/plantuml/fluxo-matricula.puml](docs/plantuml/fluxo-matricula.puml).
+Fonte do diagrama: [/docs/plantuml/fluxo-matricula.puml](/docs/plantuml/fluxo-matricula.puml).
 
 ### Fluxo de cobranca
 
@@ -205,18 +205,18 @@ end
 @enduml
 ```
 
-Fonte do diagrama: [docs/plantuml/fluxo-cobranca.puml](docs/plantuml/fluxo-cobranca.puml).
+Fonte do diagrama: [/docs/plantuml/fluxo-cobranca.puml](/docs/plantuml/fluxo-cobranca.puml).
 
 ## Observacoes de Arquitetura
 
 - O backend esta mais maduro que o frontend.
 - A autenticacao agora existe no backend e no frontend, mas ainda em formato simples de usuario administrativo unico.
 - A pasta server/generated nao deve ser editada manualmente.
-- O arquivo [docs/plantuml/db_relations.wsd](docs/plantuml/db_relations.wsd) representa o modelo relacional de referencia.
+- O arquivo [/docs/plantuml/db_relations.wsd](/docs/plantuml/db_relations.wsd) representa o modelo relacional de referencia.
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/projeto.md](docs/projeto.md)
-- [docs/rotas.md](docs/rotas.md)
-- [docs/autenticacao.md](docs/autenticacao.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/projeto.md](/docs/projeto.md)
+- [/docs/rotas.md](/docs/rotas.md)
+- [/docs/autenticacao.md](/docs/autenticacao.md)

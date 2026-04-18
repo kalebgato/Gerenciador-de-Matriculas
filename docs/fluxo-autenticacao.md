@@ -59,19 +59,19 @@ ServerAuth --> Usuario: 200 se sessao valida / 401 se invalida
 @enduml
 ```
 
-Fonte do diagrama: [docs/plantuml/fluxo-autenticacao.puml](docs/plantuml/fluxo-autenticacao.puml).
+Fonte do diagrama: [/docs/plantuml/fluxo-autenticacao.puml](/docs/plantuml/fluxo-autenticacao.puml).
 
 ## Pontos de Controle
 
 ### No frontend
 
-- [app/middleware/auth.global.ts](app/middleware/auth.global.ts): protege paginas por padrao.
-- [app/composables/useAuth.ts](app/composables/useAuth.ts): evita repeticao de chamadas e centraliza o estado.
+- [/app/middleware/auth.global.ts](/app/middleware/auth.global.ts): protege paginas por padrao.
+- [/app/composables/useAuth.ts](/app/composables/useAuth.ts): evita repeticao de chamadas e centraliza o estado.
 
 ### No backend
 
-- [server/middleware/auth.ts](server/middleware/auth.ts): protege endpoints de negocio.
-- [server/api/auth/me.get.ts](server/api/auth/me.get.ts): entrega a verdade da sessao para o app.
+- [/server/middleware/auth.ts](/server/middleware/auth.ts): protege endpoints de negocio.
+- [/server/api/auth/me.get.ts](/server/api/auth/me.get.ts): entrega a verdade da sessao para o app.
 
 ## Comportamento com AUTH_ENABLED=false
 
@@ -87,6 +87,6 @@ Esse modo existe para facilitar demos, desenvolvimento local e diagnostico.
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/autenticacao.md](docs/autenticacao.md)
-- [docs/rotas.md](docs/rotas.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/autenticacao.md](/docs/autenticacao.md)
+- [/docs/rotas.md](/docs/rotas.md)

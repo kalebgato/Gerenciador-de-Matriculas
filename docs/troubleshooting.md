@@ -27,7 +27,7 @@ Caminho do CSS no Nuxt apontando para arquivo inexistente.
 
 ### Solucao
 
-Validar o caminho em [nuxt.config.ts](nuxt.config.ts) e conferir o arquivo real em [app/assets/main.css](app/assets/main.css).
+Validar o caminho em [nuxt.config.ts](nuxt.config.ts) e conferir o arquivo real em [/app/assets/main.css](/app/assets/main.css).
 
 ## 2. Prisma sem conexao com banco
 
@@ -172,6 +172,6 @@ Evoluir para autenticacao real com token/sessao e middleware backend.
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/deploy.md](docs/deploy.md)
-- [docs/rotas.md](docs/rotas.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/deploy.md](/docs/deploy.md)
+- [/docs/rotas.md](/docs/rotas.md)

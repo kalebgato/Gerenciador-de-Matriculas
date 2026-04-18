@@ -102,7 +102,7 @@ O projeto ja possui uma base backend utilizavel, mas o frontend ainda esta em tr
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/arquitetura.md](docs/arquitetura.md)
-- [docs/rotas.md](docs/rotas.md)
-- [docs/autenticacao.md](docs/autenticacao.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/arquitetura.md](/docs/arquitetura.md)
+- [/docs/rotas.md](/docs/rotas.md)
+- [/docs/autenticacao.md](/docs/autenticacao.md)

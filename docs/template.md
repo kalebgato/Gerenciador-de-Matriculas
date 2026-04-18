@@ -14,5 +14,5 @@ Detalhe o assunto principal com seções tecnicas objetivas.
 
 ## Referencias
 
-- [docs/README.md](docs/README.md)
-- [docs/quickstart.md](docs/quickstart.md)
+- [/docs/README.md](/docs/README.md)
+- [/docs/quickstart.md](/docs/quickstart.md)
