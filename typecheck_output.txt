@@ -1,1 +1,0 @@
-ℹ Nuxt Icon server bundle mode is set to local
