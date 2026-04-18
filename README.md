@@ -28,6 +28,7 @@ O projeto usa Nuxt como frontend e backend, Prisma como camada de persistencia e
 - [docs/arquitetura.md](docs/arquitetura.md): arquitetura, diretorios, fluxos e diagramas.
 - [docs/deploy.md](docs/deploy.md): ambiente, banco, execucao local e deploy.
 - [docs/rotas.md](docs/rotas.md): paginas, APIs, payloads e comportamento das rotas.
+- [docs/exemplos-api.md](docs/exemplos-api.md): exemplos praticos de chamadas HTTP.
 - [docs/plantuml/arquitetura-geral.puml](docs/plantuml/arquitetura-geral.puml): diagrama de arquitetura.
 - [docs/plantuml/fluxo-matricula.puml](docs/plantuml/fluxo-matricula.puml): fluxo de matricula.
 - [docs/plantuml/fluxo-cobranca.puml](docs/plantuml/fluxo-cobranca.puml): fluxo de cobranca.
@@ -90,5 +91,3 @@ Em especial:
 ## Diagrama ER
 
 O diagrama da base relacional esta em [docs/db_relations.wsd](docs/db_relations.wsd).
-
-

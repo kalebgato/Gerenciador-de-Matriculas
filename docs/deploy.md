@@ -13,7 +13,7 @@ O projeto inclui um compose simples em [compose.yaml](compose.yaml) com um conta
 ### Parametros atuais
 
 | Chave | Valor |
-|---|---|
+| --- | --- |
 | imagem | postgres:18 |
 | porta | 5432 |
 | database | db |
@@ -85,7 +85,7 @@ Hoje o projeto esta preparado principalmente para execucao em ambiente Node com 
 ## Artefatos Importantes
 
 | Arquivo | Papel |
-|---|---|
+| --- | --- |
 | [package.json](package.json) | scripts de dev, build e typecheck |
 | [nuxt.config.ts](nuxt.config.ts) | configuracao da aplicacao Nuxt |
 | [compose.yaml](compose.yaml) | PostgreSQL local |

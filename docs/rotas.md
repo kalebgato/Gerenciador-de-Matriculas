@@ -5,7 +5,7 @@
 As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/pages.
 
 | Rota | Arquivo | Descricao |
-|---|---|---|
+| --- | --- | --- |
 | `/` | [app/pages/index.vue](app/pages/index.vue) | tela inicial atualmente com layout de turmas em modo prototipo |
 | `/login` | [app/pages/login.vue](app/pages/login.vue) | login local com credenciais estaticas |
 | `/dashboard` | [app/pages/dashboard.vue](app/pages/dashboard.vue) | dashboard visual com indicadores mockados |
@@ -25,7 +25,7 @@ As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/page
 ### Cursos
 
 | Metodo | Rota | Arquivo | Comportamento |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | GET | `/api/courses` | [server/api/courses/index.get.ts](server/api/courses/index.get.ts) | lista cursos com turmas |
 | POST | `/api/courses` | [server/api/courses/index.post.ts](server/api/courses/index.post.ts) | cria curso |
 | GET | `/api/courses/:id` | [server/api/courses/[id].get.ts](server/api/courses/%5Bid%5D.get.ts) | busca curso por id |
@@ -44,7 +44,7 @@ As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/page
 ### Estudantes
 
 | Metodo | Rota | Arquivo | Comportamento |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | GET | `/api/students` | [server/api/students/index.get.ts](server/api/students/index.get.ts) | lista estudantes |
 | POST | `/api/students` | [server/api/students/index.post.ts](server/api/students/index.post.ts) | cria estudante |
 | GET | `/api/students/:id` | [server/api/students/[id].get.ts](server/api/students/%5Bid%5D.get.ts) | busca por id |
@@ -69,7 +69,7 @@ As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/page
 ### Turmas
 
 | Metodo | Rota | Arquivo | Comportamento |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | GET | `/api/teams` | [server/api/teams/index.get.ts](server/api/teams/index.get.ts) | lista todas as turmas |
 | GET | `/api/teams?course_id=...` | [server/api/teams/index.get.ts](server/api/teams/index.get.ts) | filtra turmas por curso |
 | POST | `/api/teams` | [server/api/teams/index.post.ts](server/api/teams/index.post.ts) | cria turma |
@@ -97,7 +97,7 @@ As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/page
 ### Matriculas
 
 | Metodo | Rota | Arquivo | Comportamento |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | GET | `/api/enrollments` | [server/api/enrollments/index.get.ts](server/api/enrollments/index.get.ts) | lista matriculas com student e team |
 | POST | `/api/enrollments` | [server/api/enrollments/index.post.ts](server/api/enrollments/index.post.ts) | cria matricula |
 | GET | `/api/enrollments/:id` | [server/api/enrollments/[id].get.ts](server/api/enrollments/%5Bid%5D.get.ts) | busca matricula por id |
@@ -121,7 +121,7 @@ As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/page
 ### Cobranca e Pagamentos
 
 | Metodo | Rota | Arquivo | Comportamento |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | POST | `/api/billing` | [server/api/billing/index.post.ts](server/api/billing/index.post.ts) | gera cobrancas ou registra pagamento |
 | GET | `/api/billing/late` | [server/api/billing/late.get.ts](server/api/billing/late.get.ts) | lista cobrancas atrasadas |
 
@@ -203,3 +203,7 @@ UC4 ..> API3
 UC4 ..> API4
 @enduml
 ```
+
+## Execucao Pratica
+
+Para exemplos de requisicoes reais com curl, incluindo cenarios de erro e validacao de negocio, consulte [docs/exemplos-api.md](docs/exemplos-api.md).

@@ -17,7 +17,7 @@ O projeto esta dividido em cinco eixos principais:
 ## Stack Tecnologica
 
 | Camada | Tecnologia | Papel |
-|---|---|---|
+| --- | --- | --- |
 | Interface | Nuxt 4 + Vue 3 | Paginas, navegacao, SSR e UI |
 | API | H3 via Nuxt server routes | Endpoints HTTP do sistema |
 | Negocio | Services e repositories em TypeScript | Validacoes e orquestracao |
@@ -78,7 +78,7 @@ O projeto ja possui uma base backend utilizavel, mas o frontend ainda esta em tr
 ## Entidades do Dominio
 
 | Entidade | Papel |
-|---|---|
+| --- | --- |
 | Student | estudante matriculavel |
 | Course | curso que agrupa turmas |
 | Team | turma de um curso |
