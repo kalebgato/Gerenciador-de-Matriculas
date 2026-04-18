@@ -1,0 +1,29 @@
+@startuml fluxo_cobranca
+actor Usuario
+participant Client
+participant "POST /api/billing" as Api
+participant BillingService as Service
+participant BillingRepository as Repo
+database PostgreSQL as Db
+
+Usuario -> Client: gerar cobrancas do ano
+Client -> Api: POST {action: generate, enrollmentId, year, amount}
+Api -> Service: generateMonthlyCharges(...)
+Service -> Repo: countChargesByEnrollmentAndYear
+Repo -> Db: count charges
+Db --> Repo: total
+Repo --> Service: total
+
+alt ja existe cobranca no ano
+  Service --> Api: erro de duplicidade
+  Api --> Client: 400
+else nao existe
+  loop 12 meses
+    Service -> Repo: createCharge(...)
+    Repo -> Db: insert charge
+    Db --> Repo: ok
+  end
+  Service --> Api: sucesso
+  Api --> Client: 200
+end
+@enduml

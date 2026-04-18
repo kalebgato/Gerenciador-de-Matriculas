@@ -54,7 +54,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang='ts'>
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 
@@ -165,23 +165,7 @@ function voltar() {
 }
 </script>
 
-<style>
-.page {
-  padding: 30px;
-  background: #f4f4f4;
-  min-height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* 🔥 centraliza tudo */
-}
-
-/* CONTEÚDO CENTRAL */
-.page > * {
-  width: 100%;
-  max-width: 1100px;
-}
-
+<style scoped>
 /* TÍTULO */
 .title {
   font-size: 28px;

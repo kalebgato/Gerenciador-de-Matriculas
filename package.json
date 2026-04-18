@@ -7,6 +7,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "typecheck": "nuxi typecheck",
+    "sync:opencollection": "tsx scripts/sync-opencollection.ts",
     "postinstall": "prisma generate && nuxt prepare"
   },
   "dependencies": {
@@ -17,18 +19,22 @@
     "@nuxtjs/color-mode": "4.0.0",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
+    "@tailwindcss/vite": "^4.2.2",
     "@types/swagger-ui-dist": "^3.30.6",
     "nuxt": "^4.4.2",
     "pg": "^8.20.0",
     "vue": "^3.5.30",
-    "vue-router": "^5.0.3"
+    "vue-router": "^5.0.3",
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",
+    "@vue/language-core": "^3.2.6",
     "dotenv": "^17.3.1",
     "prisma": "^7.5.0",
     "ts-node": "^10.9.2",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "vue-tsc": "^3.2.6"
   }
 }

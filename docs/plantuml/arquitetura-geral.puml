@@ -1,0 +1,31 @@
+@startuml arquitetura_geral
+skinparam componentStyle rectangle
+
+package "Frontend" {
+  [Pages]
+  [Components]
+  [Composables]
+}
+
+package "Backend HTTP" {
+  [server/api]
+}
+
+package "Regra de Negocio" {
+  [Services]
+  [Repositories]
+}
+
+package "Persistencia" {
+  [Prisma Client]
+  [PostgreSQL]
+}
+
+[Pages] --> [server/api]
+[Components] --> [Pages]
+[Composables] --> [Pages]
+[server/api] --> [Services]
+[Services] --> [Repositories]
+[Repositories] --> [Prisma Client]
+[Prisma Client] --> [PostgreSQL]
+@enduml

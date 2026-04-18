@@ -11,43 +11,49 @@ datasource db {
 }
 
 model Student {
-  id    String  @id @default(uuid())
-  name  String  @db.VarChar(255)
-  cpf   String  @unique
-  email String? @db.VarChar(255)
-  phone String?
+  id                String    @id @default(uuid())
+  name              String    @db.VarChar(255)
+  cpf               String    @unique
+  email             String?   @db.VarChar(255)
+  dn                DateTime?
+  phone             String?
+  responsable_name  String?   @db.VarChar(255)
+  responsable_phone String?
+  active            Boolean   @default(true)
 
   enrollments Enrollment[]
-
-  createdAt DateTime @default(now())
 
   @@map("students")
 }
 
 model Course {
-  id          String  @id @default(uuid())
-  name        String  @db.VarChar(255)
-  description String?
-  price       Decimal @db.Decimal(10, 2)
+  id     String  @id @default(uuid())
+  title  String  @db.VarChar(255)
+  active Boolean @default(true)
 
   teams Team[]
-
-  createdAt DateTime @default(now())
 
   @@map("courses")
 }
 
 model Team {
-  id       String  @id @default(uuid())
-  name     String  @db.VarChar(255)
-  schedule String?
+  id             String    @id @default(uuid())
+  course_id      String
+  title          String    @db.VarChar(255)
+  team_leader_id String?
+  start_date     DateTime?
+  end_date       DateTime?
+  horary         String?
+  days_of_week   String?
+  active         Boolean   @default(true)
+  payment_date   DateTime?
+  price          Decimal   @db.Decimal(10, 2)
 
-  courseId String
-  course   Course @relation(fields: [courseId], references: [id])
+  course Course @relation(fields: [course_id], references: [id])
 
   enrollments Enrollment[]
 
-  createdAt DateTime @default(now())
+  @@index([course_id])
 
   @@map("teams")
 }
@@ -55,64 +61,79 @@ model Team {
 model Enrollment {
   id String @id @default(uuid())
 
-  studentId String
-  teamId    String
+  team_id    String
+  student_id String
 
-  startDate DateTime @default(now())
-  active    Boolean  @default(true)
-
-  student Student @relation(fields: [studentId], references: [id])
-  team    Team    @relation(fields: [teamId], references: [id])
+  student Student @relation(fields: [student_id], references: [id])
+  team    Team    @relation(fields: [team_id], references: [id])
 
   charges Charge[]
+  payments Payment[]
 
-  @@index([studentId])
-  @@index([teamId])
+  @@unique([team_id, student_id])
+  @@index([student_id])
+  @@index([team_id])
   @@map("enrollments")
 }
 
 model Charge {
-  id           String @id @default(uuid())
-  enrollmentId String
+  id            String @id @default(uuid())
+  enrollment_id String
 
   year  Int
   month Int
 
-  amount  Decimal  @db.Decimal(10, 2)
-  dueDate DateTime
+  amount   Decimal  @db.Decimal(10, 2)
+  due_date DateTime
+  paid     Boolean  @default(false)
 
   status ChargeStatus @default(PENDING)
 
   payments Payment[]
 
-  enrollment Enrollment @relation(fields: [enrollmentId], references: [id])
+  enrollment Enrollment @relation(fields: [enrollment_id], references: [id])
 
-  @@unique([enrollmentId, year, month])
+  @@unique([enrollment_id, year, month])
   @@map("charges")
 }
 
 model Payment {
   id String @id @default(uuid())
 
-  chargeId String
-  amount   Decimal       @db.Decimal(10, 2)
-  method   PaymentMethod
-  paidAt   DateTime      @default(now())
+  enrollment_id String
+  charge_id     String
+  amount        Decimal       @db.Decimal(10, 2)
+  payment_date  DateTime      @default(now())
+  method        PaymentMethod
 
-  charge Charge @relation(fields: [chargeId], references: [id])
+  enrollment Enrollment @relation(fields: [enrollment_id], references: [id])
+  charge     Charge     @relation(fields: [charge_id], references: [id])
+
+  @@index([enrollment_id])
+  @@index([charge_id])
 
   @@map("payments")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  name     String  @db.VarChar(255)
+  email    String  @unique @db.VarChar(255)
+  password String
+  active   Boolean @default(true)
+
+  @@map("users")
 }
 
 enum ChargeStatus {
   PENDING
   PAID
-  LATE
+  OVERDUE
 }
 
 enum PaymentMethod {
-  PIX
-  CASH
   CREDIT_CARD
   DEBIT_CARD
+  BOLETO
+  PIX
 }

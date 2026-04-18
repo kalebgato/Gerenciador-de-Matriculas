@@ -1,12 +1,16 @@
 import { prisma } from "#server/lib/prisma";
-import type { StudentCreateInput, StudentUncheckedCreateInput, StudentUpdateInput, StudentUncheckedUpdateInput, StudentWhereInput } from "#server/generated/models";
 
 export const studentRepository = {
-    create(data: StudentCreateInput) {
-        return prisma.student.create({ data });
-    },
-
-    createUnchecked(data: StudentUncheckedCreateInput) {
+    create(data: {
+        name: string;
+        cpf: string;
+        email?: string;
+        dn?: Date;
+        phone?: string;
+        responsable_name?: string;
+        responsable_phone?: string;
+        active?: boolean;
+    }) {
         return prisma.student.create({ data });
     },
 
@@ -26,14 +30,16 @@ export const studentRepository = {
         return prisma.student.findMany();
     },
 
-    update(id: string, data: StudentUpdateInput) {
-        return prisma.student.update({
-            where: { id },
-            data,
-        });
-    },
-
-    updateUnchecked(id: string, data: StudentUncheckedUpdateInput) {
+    update(id: string, data: {
+        name?: string;
+        cpf?: string;
+        email?: string;
+        dn?: Date;
+        phone?: string;
+        responsable_name?: string;
+        responsable_phone?: string;
+        active?: boolean;
+    }) {
         return prisma.student.update({
             where: { id },
             data,
@@ -46,7 +52,7 @@ export const studentRepository = {
         });
     },
 
-    count(where?: StudentWhereInput) {
+    count(where?: { active?: boolean; cpf?: string }) {
         return prisma.student.count({ where });
     },
   };

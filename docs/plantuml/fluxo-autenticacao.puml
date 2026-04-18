@@ -1,0 +1,34 @@
+@startuml fluxo_autenticacao
+actor Usuario
+participant "Login Page" as Login
+participant "auth.global.ts" as Middleware
+participant "useAuth" as Auth
+participant "GET /api/auth/me" as Me
+participant "POST /api/auth/login" as ApiLogin
+participant "server/middleware/auth.ts" as ServerAuth
+
+Usuario -> Middleware: acessa rota protegida
+Middleware -> Auth: ensureSession()
+Auth -> Me: GET /api/auth/me
+
+alt sem cookie ou sessao invalida
+  Me --> Auth: 401
+  Auth --> Middleware: authenticated = false
+  Middleware --> Usuario: redirect /login
+  Usuario -> Login: envia credenciais
+  Login -> ApiLogin: POST /api/auth/login
+  ApiLogin --> Login: 200 + cookie httpOnly
+  Login -> Auth: ensureSession(true)
+  Auth -> Me: GET /api/auth/me
+  Me --> Auth: 200 + user
+  Auth --> Login: authenticated = true
+  Login --> Usuario: redirect /dashboard
+else cookie valido
+  Me --> Auth: 200 + user
+  Auth --> Middleware: authenticated = true
+  Middleware --> Usuario: libera rota
+end
+
+Usuario -> ServerAuth: chama endpoint /api/*
+ServerAuth --> Usuario: 200 se sessao valida / 401 se invalida
+@enduml

@@ -1,0 +1,28 @@
+info:
+  name: Cria turma
+  type: http
+  seq: 12
+http:
+  method: POST
+  url: http://localhost:3000/api/teams
+  auth: inherit
+  body:
+    type: json
+    data: |-
+      {
+        "course_id": "00000000-0000-0000-0000-000000000000",
+        "title": "string",
+        "team_leader_id": "string",
+        "start_date": "2026-01-01T00:00:00.000Z",
+        "end_date": "2026-01-01T00:00:00.000Z",
+        "horary": "string",
+        "days_of_week": "string",
+        "active": true,
+        "payment_date": "2026-01-01T00:00:00.000Z",
+        "price": 10
+      }
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

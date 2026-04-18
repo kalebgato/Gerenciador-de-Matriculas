@@ -20,76 +20,46 @@ export type CourseModel = runtime.Types.Result.DefaultSelection<Prisma.$CoursePa
 
 export type AggregateCourse = {
   _count: CourseCountAggregateOutputType | null
-  _avg: CourseAvgAggregateOutputType | null
-  _sum: CourseSumAggregateOutputType | null
   _min: CourseMinAggregateOutputType | null
   _max: CourseMaxAggregateOutputType | null
 }
 
-export type CourseAvgAggregateOutputType = {
-  price: runtime.Decimal | null
-}
-
-export type CourseSumAggregateOutputType = {
-  price: runtime.Decimal | null
-}
-
 export type CourseMinAggregateOutputType = {
   id: string | null
-  name: string | null
-  description: string | null
-  price: runtime.Decimal | null
-  createdAt: Date | null
+  title: string | null
+  active: boolean | null
 }
 
 export type CourseMaxAggregateOutputType = {
   id: string | null
-  name: string | null
-  description: string | null
-  price: runtime.Decimal | null
-  createdAt: Date | null
+  title: string | null
+  active: boolean | null
 }
 
 export type CourseCountAggregateOutputType = {
   id: number
-  name: number
-  description: number
-  price: number
-  createdAt: number
+  title: number
+  active: number
   _all: number
 }
 
 
-export type CourseAvgAggregateInputType = {
-  price?: true
-}
-
-export type CourseSumAggregateInputType = {
-  price?: true
-}
-
 export type CourseMinAggregateInputType = {
   id?: true
-  name?: true
-  description?: true
-  price?: true
-  createdAt?: true
+  title?: true
+  active?: true
 }
 
 export type CourseMaxAggregateInputType = {
   id?: true
-  name?: true
-  description?: true
-  price?: true
-  createdAt?: true
+  title?: true
+  active?: true
 }
 
 export type CourseCountAggregateInputType = {
   id?: true
-  name?: true
-  description?: true
-  price?: true
-  createdAt?: true
+  title?: true
+  active?: true
   _all?: true
 }
 
@@ -131,18 +101,6 @@ export type CourseAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: CourseAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: CourseSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: CourseMinAggregateInputType
@@ -173,26 +131,20 @@ export type CourseGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: CourseCountAggregateInputType | true
-  _avg?: CourseAvgAggregateInputType
-  _sum?: CourseSumAggregateInputType
   _min?: CourseMinAggregateInputType
   _max?: CourseMaxAggregateInputType
 }
 
 export type CourseGroupByOutputType = {
   id: string
-  name: string
-  description: string | null
-  price: runtime.Decimal
-  createdAt: Date
+  title: string
+  active: boolean
   _count: CourseCountAggregateOutputType | null
-  _avg: CourseAvgAggregateOutputType | null
-  _sum: CourseSumAggregateOutputType | null
   _min: CourseMinAggregateOutputType | null
   _max: CourseMaxAggregateOutputType | null
 }
 
-type GetCourseGroupByPayload<T extends CourseGroupByArgs> = Prisma.PrismaPromise<
+export type GetCourseGroupByPayload<T extends CourseGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<CourseGroupByOutputType, T['by']> &
       {
@@ -212,19 +164,15 @@ export type CourseWhereInput = {
   OR?: Prisma.CourseWhereInput[]
   NOT?: Prisma.CourseWhereInput | Prisma.CourseWhereInput[]
   id?: Prisma.StringFilter<"Course"> | string
-  name?: Prisma.StringFilter<"Course"> | string
-  description?: Prisma.StringNullableFilter<"Course"> | string | null
-  price?: Prisma.DecimalFilter<"Course"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFilter<"Course"> | Date | string
+  title?: Prisma.StringFilter<"Course"> | string
+  active?: Prisma.BoolFilter<"Course"> | boolean
   teams?: Prisma.TeamListRelationFilter
 }
 
 export type CourseOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  description?: Prisma.SortOrderInput | Prisma.SortOrder
-  price?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   teams?: Prisma.TeamOrderByRelationAggregateInput
 }
 
@@ -233,24 +181,18 @@ export type CourseWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.CourseWhereInput | Prisma.CourseWhereInput[]
   OR?: Prisma.CourseWhereInput[]
   NOT?: Prisma.CourseWhereInput | Prisma.CourseWhereInput[]
-  name?: Prisma.StringFilter<"Course"> | string
-  description?: Prisma.StringNullableFilter<"Course"> | string | null
-  price?: Prisma.DecimalFilter<"Course"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFilter<"Course"> | Date | string
+  title?: Prisma.StringFilter<"Course"> | string
+  active?: Prisma.BoolFilter<"Course"> | boolean
   teams?: Prisma.TeamListRelationFilter
 }, "id">
 
 export type CourseOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  description?: Prisma.SortOrderInput | Prisma.SortOrder
-  price?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   _count?: Prisma.CourseCountOrderByAggregateInput
-  _avg?: Prisma.CourseAvgOrderByAggregateInput
   _max?: Prisma.CourseMaxOrderByAggregateInput
   _min?: Prisma.CourseMinOrderByAggregateInput
-  _sum?: Prisma.CourseSumOrderByAggregateInput
 }
 
 export type CourseScalarWhereWithAggregatesInput = {
@@ -258,115 +200,77 @@ export type CourseScalarWhereWithAggregatesInput = {
   OR?: Prisma.CourseScalarWhereWithAggregatesInput[]
   NOT?: Prisma.CourseScalarWhereWithAggregatesInput | Prisma.CourseScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Course"> | string
-  name?: Prisma.StringWithAggregatesFilter<"Course"> | string
-  description?: Prisma.StringNullableWithAggregatesFilter<"Course"> | string | null
-  price?: Prisma.DecimalWithAggregatesFilter<"Course"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Course"> | Date | string
+  title?: Prisma.StringWithAggregatesFilter<"Course"> | string
+  active?: Prisma.BoolWithAggregatesFilter<"Course"> | boolean
 }
 
 export type CourseCreateInput = {
   id?: string
-  name: string
-  description?: string | null
-  price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
+  title: string
+  active?: boolean
   teams?: Prisma.TeamCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateInput = {
   id?: string
-  name: string
-  description?: string | null
-  price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
+  title: string
+  active?: boolean
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   teams?: Prisma.TeamUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   teams?: Prisma.TeamUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateManyInput = {
   id?: string
-  name: string
-  description?: string | null
-  price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
+  title: string
+  active?: boolean
 }
 
 export type CourseUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type CourseUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type CourseCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  description?: Prisma.SortOrder
-  price?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-}
-
-export type CourseAvgOrderByAggregateInput = {
-  price?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  active?: Prisma.SortOrder
 }
 
 export type CourseMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  description?: Prisma.SortOrder
-  price?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  active?: Prisma.SortOrder
 }
 
 export type CourseMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  description?: Prisma.SortOrder
-  price?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-}
-
-export type CourseSumOrderByAggregateInput = {
-  price?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  active?: Prisma.SortOrder
 }
 
 export type CourseScalarRelationFilter = {
   is?: Prisma.CourseWhereInput
   isNot?: Prisma.CourseWhereInput
-}
-
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type CourseCreateNestedOneWithoutTeamsInput = {
@@ -385,18 +289,14 @@ export type CourseUpdateOneRequiredWithoutTeamsNestedInput = {
 
 export type CourseCreateWithoutTeamsInput = {
   id?: string
-  name: string
-  description?: string | null
-  price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
+  title: string
+  active?: boolean
 }
 
 export type CourseUncheckedCreateWithoutTeamsInput = {
   id?: string
-  name: string
-  description?: string | null
-  price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
+  title: string
+  active?: boolean
 }
 
 export type CourseCreateOrConnectWithoutTeamsInput = {
@@ -417,18 +317,14 @@ export type CourseUpdateToOneWithWhereWithoutTeamsInput = {
 
 export type CourseUpdateWithoutTeamsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type CourseUncheckedUpdateWithoutTeamsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -464,39 +360,31 @@ export type CourseCountOutputTypeCountTeamsArgs<ExtArgs extends runtime.Types.Ex
 
 export type CourseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  name?: boolean
-  description?: boolean
-  price?: boolean
-  createdAt?: boolean
+  title?: boolean
+  active?: boolean
   teams?: boolean | Prisma.Course$teamsArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["course"]>
 
 export type CourseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  name?: boolean
-  description?: boolean
-  price?: boolean
-  createdAt?: boolean
+  title?: boolean
+  active?: boolean
 }, ExtArgs["result"]["course"]>
 
 export type CourseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  name?: boolean
-  description?: boolean
-  price?: boolean
-  createdAt?: boolean
+  title?: boolean
+  active?: boolean
 }, ExtArgs["result"]["course"]>
 
 export type CourseSelectScalar = {
   id?: boolean
-  name?: boolean
-  description?: boolean
-  price?: boolean
-  createdAt?: boolean
+  title?: boolean
+  active?: boolean
 }
 
-export type CourseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "price" | "createdAt", ExtArgs["result"]["course"]>
+export type CourseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "active", ExtArgs["result"]["course"]>
 export type CourseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teams?: boolean | Prisma.Course$teamsArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
@@ -511,10 +399,8 @@ export type $CoursePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    name: string
-    description: string | null
-    price: runtime.Decimal
-    createdAt: Date
+    title: string
+    active: boolean
   }, ExtArgs["result"]["course"]>
   composites: {}
 }
@@ -940,10 +826,8 @@ export interface Prisma__CourseClient<T, Null = never, ExtArgs extends runtime.T
  */
 export interface CourseFieldRefs {
   readonly id: Prisma.FieldRef<"Course", 'String'>
-  readonly name: Prisma.FieldRef<"Course", 'String'>
-  readonly description: Prisma.FieldRef<"Course", 'String'>
-  readonly price: Prisma.FieldRef<"Course", 'Decimal'>
-  readonly createdAt: Prisma.FieldRef<"Course", 'DateTime'>
+  readonly title: Prisma.FieldRef<"Course", 'String'>
+  readonly active: Prisma.FieldRef<"Course", 'Boolean'>
 }
     
 

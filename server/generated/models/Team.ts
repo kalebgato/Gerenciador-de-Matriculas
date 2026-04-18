@@ -20,58 +20,112 @@ export type TeamModel = runtime.Types.Result.DefaultSelection<Prisma.$TeamPayloa
 
 export type AggregateTeam = {
   _count: TeamCountAggregateOutputType | null
+  _avg: TeamAvgAggregateOutputType | null
+  _sum: TeamSumAggregateOutputType | null
   _min: TeamMinAggregateOutputType | null
   _max: TeamMaxAggregateOutputType | null
 }
 
+export type TeamAvgAggregateOutputType = {
+  price: runtime.Decimal | null
+}
+
+export type TeamSumAggregateOutputType = {
+  price: runtime.Decimal | null
+}
+
 export type TeamMinAggregateOutputType = {
   id: string | null
-  name: string | null
-  schedule: string | null
-  courseId: string | null
-  createdAt: Date | null
+  course_id: string | null
+  title: string | null
+  team_leader_id: string | null
+  start_date: Date | null
+  end_date: Date | null
+  horary: string | null
+  days_of_week: string | null
+  active: boolean | null
+  payment_date: Date | null
+  price: runtime.Decimal | null
 }
 
 export type TeamMaxAggregateOutputType = {
   id: string | null
-  name: string | null
-  schedule: string | null
-  courseId: string | null
-  createdAt: Date | null
+  course_id: string | null
+  title: string | null
+  team_leader_id: string | null
+  start_date: Date | null
+  end_date: Date | null
+  horary: string | null
+  days_of_week: string | null
+  active: boolean | null
+  payment_date: Date | null
+  price: runtime.Decimal | null
 }
 
 export type TeamCountAggregateOutputType = {
   id: number
-  name: number
-  schedule: number
-  courseId: number
-  createdAt: number
+  course_id: number
+  title: number
+  team_leader_id: number
+  start_date: number
+  end_date: number
+  horary: number
+  days_of_week: number
+  active: number
+  payment_date: number
+  price: number
   _all: number
 }
 
 
+export type TeamAvgAggregateInputType = {
+  price?: true
+}
+
+export type TeamSumAggregateInputType = {
+  price?: true
+}
+
 export type TeamMinAggregateInputType = {
   id?: true
-  name?: true
-  schedule?: true
-  courseId?: true
-  createdAt?: true
+  course_id?: true
+  title?: true
+  team_leader_id?: true
+  start_date?: true
+  end_date?: true
+  horary?: true
+  days_of_week?: true
+  active?: true
+  payment_date?: true
+  price?: true
 }
 
 export type TeamMaxAggregateInputType = {
   id?: true
-  name?: true
-  schedule?: true
-  courseId?: true
-  createdAt?: true
+  course_id?: true
+  title?: true
+  team_leader_id?: true
+  start_date?: true
+  end_date?: true
+  horary?: true
+  days_of_week?: true
+  active?: true
+  payment_date?: true
+  price?: true
 }
 
 export type TeamCountAggregateInputType = {
   id?: true
-  name?: true
-  schedule?: true
-  courseId?: true
-  createdAt?: true
+  course_id?: true
+  title?: true
+  team_leader_id?: true
+  start_date?: true
+  end_date?: true
+  horary?: true
+  days_of_week?: true
+  active?: true
+  payment_date?: true
+  price?: true
   _all?: true
 }
 
@@ -113,6 +167,18 @@ export type TeamAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: TeamAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: TeamSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: TeamMinAggregateInputType
@@ -143,22 +209,32 @@ export type TeamGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: TeamCountAggregateInputType | true
+  _avg?: TeamAvgAggregateInputType
+  _sum?: TeamSumAggregateInputType
   _min?: TeamMinAggregateInputType
   _max?: TeamMaxAggregateInputType
 }
 
 export type TeamGroupByOutputType = {
   id: string
-  name: string
-  schedule: string | null
-  courseId: string
-  createdAt: Date
+  course_id: string
+  title: string
+  team_leader_id: string | null
+  start_date: Date | null
+  end_date: Date | null
+  horary: string | null
+  days_of_week: string | null
+  active: boolean
+  payment_date: Date | null
+  price: runtime.Decimal
   _count: TeamCountAggregateOutputType | null
+  _avg: TeamAvgAggregateOutputType | null
+  _sum: TeamSumAggregateOutputType | null
   _min: TeamMinAggregateOutputType | null
   _max: TeamMaxAggregateOutputType | null
 }
 
-type GetTeamGroupByPayload<T extends TeamGroupByArgs> = Prisma.PrismaPromise<
+export type GetTeamGroupByPayload<T extends TeamGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TeamGroupByOutputType, T['by']> &
       {
@@ -178,20 +254,32 @@ export type TeamWhereInput = {
   OR?: Prisma.TeamWhereInput[]
   NOT?: Prisma.TeamWhereInput | Prisma.TeamWhereInput[]
   id?: Prisma.StringFilter<"Team"> | string
-  name?: Prisma.StringFilter<"Team"> | string
-  schedule?: Prisma.StringNullableFilter<"Team"> | string | null
-  courseId?: Prisma.StringFilter<"Team"> | string
-  createdAt?: Prisma.DateTimeFilter<"Team"> | Date | string
+  course_id?: Prisma.StringFilter<"Team"> | string
+  title?: Prisma.StringFilter<"Team"> | string
+  team_leader_id?: Prisma.StringNullableFilter<"Team"> | string | null
+  start_date?: Prisma.DateTimeNullableFilter<"Team"> | Date | string | null
+  end_date?: Prisma.DateTimeNullableFilter<"Team"> | Date | string | null
+  horary?: Prisma.StringNullableFilter<"Team"> | string | null
+  days_of_week?: Prisma.StringNullableFilter<"Team"> | string | null
+  active?: Prisma.BoolFilter<"Team"> | boolean
+  payment_date?: Prisma.DateTimeNullableFilter<"Team"> | Date | string | null
+  price?: Prisma.DecimalFilter<"Team"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   enrollments?: Prisma.EnrollmentListRelationFilter
 }
 
 export type TeamOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  schedule?: Prisma.SortOrderInput | Prisma.SortOrder
-  courseId?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  course_id?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  team_leader_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  start_date?: Prisma.SortOrderInput | Prisma.SortOrder
+  end_date?: Prisma.SortOrderInput | Prisma.SortOrder
+  horary?: Prisma.SortOrderInput | Prisma.SortOrder
+  days_of_week?: Prisma.SortOrderInput | Prisma.SortOrder
+  active?: Prisma.SortOrder
+  payment_date?: Prisma.SortOrderInput | Prisma.SortOrder
+  price?: Prisma.SortOrder
   course?: Prisma.CourseOrderByWithRelationInput
   enrollments?: Prisma.EnrollmentOrderByRelationAggregateInput
 }
@@ -201,23 +289,37 @@ export type TeamWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.TeamWhereInput | Prisma.TeamWhereInput[]
   OR?: Prisma.TeamWhereInput[]
   NOT?: Prisma.TeamWhereInput | Prisma.TeamWhereInput[]
-  name?: Prisma.StringFilter<"Team"> | string
-  schedule?: Prisma.StringNullableFilter<"Team"> | string | null
-  courseId?: Prisma.StringFilter<"Team"> | string
-  createdAt?: Prisma.DateTimeFilter<"Team"> | Date | string
+  course_id?: Prisma.StringFilter<"Team"> | string
+  title?: Prisma.StringFilter<"Team"> | string
+  team_leader_id?: Prisma.StringNullableFilter<"Team"> | string | null
+  start_date?: Prisma.DateTimeNullableFilter<"Team"> | Date | string | null
+  end_date?: Prisma.DateTimeNullableFilter<"Team"> | Date | string | null
+  horary?: Prisma.StringNullableFilter<"Team"> | string | null
+  days_of_week?: Prisma.StringNullableFilter<"Team"> | string | null
+  active?: Prisma.BoolFilter<"Team"> | boolean
+  payment_date?: Prisma.DateTimeNullableFilter<"Team"> | Date | string | null
+  price?: Prisma.DecimalFilter<"Team"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   enrollments?: Prisma.EnrollmentListRelationFilter
 }, "id">
 
 export type TeamOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  schedule?: Prisma.SortOrderInput | Prisma.SortOrder
-  courseId?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  course_id?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  team_leader_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  start_date?: Prisma.SortOrderInput | Prisma.SortOrder
+  end_date?: Prisma.SortOrderInput | Prisma.SortOrder
+  horary?: Prisma.SortOrderInput | Prisma.SortOrder
+  days_of_week?: Prisma.SortOrderInput | Prisma.SortOrder
+  active?: Prisma.SortOrder
+  payment_date?: Prisma.SortOrderInput | Prisma.SortOrder
+  price?: Prisma.SortOrder
   _count?: Prisma.TeamCountOrderByAggregateInput
+  _avg?: Prisma.TeamAvgOrderByAggregateInput
   _max?: Prisma.TeamMaxOrderByAggregateInput
   _min?: Prisma.TeamMinOrderByAggregateInput
+  _sum?: Prisma.TeamSumOrderByAggregateInput
 }
 
 export type TeamScalarWhereWithAggregatesInput = {
@@ -225,69 +327,117 @@ export type TeamScalarWhereWithAggregatesInput = {
   OR?: Prisma.TeamScalarWhereWithAggregatesInput[]
   NOT?: Prisma.TeamScalarWhereWithAggregatesInput | Prisma.TeamScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Team"> | string
-  name?: Prisma.StringWithAggregatesFilter<"Team"> | string
-  schedule?: Prisma.StringNullableWithAggregatesFilter<"Team"> | string | null
-  courseId?: Prisma.StringWithAggregatesFilter<"Team"> | string
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Team"> | Date | string
+  course_id?: Prisma.StringWithAggregatesFilter<"Team"> | string
+  title?: Prisma.StringWithAggregatesFilter<"Team"> | string
+  team_leader_id?: Prisma.StringNullableWithAggregatesFilter<"Team"> | string | null
+  start_date?: Prisma.DateTimeNullableWithAggregatesFilter<"Team"> | Date | string | null
+  end_date?: Prisma.DateTimeNullableWithAggregatesFilter<"Team"> | Date | string | null
+  horary?: Prisma.StringNullableWithAggregatesFilter<"Team"> | string | null
+  days_of_week?: Prisma.StringNullableWithAggregatesFilter<"Team"> | string | null
+  active?: Prisma.BoolWithAggregatesFilter<"Team"> | boolean
+  payment_date?: Prisma.DateTimeNullableWithAggregatesFilter<"Team"> | Date | string | null
+  price?: Prisma.DecimalWithAggregatesFilter<"Team"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TeamCreateInput = {
   id?: string
-  name: string
-  schedule?: string | null
-  createdAt?: Date | string
+  title: string
+  team_leader_id?: string | null
+  start_date?: Date | string | null
+  end_date?: Date | string | null
+  horary?: string | null
+  days_of_week?: string | null
+  active?: boolean
+  payment_date?: Date | string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   course: Prisma.CourseCreateNestedOneWithoutTeamsInput
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUncheckedCreateInput = {
   id?: string
-  name: string
-  schedule?: string | null
-  courseId: string
-  createdAt?: Date | string
+  course_id: string
+  title: string
+  team_leader_id?: string | null
+  start_date?: Date | string | null
+  end_date?: Date | string | null
+  horary?: string | null
+  days_of_week?: string | null
+  active?: boolean
+  payment_date?: Date | string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  team_leader_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  start_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  horary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  days_of_week?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payment_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   course?: Prisma.CourseUpdateOneRequiredWithoutTeamsNestedInput
   enrollments?: Prisma.EnrollmentUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  courseId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  course_id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  team_leader_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  start_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  horary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  days_of_week?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payment_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamCreateManyInput = {
   id?: string
-  name: string
-  schedule?: string | null
-  courseId: string
-  createdAt?: Date | string
+  course_id: string
+  title: string
+  team_leader_id?: string | null
+  start_date?: Date | string | null
+  end_date?: Date | string | null
+  horary?: string | null
+  days_of_week?: string | null
+  active?: boolean
+  payment_date?: Date | string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TeamUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  team_leader_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  start_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  horary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  days_of_week?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payment_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TeamUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  courseId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  course_id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  team_leader_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  start_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  horary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  days_of_week?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payment_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TeamListRelationFilter = {
@@ -302,26 +452,52 @@ export type TeamOrderByRelationAggregateInput = {
 
 export type TeamCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  schedule?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  course_id?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  team_leader_id?: Prisma.SortOrder
+  start_date?: Prisma.SortOrder
+  end_date?: Prisma.SortOrder
+  horary?: Prisma.SortOrder
+  days_of_week?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  payment_date?: Prisma.SortOrder
+  price?: Prisma.SortOrder
+}
+
+export type TeamAvgOrderByAggregateInput = {
+  price?: Prisma.SortOrder
 }
 
 export type TeamMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  schedule?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  course_id?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  team_leader_id?: Prisma.SortOrder
+  start_date?: Prisma.SortOrder
+  end_date?: Prisma.SortOrder
+  horary?: Prisma.SortOrder
+  days_of_week?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  payment_date?: Prisma.SortOrder
+  price?: Prisma.SortOrder
 }
 
 export type TeamMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  schedule?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  course_id?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  team_leader_id?: Prisma.SortOrder
+  start_date?: Prisma.SortOrder
+  end_date?: Prisma.SortOrder
+  horary?: Prisma.SortOrder
+  days_of_week?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  payment_date?: Prisma.SortOrder
+  price?: Prisma.SortOrder
+}
+
+export type TeamSumOrderByAggregateInput = {
+  price?: Prisma.SortOrder
 }
 
 export type TeamScalarRelationFilter = {
@@ -371,6 +547,14 @@ export type TeamUncheckedUpdateManyWithoutCourseNestedInput = {
   deleteMany?: Prisma.TeamScalarWhereInput | Prisma.TeamScalarWhereInput[]
 }
 
+export type DecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
 export type TeamCreateNestedOneWithoutEnrollmentsInput = {
   create?: Prisma.XOR<Prisma.TeamCreateWithoutEnrollmentsInput, Prisma.TeamUncheckedCreateWithoutEnrollmentsInput>
   connectOrCreate?: Prisma.TeamCreateOrConnectWithoutEnrollmentsInput
@@ -387,17 +571,29 @@ export type TeamUpdateOneRequiredWithoutEnrollmentsNestedInput = {
 
 export type TeamCreateWithoutCourseInput = {
   id?: string
-  name: string
-  schedule?: string | null
-  createdAt?: Date | string
+  title: string
+  team_leader_id?: string | null
+  start_date?: Date | string | null
+  end_date?: Date | string | null
+  horary?: string | null
+  days_of_week?: string | null
+  active?: boolean
+  payment_date?: Date | string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUncheckedCreateWithoutCourseInput = {
   id?: string
-  name: string
-  schedule?: string | null
-  createdAt?: Date | string
+  title: string
+  team_leader_id?: string | null
+  start_date?: Date | string | null
+  end_date?: Date | string | null
+  horary?: string | null
+  days_of_week?: string | null
+  active?: boolean
+  payment_date?: Date | string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutTeamInput
 }
 
@@ -432,26 +628,44 @@ export type TeamScalarWhereInput = {
   OR?: Prisma.TeamScalarWhereInput[]
   NOT?: Prisma.TeamScalarWhereInput | Prisma.TeamScalarWhereInput[]
   id?: Prisma.StringFilter<"Team"> | string
-  name?: Prisma.StringFilter<"Team"> | string
-  schedule?: Prisma.StringNullableFilter<"Team"> | string | null
-  courseId?: Prisma.StringFilter<"Team"> | string
-  createdAt?: Prisma.DateTimeFilter<"Team"> | Date | string
+  course_id?: Prisma.StringFilter<"Team"> | string
+  title?: Prisma.StringFilter<"Team"> | string
+  team_leader_id?: Prisma.StringNullableFilter<"Team"> | string | null
+  start_date?: Prisma.DateTimeNullableFilter<"Team"> | Date | string | null
+  end_date?: Prisma.DateTimeNullableFilter<"Team"> | Date | string | null
+  horary?: Prisma.StringNullableFilter<"Team"> | string | null
+  days_of_week?: Prisma.StringNullableFilter<"Team"> | string | null
+  active?: Prisma.BoolFilter<"Team"> | boolean
+  payment_date?: Prisma.DateTimeNullableFilter<"Team"> | Date | string | null
+  price?: Prisma.DecimalFilter<"Team"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TeamCreateWithoutEnrollmentsInput = {
   id?: string
-  name: string
-  schedule?: string | null
-  createdAt?: Date | string
+  title: string
+  team_leader_id?: string | null
+  start_date?: Date | string | null
+  end_date?: Date | string | null
+  horary?: string | null
+  days_of_week?: string | null
+  active?: boolean
+  payment_date?: Date | string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   course: Prisma.CourseCreateNestedOneWithoutTeamsInput
 }
 
 export type TeamUncheckedCreateWithoutEnrollmentsInput = {
   id?: string
-  name: string
-  schedule?: string | null
-  courseId: string
-  createdAt?: Date | string
+  course_id: string
+  title: string
+  team_leader_id?: string | null
+  start_date?: Date | string | null
+  end_date?: Date | string | null
+  horary?: string | null
+  days_of_week?: string | null
+  active?: boolean
+  payment_date?: Date | string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TeamCreateOrConnectWithoutEnrollmentsInput = {
@@ -472,48 +686,84 @@ export type TeamUpdateToOneWithWhereWithoutEnrollmentsInput = {
 
 export type TeamUpdateWithoutEnrollmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  team_leader_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  start_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  horary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  days_of_week?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payment_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   course?: Prisma.CourseUpdateOneRequiredWithoutTeamsNestedInput
 }
 
 export type TeamUncheckedUpdateWithoutEnrollmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  courseId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  course_id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  team_leader_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  start_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  horary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  days_of_week?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payment_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TeamCreateManyCourseInput = {
   id?: string
-  name: string
-  schedule?: string | null
-  createdAt?: Date | string
+  title: string
+  team_leader_id?: string | null
+  start_date?: Date | string | null
+  end_date?: Date | string | null
+  horary?: string | null
+  days_of_week?: string | null
+  active?: boolean
+  payment_date?: Date | string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TeamUpdateWithoutCourseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  team_leader_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  start_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  horary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  days_of_week?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payment_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   enrollments?: Prisma.EnrollmentUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateWithoutCourseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  team_leader_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  start_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  horary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  days_of_week?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payment_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateManyWithoutCourseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  team_leader_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  start_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  horary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  days_of_week?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payment_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 
@@ -549,10 +799,16 @@ export type TeamCountOutputTypeCountEnrollmentsArgs<ExtArgs extends runtime.Type
 
 export type TeamSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  name?: boolean
-  schedule?: boolean
-  courseId?: boolean
-  createdAt?: boolean
+  course_id?: boolean
+  title?: boolean
+  team_leader_id?: boolean
+  start_date?: boolean
+  end_date?: boolean
+  horary?: boolean
+  days_of_week?: boolean
+  active?: boolean
+  payment_date?: boolean
+  price?: boolean
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   enrollments?: boolean | Prisma.Team$enrollmentsArgs<ExtArgs>
   _count?: boolean | Prisma.TeamCountOutputTypeDefaultArgs<ExtArgs>
@@ -560,31 +816,49 @@ export type TeamSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 
 export type TeamSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  name?: boolean
-  schedule?: boolean
-  courseId?: boolean
-  createdAt?: boolean
+  course_id?: boolean
+  title?: boolean
+  team_leader_id?: boolean
+  start_date?: boolean
+  end_date?: boolean
+  horary?: boolean
+  days_of_week?: boolean
+  active?: boolean
+  payment_date?: boolean
+  price?: boolean
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["team"]>
 
 export type TeamSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  name?: boolean
-  schedule?: boolean
-  courseId?: boolean
-  createdAt?: boolean
+  course_id?: boolean
+  title?: boolean
+  team_leader_id?: boolean
+  start_date?: boolean
+  end_date?: boolean
+  horary?: boolean
+  days_of_week?: boolean
+  active?: boolean
+  payment_date?: boolean
+  price?: boolean
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["team"]>
 
 export type TeamSelectScalar = {
   id?: boolean
-  name?: boolean
-  schedule?: boolean
-  courseId?: boolean
-  createdAt?: boolean
+  course_id?: boolean
+  title?: boolean
+  team_leader_id?: boolean
+  start_date?: boolean
+  end_date?: boolean
+  horary?: boolean
+  days_of_week?: boolean
+  active?: boolean
+  payment_date?: boolean
+  price?: boolean
 }
 
-export type TeamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "schedule" | "courseId" | "createdAt", ExtArgs["result"]["team"]>
+export type TeamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "course_id" | "title" | "team_leader_id" | "start_date" | "end_date" | "horary" | "days_of_week" | "active" | "payment_date" | "price", ExtArgs["result"]["team"]>
 export type TeamInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   enrollments?: boolean | Prisma.Team$enrollmentsArgs<ExtArgs>
@@ -605,10 +879,16 @@ export type $TeamPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    name: string
-    schedule: string | null
-    courseId: string
-    createdAt: Date
+    course_id: string
+    title: string
+    team_leader_id: string | null
+    start_date: Date | null
+    end_date: Date | null
+    horary: string | null
+    days_of_week: string | null
+    active: boolean
+    payment_date: Date | null
+    price: runtime.Decimal
   }, ExtArgs["result"]["team"]>
   composites: {}
 }
@@ -1035,10 +1315,16 @@ export interface Prisma__TeamClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface TeamFieldRefs {
   readonly id: Prisma.FieldRef<"Team", 'String'>
-  readonly name: Prisma.FieldRef<"Team", 'String'>
-  readonly schedule: Prisma.FieldRef<"Team", 'String'>
-  readonly courseId: Prisma.FieldRef<"Team", 'String'>
-  readonly createdAt: Prisma.FieldRef<"Team", 'DateTime'>
+  readonly course_id: Prisma.FieldRef<"Team", 'String'>
+  readonly title: Prisma.FieldRef<"Team", 'String'>
+  readonly team_leader_id: Prisma.FieldRef<"Team", 'String'>
+  readonly start_date: Prisma.FieldRef<"Team", 'DateTime'>
+  readonly end_date: Prisma.FieldRef<"Team", 'DateTime'>
+  readonly horary: Prisma.FieldRef<"Team", 'String'>
+  readonly days_of_week: Prisma.FieldRef<"Team", 'String'>
+  readonly active: Prisma.FieldRef<"Team", 'Boolean'>
+  readonly payment_date: Prisma.FieldRef<"Team", 'DateTime'>
+  readonly price: Prisma.FieldRef<"Team", 'Decimal'>
 }
     
 

@@ -1,0 +1,16 @@
+info:
+  name: Gera cobrancas ou registra pagamento
+  type: http
+  seq: 20
+http:
+  method: POST
+  url: http://localhost:3000/api/billing
+  auth: inherit
+  body:
+    type: json
+    data: '"string"'
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

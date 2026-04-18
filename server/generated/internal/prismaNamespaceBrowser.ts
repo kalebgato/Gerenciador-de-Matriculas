@@ -56,7 +56,8 @@ export const ModelName = {
   Team: 'Team',
   Enrollment: 'Enrollment',
   Charge: 'Charge',
-  Payment: 'Payment'
+  Payment: 'Payment',
+  User: 'User'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -80,8 +81,11 @@ export const StudentScalarFieldEnum = {
   name: 'name',
   cpf: 'cpf',
   email: 'email',
+  dn: 'dn',
   phone: 'phone',
-  createdAt: 'createdAt'
+  responsable_name: 'responsable_name',
+  responsable_phone: 'responsable_phone',
+  active: 'active'
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
@@ -89,10 +93,8 @@ export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeo
 
 export const CourseScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  description: 'description',
-  price: 'price',
-  createdAt: 'createdAt'
+  title: 'title',
+  active: 'active'
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
@@ -100,10 +102,16 @@ export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof 
 
 export const TeamScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  schedule: 'schedule',
-  courseId: 'courseId',
-  createdAt: 'createdAt'
+  course_id: 'course_id',
+  title: 'title',
+  team_leader_id: 'team_leader_id',
+  start_date: 'start_date',
+  end_date: 'end_date',
+  horary: 'horary',
+  days_of_week: 'days_of_week',
+  active: 'active',
+  payment_date: 'payment_date',
+  price: 'price'
 } as const
 
 export type TeamScalarFieldEnum = (typeof TeamScalarFieldEnum)[keyof typeof TeamScalarFieldEnum]
@@ -111,10 +119,8 @@ export type TeamScalarFieldEnum = (typeof TeamScalarFieldEnum)[keyof typeof Team
 
 export const EnrollmentScalarFieldEnum = {
   id: 'id',
-  studentId: 'studentId',
-  teamId: 'teamId',
-  startDate: 'startDate',
-  active: 'active'
+  team_id: 'team_id',
+  student_id: 'student_id'
 } as const
 
 export type EnrollmentScalarFieldEnum = (typeof EnrollmentScalarFieldEnum)[keyof typeof EnrollmentScalarFieldEnum]
@@ -122,11 +128,12 @@ export type EnrollmentScalarFieldEnum = (typeof EnrollmentScalarFieldEnum)[keyof
 
 export const ChargeScalarFieldEnum = {
   id: 'id',
-  enrollmentId: 'enrollmentId',
+  enrollment_id: 'enrollment_id',
   year: 'year',
   month: 'month',
   amount: 'amount',
-  dueDate: 'dueDate',
+  due_date: 'due_date',
+  paid: 'paid',
   status: 'status'
 } as const
 
@@ -135,13 +142,25 @@ export type ChargeScalarFieldEnum = (typeof ChargeScalarFieldEnum)[keyof typeof 
 
 export const PaymentScalarFieldEnum = {
   id: 'id',
-  chargeId: 'chargeId',
+  enrollment_id: 'enrollment_id',
+  charge_id: 'charge_id',
   amount: 'amount',
-  method: 'method',
-  paidAt: 'paidAt'
+  payment_date: 'payment_date',
+  method: 'method'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  password: 'password',
+  active: 'active'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
 export const SortOrder = {

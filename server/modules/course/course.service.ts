@@ -1,9 +1,7 @@
 import { courseRepository } from "./course.repository";
-import type { CourseCreateInput, CourseUpdateInput } from "#server/generated/models";
 
  export const courseService = {
-    async create(data: CourseCreateInput) {
-        // Validações de negócio podem ser adicionadas aqui
+    async create(data: { title: string; active?: boolean }) {
         return courseRepository.create(data);
     },
 
@@ -17,7 +15,7 @@ import type { CourseCreateInput, CourseUpdateInput } from "#server/generated/mod
         return course;
     },
 
-    async update(id: string, data: CourseUpdateInput) {
+    async update(id: string, data: { title?: string; active?: boolean }) {
         const course = await courseRepository.findById(id);
         if (!course) throw new Error("Curso não encontrado");
 

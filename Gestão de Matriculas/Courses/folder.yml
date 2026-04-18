@@ -1,7 +1,6 @@
 info:
   name: Courses
   type: folder
-  seq: 6
-
+  seq: 1
 request:
   auth: inherit

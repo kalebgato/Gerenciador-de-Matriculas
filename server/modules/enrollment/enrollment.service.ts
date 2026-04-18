@@ -1,28 +1,21 @@
 import { enrollmentRepository } from "./enrollment.repository";
 import { studentRepository } from "#server/modules/student/student.repository";
 import { teamRepository } from "#server/modules/team/team.repository";
-import type { EnrollmentCreateInput } from "#server/generated/models";
 
 export const enrollmentService = {
-    async enroll(data: { studentId: string; teamId: string }) {
-        const { studentId, teamId } = data;
+    async enroll(data: { student_id: string; team_id: string }) {
+        const { student_id, team_id } = data;
 
-        // Verifica se o aluno existe
-        const student = await studentRepository.findById(studentId);
+        const student = await studentRepository.findById(student_id);
         if (!student) throw new Error("Aluno não encontrado");
 
-        // Verifica se a turma existe
-        const team = await teamRepository.findById(teamId);
+        const team = await teamRepository.findById(team_id);
         if (!team) throw new Error("Turma não encontrada");
 
-        // Cria a matrícula
-        const enrollmentData: EnrollmentCreateInput = {
-            student: { connect: { id: studentId } },
-            team: { connect: { id: teamId } },
-            active: true,
-        };
+        const existingEnrollment = await enrollmentRepository.findByTeamAndStudent(team_id, student_id);
+        if (existingEnrollment) throw new Error("Aluno já matriculado nesta turma");
 
-        return enrollmentRepository.create(enrollmentData);
+        return enrollmentRepository.create({ student_id, team_id });
     },
 
     async getById(id: string) {
@@ -32,10 +25,13 @@ export const enrollmentService = {
     },
 
     async listByStudent(studentId: string) {
-        // Verifica se o aluno existe antes de listar
         const student = await studentRepository.findById(studentId);
         if (!student) throw new Error("Aluno não encontrado");
 
         return enrollmentRepository.listByStudent(studentId);
+    },
+
+    async listAll() {
+        return enrollmentRepository.listAll();
     },
 };

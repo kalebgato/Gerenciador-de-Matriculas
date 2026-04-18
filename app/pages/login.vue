@@ -21,38 +21,43 @@
         class="input"
       />
 
-      <button class="button">Entrar</button>
+      <button class="button" :disabled="loading">
+        {{ loading ? "Entrando..." : "Entrar" }}
+      </button>
 
       <p class="link">Esqueceu sua senha?</p>
     </form>
   </div>
 </template>
 
-<script setup>
+<script setup lang='ts'>
 import { ref } from "vue";
 
 const email = ref("");
 const senha = ref("");
+const loading = ref(false);
+const { authEnabled, login } = useAuth();
 
-function handleLogin() {
-  if (email.value === "admin@admin.com" && senha.value === "123") {
-    localStorage.setItem("auth", "true");
+async function handleLogin() {
+  if (!authEnabled.value) {
     navigateTo("/dashboard");
-  } else {
-    alert("Credenciais inválidas");
+    return;
+  }
+
+  try {
+    loading.value = true;
+    await login(email.value, senha.value);
+    navigateTo("/dashboard");
+  } catch (error) {
+    const message = (error as any)?.data?.statusMessage ?? "Credenciais invalidas";
+    alert(message);
+  } finally {
+    loading.value = false;
   }
 }
 </script>
 
-<style>
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #f4f4f4;
-}
-
+<style scoped>
 .card {
   background: white;
   padding: 40px;
@@ -65,25 +70,6 @@ function handleLogin() {
   text-align: center;
   color: #c62828;
   margin-bottom: 10px;
-}
-
-.subtitle {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.label {
-  font-size: 14px;
-  margin-top: 10px;
-  display: block;
-}
-
-.input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
 }
 
 .button {
@@ -102,10 +88,4 @@ function handleLogin() {
   background: #b71c1c;
 }
 
-.link {
-  text-align: center;
-  margin-top: 15px;
-  font-size: 12px;
-  color: #777;
-}
 </style>

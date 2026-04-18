@@ -1,0 +1,26 @@
+info:
+  name: Cria estudante
+  type: http
+  seq: 7
+http:
+  method: POST
+  url: http://localhost:3000/api/students
+  auth: inherit
+  body:
+    type: json
+    data: |-
+      {
+        "name": "string",
+        "cpf": "string",
+        "email": "string",
+        "dn": "2026-01-01T00:00:00.000Z",
+        "phone": "string",
+        "responsable_name": "string",
+        "responsable_phone": "string",
+        "active": true
+      }
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

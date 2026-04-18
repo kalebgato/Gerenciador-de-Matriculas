@@ -1,0 +1,27 @@
+info:
+  name: Atualiza turma
+  type: http
+  seq: 14
+http:
+  method: PUT
+  url: http://localhost:3000/api/teams/00000000-0000-0000-0000-000000000000
+  auth: inherit
+  body:
+    type: json
+    data: |-
+      {
+        "title": "string",
+        "team_leader_id": "string",
+        "start_date": "2026-01-01T00:00:00.000Z",
+        "end_date": "2026-01-01T00:00:00.000Z",
+        "horary": "string",
+        "days_of_week": "string",
+        "active": true,
+        "payment_date": "2026-01-01T00:00:00.000Z",
+        "price": 10
+      }
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

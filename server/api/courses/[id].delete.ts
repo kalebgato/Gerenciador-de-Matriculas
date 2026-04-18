@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         await courseService.delete(id);
-        return { message: "Turma deletada com sucesso" };
+        return { message: "Curso deletado com sucesso" };
     } catch (err: any) {
         throw createError({ statusCode: 404, statusMessage: err.message });
     }
