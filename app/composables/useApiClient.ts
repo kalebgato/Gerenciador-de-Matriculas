@@ -16,7 +16,7 @@ export const useApiClient = () => {
       body: options.body,
       credentials: "include",
       headers,
-    });
+    } as any);
   };
 
   return {

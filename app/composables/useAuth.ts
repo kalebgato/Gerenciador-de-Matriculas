@@ -1,7 +1,6 @@
 export const useAuth = () => {
   const config = useRuntimeConfig();
-
-  const authEnabled = computed(() => config.public.authEnabled);
+  const authEnabled = computed(() => config.public.authEnabled as boolean);
   const session = useState<{
     checked: boolean;
     authenticated: boolean;
@@ -43,14 +42,17 @@ export const useAuth = () => {
 
   const me = async () => {
     const headers = process.server ? useRequestHeaders(["cookie"]) : undefined;
-    const result = await $fetch<{ user: { id: string; email: string } }>("/api/auth/me", {
+    const result = await $fetch<{
+      authenticated: boolean;
+      user: { id: string; email: string };
+    }>("/api/auth/me", {
       credentials: "include",
       headers,
     });
 
     session.value = {
       checked: true,
-      authenticated: true,
+      authenticated: result.authenticated,
       user: result.user,
     };
 

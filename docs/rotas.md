@@ -16,18 +16,18 @@ As rotas de pagina sao resolvidas automaticamente pelo Nuxt a partir de app/page
 | Rota | Arquivo | Descricao |
 | --- | --- | --- |
 | `/` | [app/pages/index.vue](app/pages/index.vue) | tela inicial atualmente com layout de turmas em modo prototipo |
-| `/login` | [app/pages/login.vue](app/pages/login.vue) | login local com credenciais estaticas |
+| `/login` | [app/pages/login.vue](app/pages/login.vue) | login via backend com criacao de sessao |
 | `/dashboard` | [app/pages/dashboard.vue](app/pages/dashboard.vue) | dashboard visual com indicadores mockados |
 | `/turmas` | [app/pages/turmas/index.vue](app/pages/turmas/index.vue) | lista de turmas em modo prototipo |
 | `/turmas/:id` | [app/pages/turmas/[id].vue](app/pages/turmas/%5Bid%5D.vue) | detalhe de turma e alunos em modo prototipo |
 
 ## Observacoes Sobre o Frontend
 
-- [app/pages/login.vue](app/pages/login.vue) usa validacao local com `admin@admin.com` e `123`.
+- [app/pages/login.vue](app/pages/login.vue) usa o endpoint `POST /api/auth/login`.
 - [app/pages/dashboard.vue](app/pages/dashboard.vue) usa cards e lista de alunos mockados.
 - [app/pages/index.vue](app/pages/index.vue) e [app/pages/turmas/index.vue](app/pages/turmas/index.vue) hoje possuem fluxos prototipados de turmas.
 - [app/pages/turmas/[id].vue](app/pages/turmas/%5Bid%5D.vue) usa dados mockados para os alunos.
-- Nao ha middleware de autenticacao efetiva no backend.
+- O frontend usa middleware global de autenticacao e o backend protege endpoints via cookie de sessao.
 
 ## Rotas de API
 
@@ -53,10 +53,12 @@ bun run sync:opencollection
 
 Quando a autenticacao esta habilitada, os endpoints de negocio em `/api/*` exigem sessao valida e retornam 401 sem cookie de autenticacao.
 
-Toggle rapido da autenticacao:
+Toggle da autenticacao (constante de build em [nuxt.config.ts](nuxt.config.ts)):
 
-- `AUTH_ENABLED=true`: autenticacao habilitada.
-- `AUTH_ENABLED=false`: autenticacao desabilitada no backend e no app.
+- `AUTH_ENABLED = true`: autenticacao habilitada.
+- `AUTH_ENABLED = false`: autenticacao desabilitada no backend e no app.
+
+Alteracoes nesse valor requerem rebuild da aplicacao.
 
 ### Cursos
 
@@ -249,3 +251,5 @@ Para exemplos de requisicoes reais com curl, incluindo cenarios de erro e valida
 - [docs/README.md](docs/README.md)
 - [docs/exemplos-api.md](docs/exemplos-api.md)
 - [docs/troubleshooting.md](docs/troubleshooting.md)
+- [docs/autenticacao.md](docs/autenticacao.md)
+- [docs/composables.md](docs/composables.md)

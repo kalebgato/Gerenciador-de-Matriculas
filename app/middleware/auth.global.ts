@@ -5,7 +5,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!authEnabled.value) return;
 
   const isPublicRoute = publicRoutes.has(to.path);
-
   const session = await ensureSession();
 
   if (session.authenticated && isPublicRoute) {

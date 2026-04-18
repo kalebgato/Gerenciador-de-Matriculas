@@ -36,10 +36,18 @@ Exemplo:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/db?schema=public
-AUTH_ENABLED=true
 AUTH_SECRET=troque-essa-chave-em-producao
 AUTH_ADMIN_EMAIL=admin@admin.com
 AUTH_ADMIN_PASSWORD=123
+```
+
+Observacao:
+
+- a chave que ativa ou desativa autenticacao nao vem do ambiente;
+- ela e uma constante de build definida em [nuxt.config.ts](nuxt.config.ts):
+
+```ts
+const AUTH_ENABLED = true; // altere aqui e rebuilde
 ```
 
 O arquivo [prisma.config.ts](prisma.config.ts) carrega o .env com override. Isso garante que a URL local do projeto prevaleca sobre variaveis exportadas no shell.

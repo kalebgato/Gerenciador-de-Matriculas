@@ -78,8 +78,7 @@ O projeto ja possui uma base backend utilizavel, mas o frontend ainda esta em tr
 
 ### O que ainda e prototipado
 
-- autenticacao real;
-- guardas de rota no backend;
+- autorizacao por perfis e usuarios reais;
 - consumo do backend por todas as paginas;
 - dashboard com dados reais;
 - telas de turmas com dados vindos da API.
@@ -98,8 +97,7 @@ O projeto ja possui uma base backend utilizavel, mas o frontend ainda esta em tr
 
 ## Observacoes Importantes
 
-- A pagina de login atual nao consulta o backend.
-- O frontend usa localStorage para simular sessao.
+- A autenticacao atual usa sessao simples com cookie httpOnly.
 - Algumas paginas usam dados mockados, enquanto o backend ja expone endpoints reais.
 
 ## Referencias
@@ -107,3 +105,4 @@ O projeto ja possui uma base backend utilizavel, mas o frontend ainda esta em tr
 - [docs/README.md](docs/README.md)
 - [docs/arquitetura.md](docs/arquitetura.md)
 - [docs/rotas.md](docs/rotas.md)
+- [docs/autenticacao.md](docs/autenticacao.md)

@@ -125,10 +125,10 @@ Fonte do diagrama: [docs/plantuml/organizacao-diretorios.puml](docs/plantuml/org
 ### Fluxo de navegacao atual
 
 1. O usuario acessa o frontend.
-2. A tela de login valida credenciais locais no navegador.
-3. Ao autenticar, o frontend grava `auth=true` no localStorage.
-4. Dashboard e paginas de turmas fazem a verificacao local dessa chave.
-5. O backend hoje nao valida sessao nem token.
+2. O middleware global do app verifica a sessao via `useAuth().ensureSession()`.
+3. Se necessario, o frontend consulta `GET /api/auth/me`.
+4. Rotas protegidas so seguem com sessao valida.
+5. O backend tambem valida o cookie nas rotas `/api/*` protegidas.
 
 ### Fluxo de requisicao backend
 
@@ -210,12 +210,13 @@ Fonte do diagrama: [docs/plantuml/fluxo-cobranca.puml](docs/plantuml/fluxo-cobra
 ## Observacoes de Arquitetura
 
 - O backend esta mais maduro que o frontend.
-- A autenticacao atual e apenas simulada no cliente.
+- A autenticacao agora existe no backend e no frontend, mas ainda em formato simples de usuario administrativo unico.
 - A pasta server/generated nao deve ser editada manualmente.
-- O arquivo [docs/db_relations.wsd](docs/db_relations.wsd) representa o modelo relacional de referencia.
+- O arquivo [docs/plantuml/db_relations.wsd](docs/plantuml/db_relations.wsd) representa o modelo relacional de referencia.
 
 ## Referencias
 
 - [docs/README.md](docs/README.md)
 - [docs/projeto.md](docs/projeto.md)
 - [docs/rotas.md](docs/rotas.md)
+- [docs/autenticacao.md](docs/autenticacao.md)
