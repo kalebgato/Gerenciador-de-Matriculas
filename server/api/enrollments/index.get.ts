@@ -1,7 +1,13 @@
-import { enrollmentService } from "#server/modules/enrollment/enrollment.service";
+import { prisma } from "../../lib/prisma";
 
-export default defineEventHandler(async (event) => {
-        // Lista todas as matrículas (pode ser ajustado para limitar ou paginar)
-        // Aqui usamos listByStudent se quiser filtrar depois
-        return enrollmentService.listByStudent(""); // passando "" só como placeholder
+export default defineEventHandler(async () => {
+  const enrollments = await prisma.enrollment.findMany({
+    include: {
+      student: true,
+      team: true,
+      charges: true,
+    },
+  });
+
+  return enrollments;
 });
