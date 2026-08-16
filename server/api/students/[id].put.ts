@@ -1,10 +1,15 @@
+import { createError, defineEventHandler, readBody, type H3Event } from "h3";
 import { studentService } from "#server/modules/student/student.service";
 import type {
     StudentUpdateInput,
     StudentUncheckedUpdateInput,
 } from "#server/generated/models";
 
-export default defineEventHandler(async (event) => {
+/**
+ * PUT /api/students/:id
+ * Atualiza os dados de um aluno existente.
+ */
+export default defineEventHandler(async (event: H3Event) => {
     const { id } = event.context.params as { id: string };
     const body = await readBody<StudentUpdateInput | StudentUncheckedUpdateInput>(event);
 

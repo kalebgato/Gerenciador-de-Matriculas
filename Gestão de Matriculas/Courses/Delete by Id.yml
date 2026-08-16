@@ -1,7 +1,7 @@
 info:
   name: Delete by Id
   type: http
-  seq: 11
+  seq: 12
 
 http:
   method: DELETE
@@ -11,7 +11,7 @@ http:
 runtime:
   variables:
     - name: course_id
-      value: 96e87b0f-260f-47ad-86bb-75283d610bab
+      value: 08847499-f2e2-4b79-bdc7-5f8f49101709
 
 settings:
   encodeUrl: true

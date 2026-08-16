@@ -1,6 +1,11 @@
+import { createError, defineEventHandler, type H3Event } from "h3";
 import { billingService } from "#server/modules/billing/billing.service";
-// /api/billing/late
-export default defineEventHandler(async () => {
+
+/**
+ * GET /api/billing/late
+ * Retorna as cobranças em atraso.
+ */
+export default defineEventHandler(async (_event: H3Event) => {
     try {
         return await billingService.getLatePayments();
     } catch (err: any) {

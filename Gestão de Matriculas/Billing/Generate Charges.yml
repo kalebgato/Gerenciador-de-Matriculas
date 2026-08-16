@@ -1,0 +1,24 @@
+info:
+  name: Generate Charges
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:3000/api/billing
+  body:
+    type: json
+    data: |-
+      {
+        "action": "generate",
+        "enrollmentId": "5b5f7787-7d35-4050-85f0-4d7a4efb4f23",
+        "year": 2026,
+        "amount": 120.15
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

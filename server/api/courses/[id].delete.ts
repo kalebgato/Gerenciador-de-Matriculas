@@ -1,6 +1,11 @@
+import { createError, defineEventHandler, type H3Event } from "h3";
 import { courseService } from "#server/modules/course/course.service";
 
-export default defineEventHandler(async (event) => {
+/**
+ * DELETE /api/courses/:id
+ * Remove uma turma do sistema.
+ */
+export default defineEventHandler(async (event: H3Event) => {
     const { id } = event.context.params as { id: string };
 
     try {

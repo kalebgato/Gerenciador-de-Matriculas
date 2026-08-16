@@ -1,7 +1,12 @@
+import { createError, defineEventHandler, readBody, type H3Event } from "h3";
 import { billingService } from "#server/modules/billing/billing.service";
-import { ChargeStatus, PaymentMethod } from "#server/generated/enums";
+import { PaymentMethod } from "#server/generated/enums";
 
-export default defineEventHandler(async (event) => {
+/**
+ * POST /api/billing
+ * Gera cobranças mensais ou registra um pagamento dependendo da ação enviada.
+ */
+export default defineEventHandler(async (event: H3Event) => {
     const body = await readBody<{
         action: "generate" | "pay";
         enrollmentId?: string;
@@ -29,7 +34,6 @@ export default defineEventHandler(async (event) => {
                 throw new Error("Parâmetros inválidos para pagamento");
             }
 
-            // Converte string para enum PaymentMethod
             const methodEnum = PaymentMethod[body.method.toUpperCase() as keyof typeof PaymentMethod];
             if (!methodEnum) throw new Error("Método de pagamento inválido");
 

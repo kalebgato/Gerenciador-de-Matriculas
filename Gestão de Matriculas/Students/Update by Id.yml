@@ -10,10 +10,10 @@ http:
     type: json
     data: |-
       {
-        "name": "Fulana updated", // opcional
-        "cpf": "000.000.000-05", // opcional
-        "email": "email@email.com", // opcional
-        "phone": "90000-0000" // opcional
+        "name": "Fulana Atualizada",
+        "cpf": "000.000.000-05",
+        "email": "fulana.nova@email.com",
+        "phone": "91999-0000"
       }
   auth: inherit
 

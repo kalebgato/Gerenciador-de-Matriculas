@@ -1,11 +1,11 @@
 info:
-  name: Get By Id
+  name: Get by Student
   type: http
-  seq: 2
+  seq: 3
 
 http:
   method: GET
-  url: http://localhost:3000/api/students/{{student_id}}
+  url: http://localhost:3000/api/enrollments/student/{{student_id}}
   auth: inherit
 
 runtime:

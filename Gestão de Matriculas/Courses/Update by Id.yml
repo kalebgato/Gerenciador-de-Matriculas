@@ -1,7 +1,7 @@
 info:
   name: Update by Id
   type: http
-  seq: 10
+  seq: 11
 
 http:
   method: PUT
@@ -10,16 +10,16 @@ http:
     type: json
     data: |-
       {
-        "name": "TURMA 2 updated",
-        "schedule": "Segunda e quarta de 10h às 11:30",
-        "price": "120.15"
+        "name": "TURMA 2 - Atualizada",
+        "schedule": "Terça e quinta de 9h às 10h30",
+        "price": "140.00"
       }
   auth: inherit
 
 runtime:
   variables:
     - name: course_id
-      value: 0eacde42-5c8c-442c-be65-dd72042887d6
+      value: 08847499-f2e2-4b79-bdc7-5f8f49101709
 
 settings:
   encodeUrl: true
