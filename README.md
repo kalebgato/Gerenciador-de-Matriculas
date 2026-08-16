@@ -1,17 +1,4 @@
 
-<<<<<<< HEAD
-# Gerenciador de Matriculas
-
-Sistema web para gestao de matriculas, turmas, estudantes, cobrancas e pagamentos.
-
-## Resumo
-
-- Stack principal: Nuxt 4, Vue 3, Prisma e PostgreSQL.
-- Backend em `server/api` + `server/modules` com regras de negocio por dominio.
-- Frontend em `app/` com parte das telas ainda em modo prototipo.
-
-## Inicio Rapido
-=======
 # Gestão de Matrículas
 
 Aplicação para gestão de alunos, turmas, matrículas e cobrança financeira em um sistema escolar.
@@ -302,7 +289,6 @@ bun run dev
 ## Licença
 
 Este projeto está sob a mesma licença do repositório principal, conforme indicado no arquivo LICENSE.
->>>>>>> refs/remotes/origin/develop
 
 ```bash
 bun install
