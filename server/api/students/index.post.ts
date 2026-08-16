@@ -1,5 +1,7 @@
+import { createError, defineEventHandler, readBody, type H3Event } from "h3";
 import { studentService } from "#server/modules/student/student.service";
 
+<<<<<<< HEAD
 export default defineEventHandler(async (event) => {
     const body = await readBody<{
         name: string;
@@ -11,6 +13,15 @@ export default defineEventHandler(async (event) => {
         responsable_phone?: string;
         active?: boolean;
     }>(event);
+=======
+/**
+ * POST /api/students
+ * Cria um novo aluno.
+ */
+export default defineEventHandler(async (event: H3Event) => {
+    const body = await readBody<StudentCreateInput>(event);
+
+>>>>>>> refs/remotes/origin/develop
     try {
         const student = await studentService.create(body);
         return student;

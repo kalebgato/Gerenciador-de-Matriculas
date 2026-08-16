@@ -5,18 +5,22 @@
 
     <button class="back" @click="voltar">← Voltar</button>
 
-    <div v-if="turma">
+    <!-- Estado de Loading -->
+    <div v-if="pending" class="card loading">
+      <p>Carregando dados da turma...</p>
+    </div>
 
-      <!-- INFO -->
+    <!-- Conteúdo Principal -->
+    <div v-else-if="turma">
+
       <div class="card">
         <h2>{{ turma.nome }}</h2>
         <p>{{ turma.dia }} - {{ turma.horario }}</p>
         <p><strong>Professor:</strong> {{ turma.professor }}</p>
       </div>
 
-      <!-- TABELA -->
       <div class="card">
-        <h3>Alunos</h3>
+        <h3>Alunos Matriculados</h3>
 
         <table class="table">
           <thead>
@@ -29,7 +33,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="(aluno, i) in turma.alunos" :key="i">
+            <tr v-for="aluno in turma.alunos" :key="aluno.id">
               <td>{{ aluno.nome }}</td>
               <td>{{ aluno.email }}</td>
               <td>{{ aluno.telefone }}</td>
@@ -41,139 +45,183 @@
                 </span>
               </td>
             </tr>
+            <tr v-if="turma.alunos.length === 0">
+              <td colspan="4" class="empty-state">Nenhum aluno matriculado nesta turma.</td>
+            </tr>
           </tbody>
         </table>
       </div>
 
     </div>
 
-    <div v-else>
+    <div v-else class="card">
       <h2>Turma não encontrada</h2>
+      <p>Verifique se o ID informado na URL está correto ou se a API de turmas está acessível.</p>
     </div>
 
   </div>
 </template>
 
+<<<<<<< HEAD
 <script setup lang='ts'>
 import { useRoute } from "vue-router";
 import { computed } from "vue";
+=======
+<script setup lang="ts">
+import { useRoute } from "vue-router"
+import { computed } from "vue"
+>>>>>>> refs/remotes/origin/develop
 
-const route = useRoute();
+interface Student {
+  id: string
+  name?: string
+  nome?: string
+  email?: string
+  phone?: string
+  telefone?: string
+}
 
+interface Team {
+  id: string
+  name?: string
+  nome?: string
+  teacher?: string
+  professor?: string
+  day?: string
+  dia?: string
+  schedule?: string
+  horario?: string
+}
 
-const turmas = [
-  {
-    id: "Jean-Sabado-1400",
-    nome: "Tecido Acrobático",
-    professor: "Jean",
-    dia: "Sábado",
-    horario: "14:00",
-    alunos: [
-      {
-        nome: "Ana Souza",
-        email: "ana.souza@email.com",
-        telefone: "(92) 99123-4567",
-        status: "Pago",
-      },
-      {
-        nome: "Camila Santos",
-        email: "camila.santos@email.com",
-        telefone: "(92) 99234-5678",
-        status: "Pendente",
-      },
-      {
-        nome: "Carlos Lima",
-        email: "carlos.lima@email.com",
-        telefone: "(92) 99345-6789",
-        status: "Pago",
-      },
-      {
-        nome: "Juliana Oliveira",
-        email: "juliana.oliveira@email.com",
-        telefone: "(92) 99456-7890",
-        status: "Pago",
-      },
-      {
-        nome: "Marcos Ferreira",
-        email: "marcos.ferreira@email.com",
-        telefone: "(92) 99567-8901",
-        status: "Pendente",
-      },
-      {
-        nome: "Fernanda Costa",
-        email: "fernanda.costa@email.com",
-        telefone: "(92) 99678-9012",
-        status: "Pago",
-      },
-      {
-        nome: "Rafael Almeida",
-        email: "rafael.almeida@email.com",
-        telefone: "(92) 99789-0123",
-        status: "Pendente",
-      },
-      {
-        nome: "Patrícia Gomes",
-        email: "patricia.gomes@email.com",
-        telefone: "(92) 99890-1234",
-        status: "Pago",
-      },
-      {
-        nome: "Lucas Martins",
-        email: "lucas.martins@email.com",
-        telefone: "(92) 99901-2345",
-        status: "Pago",
-      },
-      {
-        nome: "Beatriz Rocha",
-        email: "beatriz.rocha@email.com",
-        telefone: "(92) 99012-3456",
-        status: "Pendente",
-      },
-    ],
-  },
-  {
-    id: "Maria-Quarta-1800",
-    nome: "Tecido Acrobático",
-    professor: "Maria",
-    dia: "Quarta",
-    horario: "18:00",
-    alunos: [
-      {
-        nome: "Carlos Lima",
-        email: "carlos@email.com",
-        telefone: "(92) 99999-3333",
-        status: "Pago",
-      },
-    ],
-  },
-];
+interface Enrollment {
+  id: string
+  teamId?: string
+  turmaId?: string
+  studentId?: string
+  alunoId?: string
+}
 
+interface LateCharge {
+  id: string
+  studentId?: string
+  alunoId?: string
+}
+
+const route = useRoute()
+
+const { data: rawTeams, pending } = await useLazyFetch<any>('/api/teams', { server: false })
+const { data: rawEnrollmentsAlt1 } = await useLazyFetch<any>('/api/inscricoes', { server: false })
+const { data: rawEnrollmentsAlt2 } = await useLazyFetch<any>('/api/inscrições', { server: false })
+const { data: rawStudents } = await useLazyFetch<any>('/api/students', { server: false })
+const { data: rawLateCharges } = await useLazyFetch<any>('/api/faturamento/atrasado', { server: false })
+
+function normalizeArray(res: any): any[] {
+  if (!res) return []
+  if (Array.isArray(res)) return res
+  if (Array.isArray(res.data)) return res.data
+  if (Array.isArray(res.teams)) return res.teams
+  if (Array.isArray(res.turmas)) return res.turmas
+  if (Array.isArray(res.students)) return res.students
+  if (Array.isArray(res.enrollments)) return res.enrollments
+  if (Array.isArray(res.inscricoes)) return res.inscricoes
+  if (Array.isArray(res.lateCharges)) return res.lateCharges
+  return []
+}
+
+const teams = computed<Team[]>(() => normalizeArray(rawTeams.value))
+const students = computed<Student[]>(() => normalizeArray(rawStudents.value))
+const lateCharges = computed<LateCharge[]>(() => normalizeArray(rawLateCharges.value))
+const enrollments = computed<Enrollment[]>(() => {
+  const e1 = normalizeArray(rawEnrollmentsAlt1.value)
+  return e1.length > 0 ? e1 : normalizeArray(rawEnrollmentsAlt2.value)
+})
+
+const studentMap = computed(() => {
+  const map = new Map<string, Student>()
+  for (const student of students.value) {
+    map.set(String(student.id), student)
+  }
+  return map
+})
+
+const lateStudentIds = computed(() => {
+  const ids = new Set<string>()
+  for (const item of lateCharges.value) {
+    const sId = item.studentId || item.alunoId
+    if (sId) ids.add(String(sId))
+  }
+  return ids
+})
 
 const turma = computed(() => {
-  const id = route.params.id;
-  const encontrada = turmas.find(t => t.id === id);
+  const idParam = String(route.params.id)
 
-  console.log("ID:", id);
-  console.log("Turma encontrada:", encontrada);
+  const targetTeam = teams.value.find(t => String(t.id) === idParam)
+  if (!targetTeam) return null
 
-  return encontrada;
-});
+  const teamEnrollments = enrollments.value.filter(e => {
+    const tId = e.teamId || e.turmaId
+    return String(tId) === idParam
+  })
 
-/* VOLTAR */
+  const alunos = teamEnrollments
+    .map(e => {
+      const sId = e.studentId || e.alunoId
+      if (!sId) return null
+
+      const student = studentMap.value.get(String(sId))
+      if (!student) return null
+
+      return {
+        id: String(student.id),
+        nome: student.name || student.nome || 'Sem Nome',
+        email: student.email || '-',
+        telefone: student.telefone || student.phone || '-',
+        status: lateStudentIds.value.has(String(student.id)) ? 'Pendente' : 'Pago'
+      }
+    })
+    .filter((a): a is { id: string; nome: string; email: string; telefone: string; status: string } => a !== null)
+
+  return {
+    id: String(targetTeam.id),
+    nome: targetTeam.name || targetTeam.nome || 'Turma sem nome',
+    professor: targetTeam.professor || targetTeam.teacher || 'Não informado',
+    dia: targetTeam.dia || targetTeam.day || 'Geral',
+    horario: targetTeam.horario || targetTeam.schedule || 'A definir',
+    alunos
+  }
+})
+
 function voltar() {
-  navigateTo("/turmas");
+  navigateTo("/turmas")
 }
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 /* TÍTULO */
+=======
+.page {
+  padding: 30px;
+  background: #f4f4f4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page > * {
+  width: 100%;
+  max-width: 1100px;
+}
+
+>>>>>>> refs/remotes/origin/develop
 .title {
   font-size: 28px;
   margin-bottom: 10px;
   color: #c62828;
 }
 
-/* BOTÃO */
 .back {
   background: #d32f2f;
   color: white;
@@ -182,21 +230,18 @@ function voltar() {
   border-radius: 8px;
   margin-bottom: 20px;
   cursor: pointer;
-
-  width: fit-content; /* 🔥 resolve o botão gigante */
+  width: fit-content;
 }
 
-/* CARD */
 .card {
   background: white;
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
-  width: 100%; /* 🔥 força ocupar tudo */
+  width: 100%;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* INFO */
 .card h2 {
   margin-bottom: 5px;
 }
@@ -206,12 +251,16 @@ function voltar() {
   color: #555;
 }
 
-/* TABELA */
+.loading {
+  color: #666;
+  font-style: italic;
+}
+
 .table {
   width: 100%;
   margin-top: 10px;
   border-collapse: collapse;
-  table-layout: fixed; /* 🔥 resolve quebra */
+  table-layout: fixed;
 }
 
 .table th {
@@ -225,10 +274,9 @@ function voltar() {
   padding: 12px;
   border-bottom: 1px solid #ddd;
   color: #333;
-  word-break: break-word; /* 🔥 evita quebrar layout */
+  word-break: break-word;
 }
 
-/* STATUS */
 .status {
   padding: 6px 12px;
   border-radius: 999px;
@@ -245,4 +293,14 @@ function voltar() {
 .pendente {
   background: #f46a6a;
 }
+<<<<<<< HEAD
 </style>
+=======
+
+.empty-state {
+  text-align: center;
+  color: #888;
+  padding: 20px;
+}
+</style>
+>>>>>>> refs/remotes/origin/develop

@@ -1,6 +1,11 @@
+import { createError, defineEventHandler, type H3Event } from "h3";
 import { enrollmentService } from "#server/modules/enrollment/enrollment.service";
 
-export default defineEventHandler(async (event) => {
+/**
+ * GET /api/enrollments/student/:id
+ * Lista as matrículas vinculadas a um aluno específico.
+ */
+export default defineEventHandler(async (event: H3Event) => {
     const { id: studentId } = event.context.params as { id: string };
 
     if (!studentId) {

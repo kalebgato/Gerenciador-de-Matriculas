@@ -1,0 +1,28 @@
+info:
+  name: Update by Id
+  type: http
+  seq: 11
+
+http:
+  method: PUT
+  url: http://localhost:3000/api/courses/{{course_id}}
+  body:
+    type: json
+    data: |-
+      {
+        "name": "TURMA 2 - Atualizada",
+        "schedule": "Terça e quinta de 9h às 10h30",
+        "price": "140.00"
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: course_id
+      value: 08847499-f2e2-4b79-bdc7-5f8f49101709
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

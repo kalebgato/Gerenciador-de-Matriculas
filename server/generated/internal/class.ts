@@ -17,8 +17,13 @@ import type * as Prisma from "./prismaNamespace.js"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
+<<<<<<< HEAD
   "clientVersion": "7.7.0",
   "engineVersion": "75cbdc1eb7150937890ad5465d861175c6624711",
+=======
+  "clientVersion": "7.9.1",
+  "engineVersion": "e922089b7d7502aff4249d5da3420f6fa55fc6ad",
+>>>>>>> refs/remotes/origin/develop
   "activeProvider": "postgresql",
   "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../server/generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Student {\n  id                String    @id @default(uuid())\n  name              String    @db.VarChar(255)\n  cpf               String    @unique\n  email             String?   @db.VarChar(255)\n  dn                DateTime?\n  phone             String?\n  responsable_name  String?   @db.VarChar(255)\n  responsable_phone String?\n  active            Boolean   @default(true)\n\n  enrollments Enrollment[]\n\n  @@map(\"students\")\n}\n\nmodel Course {\n  id     String  @id @default(uuid())\n  title  String  @db.VarChar(255)\n  active Boolean @default(true)\n\n  teams Team[]\n\n  @@map(\"courses\")\n}\n\nmodel Team {\n  id             String    @id @default(uuid())\n  course_id      String\n  title          String    @db.VarChar(255)\n  team_leader_id String?\n  start_date     DateTime?\n  end_date       DateTime?\n  horary         String?\n  days_of_week   String?\n  active         Boolean   @default(true)\n  payment_date   DateTime?\n  price          Decimal   @db.Decimal(10, 2)\n\n  course Course @relation(fields: [course_id], references: [id])\n\n  enrollments Enrollment[]\n\n  @@index([course_id])\n  @@map(\"teams\")\n}\n\nmodel Enrollment {\n  id String @id @default(uuid())\n\n  team_id    String\n  student_id String\n\n  student Student @relation(fields: [student_id], references: [id])\n  team    Team    @relation(fields: [team_id], references: [id])\n\n  charges  Charge[]\n  payments Payment[]\n\n  @@unique([team_id, student_id])\n  @@index([student_id])\n  @@index([team_id])\n  @@map(\"enrollments\")\n}\n\nmodel Charge {\n  id            String @id @default(uuid())\n  enrollment_id String\n\n  year  Int\n  month Int\n\n  amount   Decimal  @db.Decimal(10, 2)\n  due_date DateTime\n  paid     Boolean  @default(false)\n\n  status ChargeStatus @default(PENDING)\n\n  payments Payment[]\n\n  enrollment Enrollment @relation(fields: [enrollment_id], references: [id])\n\n  @@unique([enrollment_id, year, month])\n  @@map(\"charges\")\n}\n\nmodel Payment {\n  id String @id @default(uuid())\n\n  enrollment_id String\n  charge_id     String\n  amount        Decimal       @db.Decimal(10, 2)\n  payment_date  DateTime      @default(now())\n  method        PaymentMethod\n\n  enrollment Enrollment @relation(fields: [enrollment_id], references: [id])\n  charge     Charge     @relation(fields: [charge_id], references: [id])\n\n  @@index([enrollment_id])\n  @@index([charge_id])\n  @@map(\"payments\")\n}\n\nmodel User {\n  id       String  @id @default(uuid())\n  name     String  @db.VarChar(255)\n  email    String  @unique @db.VarChar(255)\n  password String\n  active   Boolean @default(true)\n\n  @@map(\"users\")\n}\n\nenum ChargeStatus {\n  PENDING\n  PAID\n  OVERDUE\n}\n\nenum PaymentMethod {\n  CREDIT_CARD\n  DEBIT_CARD\n  BOLETO\n  PIX\n}\n",
   "runtimeDataModel": {
@@ -82,7 +87,7 @@ export interface PrismaClientConstructor {
     LogOpts extends LogOptions<Options> = LogOptions<Options>,
     OmitOpts extends Prisma.PrismaClientOptions['omit'] = Options extends { omit: infer U } ? U : Prisma.PrismaClientOptions['omit'],
     ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
-  >(options: Prisma.Subset<Options, Prisma.PrismaClientOptions> ): PrismaClient<LogOpts, OmitOpts, ExtArgs>
+  >(options: Prisma.PrismaClientConstructorArgs<Options>): PrismaClient<LogOpts, OmitOpts, ExtArgs>
 }
 
 /**
@@ -103,7 +108,7 @@ export interface PrismaClientConstructor {
 
 export interface PrismaClient<
   in LogOpts extends Prisma.LogLevel = never,
-  in out OmitOpts extends Prisma.PrismaClientOptions['omit'] = undefined,
+  in out OmitOpts extends Prisma.PrismaClientOptions['omit'] = Prisma.PrismaClientOptions['omit'],
   in out ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -180,7 +185,7 @@ export interface PrismaClient<
    * 
    * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => runtime.Types.Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<R>
 

@@ -1,7 +1,12 @@
+import { createError, defineEventHandler, readBody, type H3Event } from "h3";
 import { billingService } from "#server/modules/billing/billing.service";
 import { PaymentMethod } from "#server/generated/enums";
 
-export default defineEventHandler(async (event) => {
+/**
+ * POST /api/billing
+ * Gera cobranças mensais ou registra um pagamento dependendo da ação enviada.
+ */
+export default defineEventHandler(async (event: H3Event) => {
     const body = await readBody<{
         action: "generate" | "pay";
         enrollmentId?: string;
