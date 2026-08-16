@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard">
-
     <aside class="sidebar">
       <h2 class="logo">PRODAGIN</h2>
 
@@ -12,7 +11,6 @@
     </aside>
 
     <main class="main">
-
       <header class="topbar">
         <h1>Turmas</h1>
         <button class="back" @click="goDashboard">Voltar</button>
@@ -20,34 +18,23 @@
 
       <select v-model="filtroProfessor" class="select">
         <option value="">Todos professores</option>
-        <option 
-          v-for="prof in professores" 
-          :key="prof"
-          :value="prof"
-        >
+        <option v-for="prof in professores" :key="prof" :value="prof">
           {{ prof }}
         </option>
       </select>
 
       <section class="cards">
-        <div
-          class="turma-card"
-          v-for="turma in turmasFiltradas"
-          :key="turma.id"
-          @click="selecionarTurma(turma)"
-        >
+        <div class="turma-card" v-for="turma in turmasFiltradas" :key="turma.id" @click="selecionarTurma(turma)">
           <h3>{{ turma.nome }}</h3>
           <p>{{ turma.dia }} - {{ turma.horario }}</p>
           <p><strong>Professor:</strong> {{ turma.professor }}</p>
           <p><strong>{{ turma.alunos.length }} alunos</strong></p>
         </div>
       </section>
-
     </main>
 
     <div v-if="turmaSelecionada" class="overlay">
       <div class="panel">
-
         <h2>{{ turmaSelecionada.nome }}</h2>
         <p>{{ turmaSelecionada.dia }} - {{ turmaSelecionada.horario }}</p>
         <p><strong>Professor:</strong> {{ turmaSelecionada.professor }}</p>
@@ -56,232 +43,199 @@
 
         <h3>Alunos</h3>
 
-        <div
-          v-for="aluno in turmaSelecionada.alunos"
-          :key="aluno.id"
-          class="aluno"
-        >
+        <div v-for="aluno in turmaSelecionada.alunos" :key="aluno.id" class="aluno">
           <span>{{ aluno.nome }}</span>
-
-          <span
-            :class="['status', aluno.status === 'Pago' ? 'pago' : 'pendente']"
-          >
+          <span :class="['status', aluno.status === 'Pago' ? 'pago' : 'pendente']">
             {{ aluno.status }}
           </span>
         </div>
 
-        <button 
-          class="enter"
-          :disabled="loading"
-          @click="entrarTurma"
-        >
+        <button class="enter" :disabled="loading" @click="entrarTurma">
           {{ loading ? "Entrando..." : "Entrar" }}
         </button>
 
-        <button class="close" @click="fecharPainel">
-          Fechar
-        </button>
+        <button class="close" @click="fecharPainel">Fechar</button>
       </div>
     </div>
-
   </div>
 </template>
 
-<<<<<<< HEAD
-<script setup lang='ts'>
-import { ref, computed } from "vue";
+<script setup lang="ts">
+import { computed, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
-const filtroProfessor = ref("");
-const turmaSelecionada = ref<any>(null);
-const loading = ref(false);
-=======
-<script setup lang="ts">
-import { ref, computed } from "vue"
-import { onBeforeRouteLeave } from "vue-router"
-
 interface Student {
-  id: string
-  name?: string
-  nome?: string
-  email?: string
+  id: string;
+  name?: string;
+  nome?: string;
+  email?: string;
 }
->>>>>>> refs/remotes/origin/develop
 
 interface Team {
-  id: string
-  name?: string
-  nome?: string
-  teacher?: string
-  professor?: string
-  day?: string
-  dia?: string
-  schedule?: string
-  horario?: string
+  id: string;
+  name?: string;
+  nome?: string;
+  teacher?: string;
+  professor?: string;
+  day?: string;
+  dia?: string;
+  schedule?: string;
+  horario?: string;
 }
 
 interface Enrollment {
-  id: string
-  teamId?: string
-  turmaId?: string
-  studentId?: string
-  alunoId?: string
+  id: string;
+  teamId?: string;
+  turmaId?: string;
+  studentId?: string;
+  alunoId?: string;
 }
 
 interface LateCharge {
-  id: string
-  studentId?: string
-  alunoId?: string
+  id: string;
+  studentId?: string;
+  alunoId?: string;
 }
 
 interface AlunoProcessado {
-  id: string
-  nome: string
-  status: string
+  id: string;
+  nome: string;
+  status: string;
 }
 
 interface TurmaProcessada {
-  id: string
-  nome: string
-  professor: string
-  dia: string
-  horario: string
-  alunos: AlunoProcessado[]
+  id: string;
+  nome: string;
+  professor: string;
+  dia: string;
+  horario: string;
+  alunos: AlunoProcessado[];
 }
 
-const filtroProfessor = ref("")
-const turmaSelecionada = ref<TurmaProcessada | null>(null)
-const loading = ref(false)
+const filtroProfessor = ref("");
+const turmaSelecionada = ref<TurmaProcessada | null>(null);
+const loading = ref(false);
 
-const { data: rawTeams } = await useFetch<any>('/api/teams')
-const { data: rawEnrollmentsAlt1 } = await useFetch<any>('/api/inscricoes')
-const { data: rawEnrollmentsAlt2 } = await useFetch<any>('/api/inscrições')
-const { data: rawStudents } = await useFetch<any>('/api/students')
-const { data: rawLateCharges } = await useFetch<any>('/api/faturamento/atrasado')
+const { data: rawTeams } = await useFetch<any>("/api/teams");
+const { data: rawEnrollmentsAlt1 } = await useFetch<any>("/api/inscricoes");
+const { data: rawEnrollmentsAlt2 } = await useFetch<any>("/api/inscrições");
+const { data: rawStudents } = await useFetch<any>("/api/students");
+const { data: rawLateCharges } = await useFetch<any>("/api/faturamento/atrasado");
 
 function normalizeArray(res: any): any[] {
-  if (!res) return []
-  if (Array.isArray(res)) return res
-  if (Array.isArray(res.data)) return res.data
-  if (Array.isArray(res.teams)) return res.teams
-  if (Array.isArray(res.turmas)) return res.turmas
-  if (Array.isArray(res.students)) return res.students
-  if (Array.isArray(res.enrollments)) return res.enrollments
-  if (Array.isArray(res.inscricoes)) return res.inscricoes
-  if (Array.isArray(res.lateCharges)) return res.lateCharges
-  return []
+  if (!res) return [];
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res.data)) return res.data;
+  if (Array.isArray(res.teams)) return res.teams;
+  if (Array.isArray(res.turmas)) return res.turmas;
+  if (Array.isArray(res.students)) return res.students;
+  if (Array.isArray(res.enrollments)) return res.enrollments;
+  if (Array.isArray(res.inscricoes)) return res.inscricoes;
+  if (Array.isArray(res.lateCharges)) return res.lateCharges;
+  return [];
 }
 
-const teams = computed<Team[]>(() => normalizeArray(rawTeams.value))
-const students = computed<Student[]>(() => normalizeArray(rawStudents.value))
-const lateCharges = computed<LateCharge[]>(() => normalizeArray(rawLateCharges.value))
+const teams = computed<Team[]>(() => normalizeArray(rawTeams.value));
+const students = computed<Student[]>(() => normalizeArray(rawStudents.value));
+const lateCharges = computed<LateCharge[]>(() => normalizeArray(rawLateCharges.value));
 const enrollments = computed<Enrollment[]>(() => {
-  const e1 = normalizeArray(rawEnrollmentsAlt1.value)
-  return e1.length > 0 ? e1 : normalizeArray(rawEnrollmentsAlt2.value)
-})
+  const e1 = normalizeArray(rawEnrollmentsAlt1.value);
+  return e1.length > 0 ? e1 : normalizeArray(rawEnrollmentsAlt2.value);
+});
 
 const studentMap = computed(() => {
-  const map = new Map<string, Student>()
+  const map = new Map<string, Student>();
   for (const student of students.value) {
-    map.set(String(student.id), student)
+    map.set(String(student.id), student);
   }
-  return map
-})
+  return map;
+});
 
 const lateStudentIds = computed(() => {
-  const ids = new Set<string>()
+  const ids = new Set<string>();
   for (const item of lateCharges.value) {
-    const sId = item.studentId || item.alunoId
-    if (sId) ids.add(String(sId))
+    const sId = item.studentId || item.alunoId;
+    if (sId) ids.add(String(sId));
   }
-  return ids
-})
+  return ids;
+});
 
 const turmas = computed<TurmaProcessada[]>(() => {
-  return teams.value.map(team => {
-    const teamIdStr = String(team.id)
+  return teams.value.map((team) => {
+    const teamIdStr = String(team.id);
 
-    const teamEnrollments = enrollments.value.filter(e => {
-      const tId = e.teamId || e.turmaId
-      return String(tId) === teamIdStr
-    })
+    const teamEnrollments = enrollments.value.filter((e) => {
+      const tId = e.teamId || e.turmaId;
+      return String(tId) === teamIdStr;
+    });
 
     const alunos = teamEnrollments
-      .map(e => {
-        const sId = e.studentId || e.alunoId
-        if (!sId) return null
+      .map((e) => {
+        const sId = e.studentId || e.alunoId;
+        if (!sId) return null;
 
-        const student = studentMap.value.get(String(sId))
-        if (!student) return null
+        const student = studentMap.value.get(String(sId));
+        if (!student) return null;
 
         return {
           id: String(student.id),
-          nome: student.name || student.nome || 'Sem Nome',
-          status: lateStudentIds.value.has(String(student.id)) ? 'Pendente' : 'Pago'
-        }
+          nome: student.name || student.nome || "Sem Nome",
+          status: lateStudentIds.value.has(String(student.id)) ? "Pendente" : "Pago",
+        };
       })
-      .filter((aluno): aluno is AlunoProcessado => aluno !== null)
+      .filter((aluno): aluno is AlunoProcessado => aluno !== null);
 
     return {
       id: teamIdStr,
-      nome: team.name || team.nome || 'Turma sem nome',
-      professor: team.professor || team.teacher || 'Não informado',
-      dia: team.dia || team.day || 'Geral',
-      horario: team.horario || team.schedule || 'A definir',
-      alunos
-    }
-  })
-})
+      nome: team.name || team.nome || "Turma sem nome",
+      professor: team.professor || team.teacher || "Não informado",
+      dia: team.dia || team.day || "Geral",
+      horario: team.horario || team.schedule || "A definir",
+      alunos,
+    };
+  });
+});
 
 const professores = computed(() => {
-  const set = new Set(turmas.value.map(t => t.professor))
-  return Array.from(set).filter(p => p !== 'Não informado')
-})
+  const set = new Set(turmas.value.map((t) => t.professor));
+  return Array.from(set).filter((p) => p !== "Não informado");
+});
 
 const turmasFiltradas = computed(() => {
-  if (!filtroProfessor.value) return turmas.value
-  return turmas.value.filter(t => t.professor === filtroProfessor.value)
-})
+  if (!filtroProfessor.value) return turmas.value;
+  return turmas.value.filter((t) => t.professor === filtroProfessor.value);
+});
 
-<<<<<<< HEAD
-function selecionarTurma(turma: any) {
+function selecionarTurma(turma: TurmaProcessada) {
   turmaSelecionada.value = turma;
   loading.value = false;
-=======
-function selecionarTurma(turma: TurmaProcessada) {
-  turmaSelecionada.value = turma
-  loading.value = false
->>>>>>> refs/remotes/origin/develop
 }
 
 function fecharPainel() {
-  turmaSelecionada.value = null
+  turmaSelecionada.value = null;
 }
 
 function entrarTurma() {
-  if (!turmaSelecionada.value || loading.value) return
+  if (!turmaSelecionada.value || loading.value) return;
 
-  loading.value = true
-  const id = turmaSelecionada.value.id
-  turmaSelecionada.value = null
+  loading.value = true;
+  const id = turmaSelecionada.value.id;
+  turmaSelecionada.value = null;
 
-  navigateTo(`/turmas/${id}`)
+  navigateTo(`/turmas/${id}`);
 }
 
 onBeforeRouteLeave(() => {
-  turmaSelecionada.value = null
-})
+  turmaSelecionada.value = null;
+});
 
-<<<<<<< HEAD
-=======
 function logout() {
-  localStorage.removeItem("auth")
-  navigateTo("/login")
+  localStorage.removeItem("auth");
+  navigateTo("/login");
 }
 
->>>>>>> refs/remotes/origin/develop
 function goDashboard() {
-  navigateTo("/dashboard")
+  navigateTo("/dashboard");
 }
 </script>
 
@@ -322,7 +276,7 @@ function goDashboard() {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: flex-end;
 }

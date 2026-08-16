@@ -129,15 +129,15 @@ async function carregarDados() {
   const [studentsResponse, coursesResponse] = await Promise.all([
     $api("/api/students"),
     $api("/api/courses")
-  ])
+  ]) as [any, any]
 
   alunos.value = Array.isArray(studentsResponse)
     ? studentsResponse
-    : studentsResponse.data || studentsResponse.students || []
+    : studentsResponse?.data || studentsResponse?.students || []
 
   const cursos: Course[] = Array.isArray(coursesResponse)
     ? coursesResponse
-    : coursesResponse.data || coursesResponse.courses || []
+    : coursesResponse?.data || coursesResponse?.courses || []
 
   turmas.value = cursos.flatMap(curso => curso.teams || [])
 }
@@ -180,8 +180,8 @@ async function criarMatricula() {
     await $api<Enrollment>("/api/enrollments", {
       method: "POST",
       body: {
-        studentId: studentId.value,
-        classId: classId.value
+        student_id: studentId.value,
+        team_id: classId.value
       }
     })
 

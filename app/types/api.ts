@@ -106,6 +106,10 @@ export type EnrollmentCreateInput = {
   team_id: EntityId;
 };
 
+export type EnrollmentUpdateInput = {
+  team_id?: EntityId;
+};
+
 export type EnrollmentWithRelations = Enrollment & {
   student: Student;
   team: Team;

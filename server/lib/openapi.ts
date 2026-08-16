@@ -474,6 +474,48 @@ export const openApiDocument = {
           404: { $ref: "#/components/responses/NotFound" },
         },
       },
+      put: {
+        tags: ["Enrollments"],
+        summary: "Atualiza a turma da matricula",
+        parameters: [{ $ref: "#/components/parameters/IdParam" }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/EnrollmentUpdateInput" },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Matricula atualizada",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Enrollment" },
+              },
+            },
+          },
+          400: { $ref: "#/components/responses/BadRequest" },
+          404: { $ref: "#/components/responses/NotFound" },
+        },
+      },
+      delete: {
+        tags: ["Enrollments"],
+        summary: "Remove matricula",
+        parameters: [{ $ref: "#/components/parameters/IdParam" }],
+        responses: {
+          200: {
+            description: "Matricula removida",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SuccessMessage" },
+              },
+            },
+          },
+          400: { $ref: "#/components/responses/BadRequest" },
+          404: { $ref: "#/components/responses/NotFound" },
+        },
+      },
     },
     "/api/enrollments/student/{id}": {
       get: {
@@ -792,6 +834,13 @@ export const openApiDocument = {
           team_id: { type: "string", format: "uuid" },
         },
         required: ["student_id", "team_id"],
+      },
+      EnrollmentUpdateInput: {
+        type: "object",
+        properties: {
+          team_id: { type: "string", format: "uuid" },
+        },
+        required: ["team_id"],
       },
       ChargeStatus: {
         type: "string",

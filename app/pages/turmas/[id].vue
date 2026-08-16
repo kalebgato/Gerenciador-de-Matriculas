@@ -1,18 +1,14 @@
 <template>
   <div class="page">
-
     <h1 class="title">Gestão da Turma</h1>
 
     <button class="back" @click="voltar">← Voltar</button>
 
-    <!-- Estado de Loading -->
     <div v-if="pending" class="card loading">
       <p>Carregando dados da turma...</p>
     </div>
 
-    <!-- Conteúdo Principal -->
     <div v-else-if="turma">
-
       <div class="card">
         <h2>{{ turma.nome }}</h2>
         <p>{{ turma.dia }} - {{ turma.horario }}</p>
@@ -38,9 +34,7 @@
               <td>{{ aluno.email }}</td>
               <td>{{ aluno.telefone }}</td>
               <td>
-                <span
-                  :class="['status', aluno.status === 'Pago' ? 'pago' : 'pendente']"
-                >
+                <span :class="['status', aluno.status === 'Pago' ? 'pago' : 'pendente']">
                   {{ aluno.status }}
                 </span>
               </td>
@@ -51,156 +45,145 @@
           </tbody>
         </table>
       </div>
-
     </div>
 
     <div v-else class="card">
       <h2>Turma não encontrada</h2>
       <p>Verifique se o ID informado na URL está correto ou se a API de turmas está acessível.</p>
     </div>
-
   </div>
 </template>
 
-<<<<<<< HEAD
-<script setup lang='ts'>
-import { useRoute } from "vue-router";
-import { computed } from "vue";
-=======
 <script setup lang="ts">
-import { useRoute } from "vue-router"
-import { computed } from "vue"
->>>>>>> refs/remotes/origin/develop
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 
 interface Student {
-  id: string
-  name?: string
-  nome?: string
-  email?: string
-  phone?: string
-  telefone?: string
+  id: string;
+  name?: string;
+  nome?: string;
+  email?: string;
+  phone?: string;
+  telefone?: string;
 }
 
 interface Team {
-  id: string
-  name?: string
-  nome?: string
-  teacher?: string
-  professor?: string
-  day?: string
-  dia?: string
-  schedule?: string
-  horario?: string
+  id: string;
+  name?: string;
+  nome?: string;
+  teacher?: string;
+  professor?: string;
+  day?: string;
+  dia?: string;
+  schedule?: string;
+  horario?: string;
 }
 
 interface Enrollment {
-  id: string
-  teamId?: string
-  turmaId?: string
-  studentId?: string
-  alunoId?: string
+  id: string;
+  teamId?: string;
+  turmaId?: string;
+  studentId?: string;
+  alunoId?: string;
 }
 
 interface LateCharge {
-  id: string
-  studentId?: string
-  alunoId?: string
+  id: string;
+  studentId?: string;
+  alunoId?: string;
 }
 
-const route = useRoute()
+const route = useRoute();
 
-const { data: rawTeams, pending } = await useLazyFetch<any>('/api/teams', { server: false })
-const { data: rawEnrollmentsAlt1 } = await useLazyFetch<any>('/api/inscricoes', { server: false })
-const { data: rawEnrollmentsAlt2 } = await useLazyFetch<any>('/api/inscrições', { server: false })
-const { data: rawStudents } = await useLazyFetch<any>('/api/students', { server: false })
-const { data: rawLateCharges } = await useLazyFetch<any>('/api/faturamento/atrasado', { server: false })
+const { data: rawTeams, pending } = await useLazyFetch<any>("/api/teams", { server: false });
+const { data: rawEnrollmentsAlt1 } = await useLazyFetch<any>("/api/inscricoes", { server: false });
+const { data: rawEnrollmentsAlt2 } = await useLazyFetch<any>("/api/inscrições", { server: false });
+const { data: rawStudents } = await useLazyFetch<any>("/api/students", { server: false });
+const { data: rawLateCharges } = await useLazyFetch<any>("/api/faturamento/atrasado", { server: false });
 
 function normalizeArray(res: any): any[] {
-  if (!res) return []
-  if (Array.isArray(res)) return res
-  if (Array.isArray(res.data)) return res.data
-  if (Array.isArray(res.teams)) return res.teams
-  if (Array.isArray(res.turmas)) return res.turmas
-  if (Array.isArray(res.students)) return res.students
-  if (Array.isArray(res.enrollments)) return res.enrollments
-  if (Array.isArray(res.inscricoes)) return res.inscricoes
-  if (Array.isArray(res.lateCharges)) return res.lateCharges
-  return []
+  if (!res) return [];
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res.data)) return res.data;
+  if (Array.isArray(res.teams)) return res.teams;
+  if (Array.isArray(res.turmas)) return res.turmas;
+  if (Array.isArray(res.students)) return res.students;
+  if (Array.isArray(res.enrollments)) return res.enrollments;
+  if (Array.isArray(res.inscricoes)) return res.inscricoes;
+  if (Array.isArray(res.lateCharges)) return res.lateCharges;
+  return [];
 }
 
-const teams = computed<Team[]>(() => normalizeArray(rawTeams.value))
-const students = computed<Student[]>(() => normalizeArray(rawStudents.value))
-const lateCharges = computed<LateCharge[]>(() => normalizeArray(rawLateCharges.value))
+const teams = computed<Team[]>(() => normalizeArray(rawTeams.value));
+const students = computed<Student[]>(() => normalizeArray(rawStudents.value));
+const lateCharges = computed<LateCharge[]>(() => normalizeArray(rawLateCharges.value));
 const enrollments = computed<Enrollment[]>(() => {
-  const e1 = normalizeArray(rawEnrollmentsAlt1.value)
-  return e1.length > 0 ? e1 : normalizeArray(rawEnrollmentsAlt2.value)
-})
+  const e1 = normalizeArray(rawEnrollmentsAlt1.value);
+  return e1.length > 0 ? e1 : normalizeArray(rawEnrollmentsAlt2.value);
+});
 
 const studentMap = computed(() => {
-  const map = new Map<string, Student>()
+  const map = new Map<string, Student>();
   for (const student of students.value) {
-    map.set(String(student.id), student)
+    map.set(String(student.id), student);
   }
-  return map
-})
+  return map;
+});
 
 const lateStudentIds = computed(() => {
-  const ids = new Set<string>()
+  const ids = new Set<string>();
   for (const item of lateCharges.value) {
-    const sId = item.studentId || item.alunoId
-    if (sId) ids.add(String(sId))
+    const sId = item.studentId || item.alunoId;
+    if (sId) ids.add(String(sId));
   }
-  return ids
-})
+  return ids;
+});
 
 const turma = computed(() => {
-  const idParam = String(route.params.id)
+  const idParam = String(route.params.id);
 
-  const targetTeam = teams.value.find(t => String(t.id) === idParam)
-  if (!targetTeam) return null
+  const targetTeam = teams.value.find((t) => String(t.id) === idParam);
+  if (!targetTeam) return null;
 
-  const teamEnrollments = enrollments.value.filter(e => {
-    const tId = e.teamId || e.turmaId
-    return String(tId) === idParam
-  })
+  const teamEnrollments = enrollments.value.filter((e) => {
+    const tId = e.teamId || e.turmaId;
+    return String(tId) === idParam;
+  });
 
   const alunos = teamEnrollments
-    .map(e => {
-      const sId = e.studentId || e.alunoId
-      if (!sId) return null
+    .map((e) => {
+      const sId = e.studentId || e.alunoId;
+      if (!sId) return null;
 
-      const student = studentMap.value.get(String(sId))
-      if (!student) return null
+      const student = studentMap.value.get(String(sId));
+      if (!student) return null;
 
       return {
         id: String(student.id),
-        nome: student.name || student.nome || 'Sem Nome',
-        email: student.email || '-',
-        telefone: student.telefone || student.phone || '-',
-        status: lateStudentIds.value.has(String(student.id)) ? 'Pendente' : 'Pago'
-      }
+        nome: student.name || student.nome || "Sem Nome",
+        email: student.email || "-",
+        telefone: student.telefone || student.phone || "-",
+        status: lateStudentIds.value.has(String(student.id)) ? "Pendente" : "Pago",
+      };
     })
-    .filter((a): a is { id: string; nome: string; email: string; telefone: string; status: string } => a !== null)
+    .filter((a): a is { id: string; nome: string; email: string; telefone: string; status: string } => a !== null);
 
   return {
     id: String(targetTeam.id),
-    nome: targetTeam.name || targetTeam.nome || 'Turma sem nome',
-    professor: targetTeam.professor || targetTeam.teacher || 'Não informado',
-    dia: targetTeam.dia || targetTeam.day || 'Geral',
-    horario: targetTeam.horario || targetTeam.schedule || 'A definir',
-    alunos
-  }
-})
+    nome: targetTeam.name || targetTeam.nome || "Turma sem nome",
+    professor: targetTeam.professor || targetTeam.teacher || "Não informado",
+    dia: targetTeam.dia || targetTeam.day || "Geral",
+    horario: targetTeam.horario || targetTeam.schedule || "A definir",
+    alunos,
+  };
+});
 
 function voltar() {
-  navigateTo("/turmas")
+  navigateTo("/turmas");
 }
 </script>
 
 <style scoped>
-<<<<<<< HEAD
-/* TÍTULO */
-=======
 .page {
   padding: 30px;
   background: #f4f4f4;
@@ -215,7 +198,6 @@ function voltar() {
   max-width: 1100px;
 }
 
->>>>>>> refs/remotes/origin/develop
 .title {
   font-size: 28px;
   margin-bottom: 10px;
@@ -239,7 +221,7 @@ function voltar() {
   border-radius: 12px;
   margin-bottom: 20px;
   width: 100%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .card h2 {
@@ -293,9 +275,6 @@ function voltar() {
 .pendente {
   background: #f46a6a;
 }
-<<<<<<< HEAD
-</style>
-=======
 
 .empty-state {
   text-align: center;
@@ -303,4 +282,4 @@ function voltar() {
   padding: 20px;
 }
 </style>
->>>>>>> refs/remotes/origin/develop
+

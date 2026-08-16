@@ -1,27 +1,24 @@
 import { createError, defineEventHandler, readBody, type H3Event } from "h3";
 import { enrollmentService } from "#server/modules/enrollment/enrollment.service";
 
-interface EnrollmentCreateBody {
-    student_id: string;
-    team_id: string;
+interface EnrollmentUpdateBody {
+    team_id?: string;
 }
 
 /**
- * POST /api/enrollments
- * Realiza a matrícula de um aluno em uma turma.
+ * PUT /api/enrollments/:id
+ * Atualiza a turma da matrícula quando a turma alvo ainda está ativa.
  */
 export default defineEventHandler(async (event: H3Event) => {
-    const body = await readBody<Partial<EnrollmentCreateBody>>(event);
+    const { id } = event.context.params as { id: string };
+    const body = await readBody<Partial<EnrollmentUpdateBody>>(event);
 
-    if (!body.student_id || !body.team_id) {
+    if (!body.team_id) {
         throw createError({ statusCode: 400, statusMessage: "Parâmetros inválidos" });
     }
 
     try {
-        return await enrollmentService.enroll({
-            student_id: body.student_id,
-            team_id: body.team_id,
-        });
+        return await enrollmentService.update(id, { team_id: body.team_id });
     } catch (err: any) {
         throw createError({ statusCode: 400, statusMessage: err.message });
     }

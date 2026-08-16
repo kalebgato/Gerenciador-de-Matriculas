@@ -1,6 +1,7 @@
 import type {
   Enrollment,
   EnrollmentCreateInput,
+  EnrollmentUpdateInput,
   EnrollmentWithRelations,
   EnrollmentWithTeam,
   EntityId,
@@ -16,5 +17,8 @@ export const useEnrollments = () => {
       api.get<EnrollmentWithTeam[]>(`/api/enrollments/student/${studentId}`),
     create: (payload: EnrollmentCreateInput) =>
       api.post<Enrollment>("/api/enrollments", payload),
+    update: (id: EntityId, payload: EnrollmentUpdateInput) =>
+      api.put<Enrollment>(`/api/enrollments/${id}`, payload),
+    remove: (id: EntityId) => api.delete<{ message: string }>(`/api/enrollments/${id}`),
   };
 };

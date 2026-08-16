@@ -139,6 +139,8 @@ Alteracoes nesse valor requerem rebuild da aplicacao.
 | GET | `/api/enrollments` | [/server/api/enrollments/index.get.ts](/server/api/enrollments/index.get.ts) | lista matriculas com student e team |
 | POST | `/api/enrollments` | [/server/api/enrollments/index.post.ts](/server/api/enrollments/index.post.ts) | cria matricula |
 | GET | `/api/enrollments/:id` | [/server/api/enrollments/[id].get.ts](/server/api/enrollments/%5Bid%5D.get.ts) | busca matricula por id |
+| PUT | `/api/enrollments/:id` | [/server/api/enrollments/[id].put.ts](/server/api/enrollments/%5Bid%5D.put.ts) | atualiza a turma da matricula quando a turma ainda está ativa |
+| DELETE | `/api/enrollments/:id` | [/server/api/enrollments/[id].delete.ts](/server/api/enrollments/%5Bid%5D.delete.ts) | remove matricula somente se a turma estiver ativa |
 | GET | `/api/enrollments/student/:id` | [/server/api/enrollments/student/[id].get.ts](/server/api/enrollments/student/%5Bid%5D.get.ts) | lista matriculas de um estudante |
 
 #### Payload principal de matricula
@@ -150,10 +152,20 @@ Alteracoes nesse valor requerem rebuild da aplicacao.
 }
 ```
 
+#### Payload para atualização da matrícula
+
+```json
+{
+  "team_id": "uuid-da-nova-turma"
+}
+```
+
 #### Validacoes relevantes
 
 - estudante deve existir;
 - turma deve existir;
+- turma deve estar ativa para criar, alterar ou remover a matrícula;
+- nao pode haver mais de uma matrícula do aluno no mesmo curso;
 - nao pode haver matricula duplicada para a combinacao team_id + student_id.
 
 ### Cobranca e Pagamentos

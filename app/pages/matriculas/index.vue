@@ -143,11 +143,11 @@ const erroApi = ref(false)
 
 async function carregarAlunos() {
   try {
-    const response = await $api("/api/students")
+    const response: any = await $api("/api/students")
 
     alunos.value = Array.isArray(response)
       ? response
-      : response.data || response.students || []
+      : response?.data || response?.students || []
   } catch {
     alunos.value = []
     erroApi.value = true
@@ -156,11 +156,11 @@ async function carregarAlunos() {
 
 async function carregarTurmas() {
   try {
-    const response = await $api("/api/courses")
+    const response: any = await $api("/api/courses")
 
     const cursos: Course[] = Array.isArray(response)
       ? response
-      : response.data || response.courses || []
+      : response?.data || response?.courses || []
 
     turmas.value = cursos.flatMap(curso => curso.teams || [])
   } catch {
@@ -174,13 +174,13 @@ async function carregarMatriculas() {
     const resultados = await Promise.all(
       alunos.value.map(async aluno => {
         try {
-          const response = await $api(
+          const response: any = await $api(
             `/api/enrollments/student/${encodeURIComponent(aluno.id)}`
           )
 
           const lista: Enrollment[] = Array.isArray(response)
             ? response
-            : response.data || response.enrollments || []
+            : response?.data || response?.enrollments || []
 
           return lista
         } catch {

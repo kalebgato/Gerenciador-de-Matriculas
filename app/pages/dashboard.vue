@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard">
-
     <aside class="sidebar">
       <h2 class="logo">PRODAGIN</h2>
 
@@ -12,10 +11,8 @@
     </aside>
 
     <main class="main">
-
       <header class="topbar">
         <h1>Dashboard</h1>
-
         <AuthLogoutAction class="logout-btn" text="Sair" loading-text="Saindo..." />
       </header>
 
@@ -60,9 +57,7 @@
               <td>{{ aluno.turma }}</td>
 
               <td>
-                <span
-                  :class="['status', aluno.status === 'Pago' ? 'pago' : 'pendente']"
-                >
+                <span :class="['status', aluno.status === 'Pago' ? 'pago' : 'pendente']">
                   {{ aluno.status }}
                 </span>
               </td>
@@ -77,127 +72,116 @@
           </tbody>
         </table>
       </section>
-
     </main>
   </div>
 </template>
 
-<<<<<<< HEAD
-<script setup lang='ts'>
-const alunos = [
-  { nome: "Ana Souza", turma: "Tecido Acrobático", status: "Pago" },
-  { nome: "Camila Santos", turma: "Tecido Acrobático", status: "Pendente" },
-  { nome: "Carlos Lima", turma: "Tecido Acrobático", status: "Pago" },
-];
-
-=======
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed } from "vue";
 
 interface Student {
-  id: string
-  name?: string
-  nome?: string
-  email?: string
+  id: string;
+  name?: string;
+  nome?: string;
+  email?: string;
 }
 
 interface LateCharge {
-  id: string
-  studentId?: string
-  alunoId?: string
-  amount?: number
+  id: string;
+  studentId?: string;
+  alunoId?: string;
+  amount?: number;
 }
 
 interface Enrollment {
-  id: string
-  studentId?: string
-  alunoId?: string
-  teamId?: string
-  turmaId?: string
+  id: string;
+  studentId?: string;
+  alunoId?: string;
+  teamId?: string;
+  turmaId?: string;
   team?: {
-    name?: string
-  }
+    name?: string;
+  };
 }
 
-const { data: rawStudents } = await useLazyFetch<any>('/api/students', { server: false })
-const { data: rawLateCharges } = await useLazyFetch<any>('/api/faturamento/atrasado', { server: false })
-const { data: rawEnrollmentsAlt1 } = await useLazyFetch<any>('/api/inscricoes', { server: false })
-const { data: rawEnrollmentsAlt2 } = await useLazyFetch<any>('/api/inscrições', { server: false })
+const { data: rawStudents } = await useLazyFetch<any>("/api/students", { server: false });
+const { data: rawLateCharges } = await useLazyFetch<any>("/api/faturamento/atrasado", { server: false });
+const { data: rawEnrollmentsAlt1 } = await useLazyFetch<any>("/api/inscricoes", { server: false });
+const { data: rawEnrollmentsAlt2 } = await useLazyFetch<any>("/api/inscrições", { server: false });
 
 function normalizeArray(res: any): any[] {
-  if (!res) return []
-  if (Array.isArray(res)) return res
-  if (Array.isArray(res.data)) return res.data
-  if (Array.isArray(res.students)) return res.students
-  if (Array.isArray(res.lateCharges)) return res.lateCharges
-  if (Array.isArray(res.enrollments)) return res.enrollments
-  if (Array.isArray(res.inscricoes)) return res.inscricoes
-  return []
+  if (!res) return [];
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res.data)) return res.data;
+  if (Array.isArray(res.students)) return res.students;
+  if (Array.isArray(res.lateCharges)) return res.lateCharges;
+  if (Array.isArray(res.enrollments)) return res.enrollments;
+  if (Array.isArray(res.inscricoes)) return res.inscricoes;
+  return [];
 }
 
-const students = computed<Student[]>(() => normalizeArray(rawStudents.value))
-const lateCharges = computed<LateCharge[]>(() => normalizeArray(rawLateCharges.value))
+const students = computed<Student[]>(() => normalizeArray(rawStudents.value));
+const lateCharges = computed<LateCharge[]>(() => normalizeArray(rawLateCharges.value));
 const enrollments = computed<Enrollment[]>(() => {
-  const e1 = normalizeArray(rawEnrollmentsAlt1.value)
-  return e1.length > 0 ? e1 : normalizeArray(rawEnrollmentsAlt2.value)
-})
+  const e1 = normalizeArray(rawEnrollmentsAlt1.value);
+  return e1.length > 0 ? e1 : normalizeArray(rawEnrollmentsAlt2.value);
+});
 
-const totalAlunos = computed(() => students.value.length)
-const totalPendentes = computed(() => lateCharges.value.length)
-const totalPagos = computed(() => Math.max(0, totalAlunos.value - totalPendentes.value))
+const totalAlunos = computed(() => students.value.length);
+const totalPendentes = computed(() => lateCharges.value.length);
+const totalPagos = computed(() => Math.max(0, totalAlunos.value - totalPendentes.value));
 
 const taxaInadimplencia = computed(() => {
-  if (!totalAlunos.value) return 0
-  return Math.round((totalPendentes.value / totalAlunos.value) * 100)
-})
+  if (!totalAlunos.value) return 0;
+  return Math.round((totalPendentes.value / totalAlunos.value) * 100);
+});
 
 const lateStudentIds = computed(() => {
-  const ids = new Set<string>()
+  const ids = new Set<string>();
   for (const item of lateCharges.value) {
-    const sId = item.studentId || item.alunoId
-    if (sId) ids.add(String(sId))
+    const sId = item.studentId || item.alunoId;
+    if (sId) ids.add(String(sId));
   }
-  return ids
-})
+  return ids;
+});
 
 const enrollmentMap = computed(() => {
-  const map = new Map<string, string>()
+  const map = new Map<string, string>();
   for (const item of enrollments.value) {
-    const sId = item.studentId || item.alunoId
+    const sId = item.studentId || item.alunoId;
     if (sId && item.team?.name) {
-      map.set(String(sId), item.team.name)
+      map.set(String(sId), item.team.name);
     }
   }
-  return map
-})
+  return map;
+});
 
 const alunosProcessados = computed(() => {
-  return students.value.map(student => {
-    const sId = String(student.id)
-    const isPendente = lateStudentIds.value.has(sId)
-    const turmaNome = enrollmentMap.value.get(sId) || 'Sem Turma'
+  return students.value.map((student) => {
+    const sId = String(student.id);
+    const isPendente = lateStudentIds.value.has(sId);
+    const turmaNome = enrollmentMap.value.get(sId) || "Sem Turma";
 
     return {
       id: sId,
-      nome: student.name || student.nome || 'Sem Nome',
+      nome: student.name || student.nome || "Sem Nome",
       turma: turmaNome,
-      status: isPendente ? 'Pendente' : 'Pago'
-    }
-  })
-})
+      status: isPendente ? "Pendente" : "Pago",
+    };
+  });
+});
 
 function logout() {
-  localStorage.removeItem("auth")
-  navigateTo("/login")
+  localStorage.removeItem("auth");
+  navigateTo("/login");
 }
 
->>>>>>> refs/remotes/origin/develop
 function goTurmas() {
-  navigateTo("/turmas")
+  navigateTo("/turmas");
 }
 
 function verDetalhes(id: string) {
-  navigateTo(`/alunos/${id}`)
+  navigateTo(`/alunos/${id}`);
 }
 </script>
 
@@ -238,6 +222,7 @@ function verDetalhes(id: string) {
 .topbar {
   display: flex;
   justify-content: space-between;
+
   align-items: center;
 }
 
