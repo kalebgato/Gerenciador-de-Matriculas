@@ -17,8 +17,8 @@ import type * as Prisma from "./prismaNamespace.js"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.5.0",
-  "engineVersion": "280c870be64f457428992c43c1f6d557fab6e29e",
+  "clientVersion": "7.8.0",
+  "engineVersion": "3c6e192761c0362d496ed980de936e2f3cebcd3a",
   "activeProvider": "postgresql",
   "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../server/generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Student {\n  id    String  @id @default(uuid())\n  name  String  @db.VarChar(255)\n  cpf   String  @unique\n  email String? @db.VarChar(255)\n  phone String?\n\n  enrollments Enrollment[]\n\n  createdAt DateTime @default(now())\n\n  @@map(\"students\")\n}\n\nmodel Course {\n  id          String  @id @default(uuid())\n  name        String  @db.VarChar(255)\n  description String?\n  price       Decimal @db.Decimal(10, 2)\n\n  teams Team[]\n\n  createdAt DateTime @default(now())\n\n  @@map(\"courses\")\n}\n\nmodel Team {\n  id       String  @id @default(uuid())\n  name     String  @db.VarChar(255)\n  schedule String?\n\n  courseId String\n  course   Course @relation(fields: [courseId], references: [id])\n\n  enrollments Enrollment[]\n\n  createdAt DateTime @default(now())\n\n  @@map(\"teams\")\n}\n\nmodel Enrollment {\n  id String @id @default(uuid())\n\n  studentId String\n  teamId    String\n\n  startDate DateTime @default(now())\n  active    Boolean  @default(true)\n\n  student Student @relation(fields: [studentId], references: [id])\n  team    Team    @relation(fields: [teamId], references: [id])\n\n  charges Charge[]\n\n  @@index([studentId])\n  @@index([teamId])\n  @@map(\"enrollments\")\n}\n\nmodel Charge {\n  id           String @id @default(uuid())\n  enrollmentId String\n\n  year  Int\n  month Int\n\n  amount  Decimal  @db.Decimal(10, 2)\n  dueDate DateTime\n\n  status ChargeStatus @default(PENDING)\n\n  payments Payment[]\n\n  enrollment Enrollment @relation(fields: [enrollmentId], references: [id])\n\n  @@unique([enrollmentId, year, month])\n  @@map(\"charges\")\n}\n\nmodel Payment {\n  id String @id @default(uuid())\n\n  chargeId String\n  amount   Decimal       @db.Decimal(10, 2)\n  method   PaymentMethod\n  paidAt   DateTime      @default(now())\n\n  charge Charge @relation(fields: [chargeId], references: [id])\n\n  @@map(\"payments\")\n}\n\nenum ChargeStatus {\n  PENDING\n  PAID\n  LATE\n}\n\nenum PaymentMethod {\n  PIX\n  CASH\n  CREDIT_CARD\n  DEBIT_CARD\n}\n",
   "runtimeDataModel": {
@@ -180,7 +180,7 @@ export interface PrismaClient<
    * 
    * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => runtime.Types.Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<R>
 

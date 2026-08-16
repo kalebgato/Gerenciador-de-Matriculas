@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard">
-
     <aside class="sidebar">
       <h2 class="logo">PRODAGIN</h2>
 
@@ -12,7 +11,6 @@
     </aside>
 
     <main class="main">
-
       <header class="topbar">
         <h1>Dashboard</h1>
 
@@ -24,22 +22,22 @@
       <section class="cards">
         <div class="card blue">
           <p>Total de Alunos</p>
-          <h2>120</h2>
+          <h2>{{ totalAlunos }}</h2>
         </div>
 
         <div class="card green">
           <p>Pagos</p>
-          <h2>80</h2>
+          <h2>{{ pagos }}</h2>
         </div>
 
         <div class="card red">
           <p>Pendentes</p>
-          <h2>40</h2>
+          <h2>{{ pendentes }}</h2>
         </div>
 
         <div class="card orange">
           <p>% Inadimplência</p>
-          <h2>33%</h2>
+          <h2>{{ inadimplencia }}%</h2>
         </div>
       </section>
 
@@ -50,50 +48,90 @@
           <thead>
             <tr>
               <th>Nome</th>
-              <th>Turma</th>
+              <th>Email</th>
               <th>Status</th>
-              <th>Ações</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr v-for="(aluno, i) in alunos" :key="i">
-              <td>{{ aluno.nome }}</td>
-              <td>{{ aluno.turma }}</td>
+            <tr v-for="aluno in alunos" :key="aluno.id">
+              <td>{{ aluno.name }}</td>
+              <td>{{ aluno.email }}</td>
 
               <td>
                 <span
-                  :class="['status', aluno.status === 'Pago' ? 'pago' : 'pendente']"
+                  :class="[
+                    'status',
+                    alunosPendentesIds.includes(aluno.id)
+                      ? 'pendente'
+                      : 'pago'
+                  ]"
                 >
-                  {{ aluno.status }}
+                  {{
+                    alunosPendentesIds.includes(aluno.id)
+                      ? "Pendente"
+                      : "Pago"
+                  }}
                 </span>
-              </td>
-
-              <td>
-                <button class="btn">Ver detalhes</button>
               </td>
             </tr>
           </tbody>
         </table>
       </section>
-
     </main>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 
-const alunos = [
-  { nome: "Ana Souza", turma: "Tecido Acrobático", status: "Pago" },
-  { nome: "Camila Santos", turma: "Tecido Acrobático", status: "Pendente" },
-  { nome: "Carlos Lima", turma: "Tecido Acrobático", status: "Pago" },
-];
+const alunos = ref([]);
+const cobrancasPendentes = ref([]);
 
-onMounted(() => {
-  const isLogged = localStorage.getItem("auth");
-  if (!isLogged) navigateTo("/login");
+const totalAlunos = computed(() => alunos.value.length);
+
+const pendentes = computed(() => cobrancasPendentes.value.length);
+
+const pagos = computed(() => {
+  return totalAlunos.value - pendentes.value;
 });
+
+const inadimplencia = computed(() => {
+  if (totalAlunos.value === 0) return 0;
+
+  return Math.round((pendentes.value / totalAlunos.value) * 100);
+});
+
+const alunosPendentesIds = computed(() => {
+  return cobrancasPendentes.value.map(
+    (cobranca) => cobranca.enrollment.student.id
+  );
+});
+
+onMounted(async () => {
+  const isLogged = localStorage.getItem("auth");
+
+  if (!isLogged) {
+    navigateTo("/login");
+    return;
+  }
+
+  await carregarDados();
+});
+
+async function carregarDados() {
+  try {
+    const [studentsRes, lateRes] = await Promise.all([
+      $fetch("/api/students"),
+      $fetch("/api/billing/late"),
+    ]);
+
+    alunos.value = studentsRes;
+    cobrancasPendentes.value = lateRes;
+  } catch (error) {
+    console.error("Erro ao carregar dashboard:", error);
+  }
+}
 
 function logout() {
   localStorage.removeItem("auth");
@@ -134,13 +172,11 @@ function goTurmas() {
   font-weight: bold;
 }
 
-/* MAIN */
 .main {
   flex: 1;
   padding: 30px;
 }
 
-/* TOPBAR */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -198,8 +234,9 @@ function goTurmas() {
 
 .table th,
 .table td {
-  padding: 10px;
+  padding: 12px;
   text-align: left;
+  border-bottom: 1px solid #eee;
 }
 
 .status {
@@ -215,14 +252,5 @@ function goTurmas() {
 
 .pendente {
   background: #f46a6a;
-}
-
-.btn {
-  background: #d32f2f;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
 }
 </style>

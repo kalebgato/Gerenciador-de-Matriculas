@@ -1,41 +1,49 @@
 <template>
   <div class="page">
-
     <h1 class="title">Gestão da Turma</h1>
 
     <button class="back" @click="voltar">← Voltar</button>
 
-    <div v-if="turma">
+    <div v-if="loading" class="card">
+      <h2 class="text-dark">Carregando turma...</h2>
+    </div>
 
-      <!-- INFO -->
+    <div v-else-if="turma">
       <div class="card">
-        <h2>{{ turma.nome }}</h2>
-        <p>{{ turma.dia }} - {{ turma.horario }}</p>
-        <p><strong>Professor:</strong> {{ turma.professor }}</p>
+        <h2 class="text-dark">{{ turma.nome }}</h2>
+        <p class="text-dark"><strong>Horário:</strong> {{ turma.dia }}</p>
+        <p class="text-dark"><strong>Curso:</strong> {{ turma.curso }}</p>
+        <p class="text-dark"><strong>Status:</strong> Turma ativa</p>
       </div>
 
-      <!-- TABELA -->
       <div class="card">
-        <h3>Alunos</h3>
+        <h3 class="text-dark">Alunos da turma</h3>
 
-        <table class="table">
+        <div v-if="turma.alunos.length === 0" class="text-dark">
+          Nenhum aluno matriculado nesta turma.
+        </div>
+
+        <table v-else class="table">
           <thead>
             <tr>
               <th>Nome</th>
               <th>Email</th>
               <th>Telefone</th>
-              <th>Status</th>
+              <th>Status Financeiro</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr v-for="(aluno, i) in turma.alunos" :key="i">
+            <tr v-for="aluno in turma.alunos" :key="aluno.id">
               <td>{{ aluno.nome }}</td>
               <td>{{ aluno.email }}</td>
               <td>{{ aluno.telefone }}</td>
               <td>
                 <span
-                  :class="['status', aluno.status === 'Pago' ? 'pago' : 'pendente']"
+                  :class="[
+                    'status',
+                    aluno.status === 'Pago' ? 'pago' : 'pendente'
+                  ]"
                 >
                   {{ aluno.status }}
                 </span>
@@ -44,125 +52,77 @@
           </tbody>
         </table>
       </div>
-
     </div>
 
-    <div v-else>
-      <h2>Turma não encontrada</h2>
+    <div v-else class="card">
+      <h2 class="text-dark">Turma não encontrada</h2>
     </div>
-
   </div>
 </template>
 
 <script setup>
 import { useRoute } from "vue-router";
-import { computed } from "vue";
+import { ref, onMounted } from "vue";
 
 const route = useRoute();
 
+const turma = ref(null);
+const loading = ref(true);
 
-const turmas = [
-  {
-    id: "Jean-Sabado-1400",
-    nome: "Tecido Acrobático",
-    professor: "Jean",
-    dia: "Sábado",
-    horario: "14:00",
-    alunos: [
-      {
-        nome: "Ana Souza",
-        email: "ana.souza@email.com",
-        telefone: "(92) 99123-4567",
-        status: "Pago",
-      },
-      {
-        nome: "Camila Santos",
-        email: "camila.santos@email.com",
-        telefone: "(92) 99234-5678",
-        status: "Pendente",
-      },
-      {
-        nome: "Carlos Lima",
-        email: "carlos.lima@email.com",
-        telefone: "(92) 99345-6789",
-        status: "Pago",
-      },
-      {
-        nome: "Juliana Oliveira",
-        email: "juliana.oliveira@email.com",
-        telefone: "(92) 99456-7890",
-        status: "Pago",
-      },
-      {
-        nome: "Marcos Ferreira",
-        email: "marcos.ferreira@email.com",
-        telefone: "(92) 99567-8901",
-        status: "Pendente",
-      },
-      {
-        nome: "Fernanda Costa",
-        email: "fernanda.costa@email.com",
-        telefone: "(92) 99678-9012",
-        status: "Pago",
-      },
-      {
-        nome: "Rafael Almeida",
-        email: "rafael.almeida@email.com",
-        telefone: "(92) 99789-0123",
-        status: "Pendente",
-      },
-      {
-        nome: "Patrícia Gomes",
-        email: "patricia.gomes@email.com",
-        telefone: "(92) 99890-1234",
-        status: "Pago",
-      },
-      {
-        nome: "Lucas Martins",
-        email: "lucas.martins@email.com",
-        telefone: "(92) 99901-2345",
-        status: "Pago",
-      },
-      {
-        nome: "Beatriz Rocha",
-        email: "beatriz.rocha@email.com",
-        telefone: "(92) 99012-3456",
-        status: "Pendente",
-      },
-    ],
-  },
-  {
-    id: "Maria-Quarta-1800",
-    nome: "Tecido Acrobático",
-    professor: "Maria",
-    dia: "Quarta",
-    horario: "18:00",
-    alunos: [
-      {
-        nome: "Carlos Lima",
-        email: "carlos@email.com",
-        telefone: "(92) 99999-3333",
-        status: "Pago",
-      },
-    ],
-  },
-];
+async function carregarTurma() {
+  try {
+    const id = String(route.params.id);
 
+    const cursos = await $fetch("/api/courses");
+    const enrollments = await $fetch("/api/enrollments");
 
-const turma = computed(() => {
-  const id = route.params.id;
-  const encontrada = turmas.find(t => t.id === id);
+    let turmaEncontrada = null;
 
-  console.log("ID:", id);
-  console.log("Turma encontrada:", encontrada);
+    for (const curso of cursos) {
+      const team = curso.teams.find((t) => String(t.id) === id);
 
-  return encontrada;
-});
+      if (team) {
+        const alunosDaTurma = enrollments
+          .filter((e) => String(e.teamId) === id)
+          .map((e) => ({
+            id: e.student.id,
+            nome: e.student.name,
+            email: e.student.email,
+            telefone: e.student.phone,
+            status:
+              e.charges?.some((c) => c.status === "PENDING")
+                ? "Pendente"
+                : "Pago",
+          }));
 
-/* VOLTAR */
+        turmaEncontrada = {
+          id: team.id,
+          nome: team.name,
+          dia: team.schedule || "Sem horário",
+          curso: curso.name,
+          alunos: alunosDaTurma,
+        };
+
+        break;
+      }
+    }
+
+    turma.value = turmaEncontrada;
+  } catch (error) {
+    console.error("Erro ao carregar turma:", error);
+    turma.value = null;
+  } finally {
+    loading.value = false;
+  }
+}
+
 function voltar() {
   navigateTo("/turmas");
 }
+
+onMounted(() => {
+  carregarTurma();
+});
 </script>
 
 <style>
@@ -170,88 +130,61 @@ function voltar() {
   padding: 30px;
   background: #f4f4f4;
   min-height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* 🔥 centraliza tudo */
 }
 
-/* CONTEÚDO CENTRAL */
-.page > * {
-  width: 100%;
-  max-width: 1100px;
-}
-
-/* TÍTULO */
 .title {
   font-size: 28px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   color: #c62828;
 }
 
-/* BOTÃO */
 .back {
   background: #d32f2f;
   color: white;
   border: none;
-  padding: 8px 14px;
+  padding: 10px 16px;
   border-radius: 8px;
   margin-bottom: 20px;
   cursor: pointer;
-
-  width: fit-content; /* 🔥 resolve o botão gigante */
 }
 
-/* CARD */
 .card {
   background: white;
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
-  width: 100%; /* 🔥 força ocupar tudo */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* INFO */
-.card h2 {
-  margin-bottom: 5px;
+.text-dark {
+  color: #222 !important;
 }
 
-.card p {
-  margin: 4px 0;
-  color: #555;
-}
-
-/* TABELA */
 .table {
   width: 100%;
-  margin-top: 10px;
+  margin-top: 15px;
   border-collapse: collapse;
-  table-layout: fixed; /* 🔥 resolve quebra */
 }
 
 .table th {
-  background: #eee;
+  background: #f0f0f0;
   padding: 12px;
   text-align: left;
-  color: #333;
+  color: #222 !important;
 }
 
 .table td {
   padding: 12px;
   border-bottom: 1px solid #ddd;
-  color: #333;
-  word-break: break-word; /* 🔥 evita quebrar layout */
+  color: #222 !important;
 }
 
-/* STATUS */
 .status {
   padding: 6px 12px;
   border-radius: 999px;
-  color: white;
+  color: white !important;
   font-size: 12px;
   font-weight: bold;
-  display: inline-block;
 }
 
 .pago {
