@@ -265,9 +265,6 @@ function verDetalhes(id: string) {
   background: #f46a6a;
 }
 
-<<<<<<< HEAD
-</style>
-=======
 .btn {
   background: #d32f2f;
   color: white;
@@ -283,4 +280,3 @@ function verDetalhes(id: string) {
   padding: 20px;
 }
 </style>
->>>>>>> refs/remotes/origin/develop
