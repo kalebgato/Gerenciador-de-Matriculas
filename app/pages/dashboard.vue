@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 interface Student {
   id: string;
@@ -88,26 +88,33 @@ interface Student {
 
 interface LateCharge {
   id: string;
+  student_id?: string;
   studentId?: string;
   alunoId?: string;
   amount?: number;
+  enrollment?: {
+    student?: { id?: string };
+  };
 }
 
 interface Enrollment {
   id: string;
+  student_id?: string;
   studentId?: string;
   alunoId?: string;
+  team_id?: string;
   teamId?: string;
   turmaId?: string;
   team?: {
+    title?: string;
     name?: string;
   };
 }
 
-const { data: rawStudents } = await useLazyFetch<any>("/api/students", { server: false });
-const { data: rawLateCharges } = await useLazyFetch<any>("/api/faturamento/atrasado", { server: false });
-const { data: rawEnrollmentsAlt1 } = await useLazyFetch<any>("/api/inscricoes", { server: false });
-const { data: rawEnrollmentsAlt2 } = await useLazyFetch<any>("/api/inscrições", { server: false });
+const api = useApiClient();
+
+const { data: rawStudents } = await useFetch<any>("/api/students");
+const { data: rawLateCharges } = await useFetch<any>("/api/billing/late");
 
 function normalizeArray(res: any): any[] {
   if (!res) return [];
@@ -122,13 +129,26 @@ function normalizeArray(res: any): any[] {
 
 const students = computed<Student[]>(() => normalizeArray(rawStudents.value));
 const lateCharges = computed<LateCharge[]>(() => normalizeArray(rawLateCharges.value));
-const enrollments = computed<Enrollment[]>(() => {
-  const e1 = normalizeArray(rawEnrollmentsAlt1.value);
-  return e1.length > 0 ? e1 : normalizeArray(rawEnrollmentsAlt2.value);
+
+const enrollmentsResults = await Promise.all(
+  normalizeArray(rawStudents.value).map((s: any) =>
+    api.get<any>(`/api/enrollments/student/${s.id}`).catch(() => [])
+  )
+);
+const enrollmentsFlat = ref<any[]>(enrollmentsResults.flat());
+const enrollments = computed<Enrollment[]>(() => normalizeArray(enrollmentsFlat.value));
+
+const lateStudentIds = computed(() => {
+  const ids = new Set<string>();
+  for (const item of lateCharges.value) {
+    const sId = item.enrollment?.student?.id || item.student_id || item.studentId || item.alunoId;
+    if (sId) ids.add(String(sId));
+  }
+  return ids;
 });
 
 const totalAlunos = computed(() => students.value.length);
-const totalPendentes = computed(() => lateCharges.value.length);
+const totalPendentes = computed(() => lateStudentIds.value.size);
 const totalPagos = computed(() => Math.max(0, totalAlunos.value - totalPendentes.value));
 
 const taxaInadimplencia = computed(() => {
@@ -136,21 +156,13 @@ const taxaInadimplencia = computed(() => {
   return Math.round((totalPendentes.value / totalAlunos.value) * 100);
 });
 
-const lateStudentIds = computed(() => {
-  const ids = new Set<string>();
-  for (const item of lateCharges.value) {
-    const sId = item.studentId || item.alunoId;
-    if (sId) ids.add(String(sId));
-  }
-  return ids;
-});
-
 const enrollmentMap = computed(() => {
   const map = new Map<string, string>();
   for (const item of enrollments.value) {
-    const sId = item.studentId || item.alunoId;
-    if (sId && item.team?.name) {
-      map.set(String(sId), item.team.name);
+    const sId = item.student_id || item.studentId || item.alunoId;
+    const turmaNome = item.team?.title || item.team?.name;
+    if (sId && turmaNome) {
+      map.set(String(sId), turmaNome);
     }
   }
   return map;
@@ -188,42 +200,67 @@ function verDetalhes(id: string) {
 <style scoped>
 .dashboard {
   display: flex;
-  height: 100vh;
-  background: #f4f4f4;
+  min-height: 100vh;
+  background: #f7f7f7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .sidebar {
-  width: 220px;
-  background: white;
-  padding: 20px;
+  width: 230px;
+  background: #ffffff;
+  padding: 24px 16px;
   border-right: 1px solid #eee;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
 }
 
 .logo {
   color: #c62828;
-  margin-bottom: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 28px;
+  font-size: 24px;
 }
 
-.sidebar p {
-  margin: 10px 0;
+.sidebar nav p,
+.sidebar nav :deep(p) {
+  margin: 4px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
   cursor: pointer;
+  color: #444;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar nav p:hover,
+.sidebar nav :deep(p:hover) {
+  background: #fdecea;
+  color: #c62828;
 }
 
 .sidebar .active {
-  color: #c62828;
-  font-weight: bold;
+  background: #c62828;
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 .main {
   flex: 1;
-  padding: 30px;
+  padding: 32px 40px;
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
-
   align-items: center;
+  margin-bottom: 24px;
+}
+
+.topbar h1 {
+  font-size: 30px;
+  font-weight: 800;
+  color: #222;
 }
 
 .cards {
@@ -234,9 +271,43 @@ function verDetalhes(id: string) {
 }
 
 .card {
-  padding: 20px;
-  border-radius: 12px;
+  padding: 22px;
+  border-radius: 14px;
   color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card p {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.9;
+  margin: 0 0 6px 0;
+}
+
+.card h2 {
+  font-size: 30px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.table-section {
+  background: white;
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.table-section h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 16px 0;
 }
 
 .table {
@@ -244,34 +315,72 @@ function verDetalhes(id: string) {
   border-collapse: collapse;
 }
 
-.table th,
-.table td {
-  padding: 10px;
+.table th {
+  padding: 12px 10px;
   text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.table td {
+  padding: 14px 10px;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  border-bottom: 1px solid #f4f4f4;
 }
 
 .status {
-  padding: 5px 10px;
-  border-radius: 8px;
+  padding: 4px 12px;
+  border-radius: 20px;
   color: white;
   font-size: 12px;
+  font-weight: 600;
 }
 
 .pago {
-  background: #34c38f;
+  background: #2e7d32;
 }
 
 .pendente {
-  background: #f46a6a;
+  background: #c62828;
 }
 
 .btn {
-  background: #d32f2f;
+  background: #c62828;
   color: white;
   border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.btn:hover {
+  background: #a91f1f;
+}
+
+.logout-btn {
+  background: #ffffff;
+  color: #c62828;
+  border: 2px solid #c62828;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.logout-btn:hover {
+  background: #c62828;
+  color: #ffffff;
 }
 
 .empty-state {

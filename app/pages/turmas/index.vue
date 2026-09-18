@@ -6,6 +6,7 @@
       <nav>
         <p @click="goDashboard">Dashboard</p>
         <p class="active">Turmas</p>
+        <p @click="goMatriculas">Matrículas</p>
         <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
     </aside>
@@ -73,20 +74,26 @@ interface Student {
 
 interface Team {
   id: string;
+  title?: string;
   name?: string;
   nome?: string;
+  team_leader_id?: string;
   teacher?: string;
   professor?: string;
+  days_of_week?: string;
   day?: string;
   dia?: string;
+  horary?: string;
   schedule?: string;
   horario?: string;
 }
 
 interface Enrollment {
   id: string;
+  team_id?: string;
   teamId?: string;
   turmaId?: string;
+  student_id?: string;
   studentId?: string;
   alunoId?: string;
 }
@@ -116,11 +123,11 @@ const filtroProfessor = ref("");
 const turmaSelecionada = ref<TurmaProcessada | null>(null);
 const loading = ref(false);
 
+const api = useApiClient();
+
 const { data: rawTeams } = await useFetch<any>("/api/teams");
-const { data: rawEnrollmentsAlt1 } = await useFetch<any>("/api/inscricoes");
-const { data: rawEnrollmentsAlt2 } = await useFetch<any>("/api/inscrições");
 const { data: rawStudents } = await useFetch<any>("/api/students");
-const { data: rawLateCharges } = await useFetch<any>("/api/faturamento/atrasado");
+const { data: rawLateCharges } = await useFetch<any>("/api/billing/late");
 
 function normalizeArray(res: any): any[] {
   if (!res) return [];
@@ -138,10 +145,14 @@ function normalizeArray(res: any): any[] {
 const teams = computed<Team[]>(() => normalizeArray(rawTeams.value));
 const students = computed<Student[]>(() => normalizeArray(rawStudents.value));
 const lateCharges = computed<LateCharge[]>(() => normalizeArray(rawLateCharges.value));
-const enrollments = computed<Enrollment[]>(() => {
-  const e1 = normalizeArray(rawEnrollmentsAlt1.value);
-  return e1.length > 0 ? e1 : normalizeArray(rawEnrollmentsAlt2.value);
-});
+const enrollmentsResults = await Promise.all(
+  normalizeArray(rawStudents.value).map((s: any) =>
+    api.get<any>(`/api/enrollments/student/${s.id}`).catch(() => [])
+  )
+);
+const enrollmentsFlat = ref<any[]>(enrollmentsResults.flat());
+
+const enrollments = computed<Enrollment[]>(() => normalizeArray(enrollmentsFlat.value));
 
 const studentMap = computed(() => {
   const map = new Map<string, Student>();
@@ -154,7 +165,7 @@ const studentMap = computed(() => {
 const lateStudentIds = computed(() => {
   const ids = new Set<string>();
   for (const item of lateCharges.value) {
-    const sId = item.studentId || item.alunoId;
+    const sId = item.enrollment?.student?.id || item.studentId || item.alunoId;
     if (sId) ids.add(String(sId));
   }
   return ids;
@@ -165,13 +176,13 @@ const turmas = computed<TurmaProcessada[]>(() => {
     const teamIdStr = String(team.id);
 
     const teamEnrollments = enrollments.value.filter((e) => {
-      const tId = e.teamId || e.turmaId;
+      const tId = e.team_id || e.teamId || e.turmaId;
       return String(tId) === teamIdStr;
     });
 
     const alunos = teamEnrollments
       .map((e) => {
-        const sId = e.studentId || e.alunoId;
+        const sId = e.student_id || e.studentId || e.alunoId;
         if (!sId) return null;
 
         const student = studentMap.value.get(String(sId));
@@ -187,10 +198,10 @@ const turmas = computed<TurmaProcessada[]>(() => {
 
     return {
       id: teamIdStr,
-      nome: team.name || team.nome || "Turma sem nome",
-      professor: team.professor || team.teacher || "Não informado",
-      dia: team.dia || team.day || "Geral",
-      horario: team.horario || team.schedule || "A definir",
+      nome: team.title || team.name || team.nome || "Turma sem nome",
+      professor: team.team_leader_id || team.professor || team.teacher || "Não informado",
+      dia: team.days_of_week || team.dia || team.day || "Horário",
+      horario: team.horary || team.horario || team.schedule || "A definir",
       alunos,
     };
   });
@@ -237,22 +248,110 @@ function logout() {
 function goDashboard() {
   navigateTo("/dashboard");
 }
+
+function goMatriculas() {
+  navigateTo("/matriculas");
+}
 </script>
 
 <style scoped>
 .dashboard {
   display: flex;
+  min-height: 100vh;
+  background: #f7f7f7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .sidebar {
-  width: 200px;
-  padding: 20px;
-  background: #f5f5f5;
+  width: 230px;
+  background: #ffffff;
+  padding: 24px 16px;
+  border-right: 1px solid #eee;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
+}
+
+.logo {
+  color: #c62828;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 28px;
+  font-size: 24px;
+}
+
+.sidebar nav p,
+.sidebar nav :deep(p) {
+  margin: 4px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #444;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar nav p:hover,
+.sidebar nav :deep(p:hover) {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.sidebar .active {
+  background: #c62828;
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 .main {
   flex: 1;
-  padding: 20px;
+  padding: 32px 40px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.topbar h1 {
+  font-size: 30px;
+  font-weight: 800;
+  color: #222;
+}
+
+.back {
+  background: #ffffff;
+  color: #c62828;
+  border: 2px solid #c62828;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.back:hover {
+  background: #c62828;
+  color: #ffffff;
+}
+
+.select {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 24px;
+  background: #ffffff;
+  color: #333;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #c62828;
 }
 
 .cards {
@@ -262,69 +361,122 @@ function goDashboard() {
 }
 
 .turma-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 5px solid #c62828;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .turma-card:hover {
-  transform: scale(1.02);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(198, 40, 40, 0.15);
+}
+
+.turma-card h3 {
+  color: #222;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.turma-card p {
+  color: #555;
+  margin: 4px 0;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: flex-end;
+  z-index: 50;
 }
 
 .panel {
-  width: 350px;
-  background: white;
-  padding: 20px;
+  width: 380px;
+  background: #ffffff;
+  padding: 28px;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+}
+
+.panel h2 {
+  color: #c62828;
+  margin-bottom: 4px;
+}
+
+.panel hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 16px 0;
 }
 
 .aluno {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 10px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid #f4f4f4;
 }
 
 .status {
-  padding: 5px 10px;
-  border-radius: 8px;
+  padding: 4px 12px;
+  border-radius: 20px;
   color: white;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .pago {
-  background: #34c38f;
+  background: #2e7d32;
 }
 
 .pendente {
-  background: #f46a6a;
+  background: #c62828;
 }
 
 .enter {
   width: 100%;
-  margin-top: 20px;
-  background: #d32f2f;
+  margin-top: 24px;
+  background: #c62828;
   color: white;
   border: none;
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.enter:hover {
+  background: #a91f1f;
 }
 
 .enter:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .close {
   width: 100%;
   margin-top: 10px;
   cursor: pointer;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #444;
+  transition: background 0.15s;
+}
+
+.close:hover {
+  background: #f4f4f4;
 }
 </style>

@@ -5,8 +5,8 @@
 
       <nav>
         <p @click="goDashboard">Dashboard</p>
-        <p class="active">Matrículas</p>
         <p @click="goTurmas">Turmas</p>
+        <p class="active">Matrículas</p>
         <p @click="logout">Logout</p>
       </nav>
     </aside>
@@ -51,7 +51,7 @@
             :key="turma.id"
             :value="turma.id"
           >
-            {{ turma.name || turma.nome }}
+            {{ turma.title || turma.name || turma.nome }}
           </option>
         </select>
       </section>
@@ -65,6 +65,10 @@
           Algumas informações não puderam ser atualizadas pelo servidor.
         </p>
 
+        <p v-if="feedbackMsg" :class="['feedback', feedbackErro ? 'feedback-error' : 'feedback-success']">
+          {{ feedbackMsg }}
+        </p>
+
         <table class="table">
           <thead>
             <tr>
@@ -72,6 +76,7 @@
               <th>Turma</th>
               <th>Horário</th>
               <th>ID da matrícula</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -83,11 +88,21 @@
               <td>{{ nomeAluno(matricula) }}</td>
               <td>{{ nomeTurma(matricula) }}</td>
               <td>{{ horarioTurma(matricula) }}</td>
-              <td>{{ matricula.id || "Não informado" }}</td>
+              <td :title="matricula.id || ''">{{ matricula.id ? matricula.id.slice(0, 8) + '...' : "Não informado" }}</td>
+              <td>
+                <button
+                  v-if="matricula.id"
+                  class="cancel-button"
+                  :disabled="cancelandoIds.has(matricula.id)"
+                  @click="cancelarMatricula(matricula)"
+                >
+                  {{ cancelandoIds.has(matricula.id) ? "Cancelando..." : "Cancelar matrícula" }}
+                </button>
+              </td>
             </tr>
 
             <tr v-if="matriculasFiltradas.length === 0">
-              <td colspan="4" class="empty-state">
+              <td colspan="5" class="empty-state">
                 Nenhuma matrícula encontrada.
               </td>
             </tr>
@@ -109,9 +124,13 @@ interface Student {
 
 interface Team {
   id: string
+  title?: string
   name?: string
   nome?: string
+  team_leader_id?: string
+  horary?: string
   schedule?: string
+  days_of_week?: string
 }
 
 interface Course {
@@ -122,14 +141,16 @@ interface Course {
 
 interface Enrollment {
   id?: string
-  studentId: string
-  teamId: string
+  student_id?: string
+  studentId?: string
+  team_id?: string
+  teamId?: string
   startDate?: string
   active?: boolean
   team?: Team
 }
 
-const { $api } = useNuxtApp()
+const api = useApiClient()
 
 const alunos = ref<Student[]>([])
 const turmas = ref<Team[]>([])
@@ -141,9 +162,13 @@ const filtroTurma = ref("")
 const pending = ref(true)
 const erroApi = ref(false)
 
+const cancelandoIds = ref(new Set<string>())
+const feedbackMsg = ref("")
+const feedbackErro = ref(false)
+
 async function carregarAlunos() {
   try {
-    const response: any = await $api("/api/students")
+    const response: any = await api.get("/api/students")
 
     alunos.value = Array.isArray(response)
       ? response
@@ -156,7 +181,7 @@ async function carregarAlunos() {
 
 async function carregarTurmas() {
   try {
-    const response: any = await $api("/api/courses")
+    const response: any = await api.get("/api/courses")
 
     const cursos: Course[] = Array.isArray(response)
       ? response
@@ -174,7 +199,7 @@ async function carregarMatriculas() {
     const resultados = await Promise.all(
       alunos.value.map(async aluno => {
         try {
-          const response: any = await $api(
+          const response: any = await api.get(
             `/api/enrollments/student/${encodeURIComponent(aluno.id)}`
           )
 
@@ -215,11 +240,19 @@ async function carregarDados() {
   }
 }
 
+function idAluno(matricula: Enrollment) {
+  return matricula.student_id || matricula.studentId
+}
+
+function idTurma(matricula: Enrollment) {
+  return matricula.team_id || matricula.teamId
+}
+
 const matriculasUnicas = computed(() => {
   const mapa = new Map<string, Enrollment>()
 
   for (const matricula of matriculas.value) {
-    const chave = `${matricula.studentId}-${matricula.teamId}`
+    const chave = `${idAluno(matricula)}-${idTurma(matricula)}`
 
     if (!mapa.has(chave)) {
       mapa.set(chave, matricula)
@@ -233,50 +266,88 @@ const matriculasFiltradas = computed(() => {
   return matriculasUnicas.value.filter(matricula => {
     const alunoOk =
       !filtroAluno.value ||
-      String(matricula.studentId) === String(filtroAluno.value)
+      String(idAluno(matricula)) === String(filtroAluno.value)
 
     const turmaOk =
       !filtroTurma.value ||
-      String(matricula.teamId) === String(filtroTurma.value)
+      String(idTurma(matricula)) === String(filtroTurma.value)
 
     return alunoOk && turmaOk
   })
 })
 
 function chaveMatricula(matricula: Enrollment) {
-  return `${matricula.studentId}-${matricula.teamId}`
+  return `${idAluno(matricula)}-${idTurma(matricula)}`
 }
 
 function nomeAluno(matricula: Enrollment) {
   const aluno = alunos.value.find(
-    item => String(item.id) === String(matricula.studentId)
+    item => String(item.id) === String(idAluno(matricula))
   )
 
   return aluno?.name || aluno?.nome || "Aluno não encontrado"
 }
 
 function nomeTurma(matricula: Enrollment) {
-  if (matricula.team?.name || matricula.team?.nome) {
-    return matricula.team.name || matricula.team.nome
+  if (matricula.team?.title || matricula.team?.name || matricula.team?.nome) {
+    return matricula.team.title || matricula.team.name || matricula.team.nome
   }
 
   const turma = turmas.value.find(
-    item => String(item.id) === String(matricula.teamId)
+    item => String(item.id) === String(idTurma(matricula))
   )
 
-  return turma?.name || turma?.nome || "Turma não encontrada"
+  return turma?.title || turma?.name || turma?.nome || "Turma não encontrada"
 }
 
 function horarioTurma(matricula: Enrollment) {
-  if (matricula.team?.schedule) {
-    return matricula.team.schedule
+  if (matricula.team?.horary || matricula.team?.schedule) {
+    return matricula.team.horary || matricula.team.schedule
   }
 
   const turma = turmas.value.find(
-    item => String(item.id) === String(matricula.teamId)
+    item => String(item.id) === String(idTurma(matricula))
   )
 
-  return turma?.schedule || "Horário não informado"
+  return turma?.horary || turma?.schedule || "Horário não informado"
+}
+
+async function cancelarMatricula(matricula: Enrollment) {
+  const id = matricula.id
+  if (!id) return
+
+  const confirmado = confirm(
+    `Cancelar a matrícula de ${nomeAluno(matricula)} em ${nomeTurma(matricula)}? Essa ação não pode ser desfeita.`
+  )
+  if (!confirmado) return
+
+  feedbackMsg.value = ""
+  feedbackErro.value = false
+
+  const novoSet = new Set(cancelandoIds.value)
+  novoSet.add(id)
+  cancelandoIds.value = novoSet
+
+  try {
+    await api.delete(`/api/enrollments/${id}`)
+
+    matriculas.value = matriculas.value.filter(m => m.id !== id)
+
+    feedbackErro.value = false
+    feedbackMsg.value = "Matrícula cancelada com sucesso."
+  } catch (err: any) {
+    feedbackErro.value = true
+    feedbackMsg.value =
+      err?.data?.statusMessage ||
+      err?.data?.message ||
+      err?.response?._data?.statusMessage ||
+      err?.response?._data?.message ||
+      "Não foi possível cancelar a matrícula."
+  } finally {
+    const restante = new Set(cancelandoIds.value)
+    restante.delete(id)
+    cancelandoIds.value = restante
+  }
 }
 
 function novaMatricula() {
@@ -299,60 +370,91 @@ function logout() {
 await carregarDados()
 </script>
 
-<style>
+<style scoped>
 .page {
   display: flex;
+  flex-direction: row;
+  align-items: stretch;
   min-height: 100vh;
-  background: #f4f4f4;
+  background: #f7f7f7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.page > * {
+  width: auto;
+  max-width: none;
 }
 
 .sidebar {
-  width: 200px;
-  padding: 20px;
-  background: #f5f5f5;
+  width: 230px;
+  background: #ffffff;
+  padding: 24px 16px;
+  border-right: 1px solid #eee;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
 }
 
 .logo {
-  margin-bottom: 30px;
+  color: #c62828;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 28px;
+  font-size: 24px;
 }
 
 .sidebar nav p {
+  margin: 4px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
   cursor: pointer;
-  margin: 20px 0;
+  color: #444;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar nav p:hover {
+  background: #fdecea;
+  color: #c62828;
 }
 
 .sidebar nav .active {
-  color: #d32f2f;
-  font-weight: bold;
+  background: #c62828;
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 .main {
   flex: 1;
-  padding: 30px;
+  padding: 32px 40px;
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 24px;
 }
 
 .topbar h1 {
-  color: #c62828;
+  font-size: 30px;
+  font-weight: 800;
+  color: #222;
 }
 
 .new-button {
-  background: #d32f2f;
+  background: #c62828;
   color: white;
   border: none;
-  padding: 10px 18px;
+  padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  transition: background 0.15s;
 }
 
 .new-button:hover {
-  background: #b71c1c;
+  background: #a91f1f;
 }
 
 .filters {
@@ -362,18 +464,28 @@ await carregarDados()
 }
 
 .select {
-  padding: 10px;
+  padding: 10px 16px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background: white;
   min-width: 220px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #c62828;
 }
 
 .card {
   background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border-left: 5px solid #c62828;
   overflow-x: auto;
 }
 
@@ -383,6 +495,47 @@ await carregarDados()
   padding: 10px;
   border-radius: 8px;
   margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.feedback {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.feedback-success {
+  background: #dff5e9;
+  color: #218838;
+}
+
+.feedback-error {
+  background: #fde2e2;
+  color: #c62828;
+}
+
+.cancel-button {
+  background: #ffffff;
+  color: #c62828;
+  border: 2px solid #c62828;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #c62828;
+  color: #ffffff;
+}
+
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .table {
@@ -391,16 +544,27 @@ await carregarDados()
 }
 
 .table th {
-  background: #eee;
-  padding: 12px;
+  padding: 12px 10px;
   text-align: left;
-  color: #333;
+  font-size: 13px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #f0f0f0;
 }
 
 .table td {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
+  padding: 14px 10px;
+  border-bottom: 1px solid #f4f4f4;
   color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.table tr {
+  height: 56px;
 }
 
 .empty-state {

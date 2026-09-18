@@ -5,8 +5,8 @@
 
       <nav>
         <p @click="goDashboard">Dashboard</p>
-        <p class="active">Matrículas</p>
         <p @click="goTurmas">Turmas</p>
+        <p class="active">Matrículas</p>
         <p @click="logout">Logout</p>
       </nav>
     </aside>
@@ -56,8 +56,8 @@
               :key="turma.id"
               :value="turma.id"
             >
-              {{ turma.name || turma.nome }}
-              {{ turma.schedule ? ` - ${turma.schedule}` : "" }}
+              {{ turma.title || turma.name || turma.nome }}
+              {{ turma.horary || turma.schedule ? ` - ${turma.horary || turma.schedule}` : "" }}
             </option>
           </select>
 
@@ -92,9 +92,13 @@ interface Student {
 
 interface Team {
   id: string
+  title?: string
   name?: string
   nome?: string
+  team_leader_id?: string
+  horary?: string
   schedule?: string
+  days_of_week?: string
 }
 
 interface Course {
@@ -113,7 +117,7 @@ interface Enrollment {
   team?: Team
 }
 
-const { $api } = useNuxtApp()
+const api = useApiClient()
 
 const alunos = ref<Student[]>([])
 const turmas = ref<Team[]>([])
@@ -127,8 +131,8 @@ const sucesso = ref(false)
 
 async function carregarDados() {
   const [studentsResponse, coursesResponse] = await Promise.all([
-    $api("/api/students"),
-    $api("/api/courses")
+    api.get("/api/students"),
+    api.get("/api/courses")
   ]) as [any, any]
 
   alunos.value = Array.isArray(studentsResponse)
@@ -177,12 +181,9 @@ async function criarMatricula() {
   loading.value = true
 
   try {
-    await $api<Enrollment>("/api/enrollments", {
-      method: "POST",
-      body: {
-        student_id: studentId.value,
-        team_id: classId.value
-      }
+    await api.post<Enrollment>("/api/enrollments", {
+      student_id: studentId.value,
+      team_id: classId.value
     })
 
     sucesso.value = true
@@ -228,58 +229,95 @@ function logout() {
 await carregarDados()
 </script>
 
-<style>
+<style scoped>
 .page {
   display: flex;
+  flex-direction: row;
+  align-items: stretch;
   min-height: 100vh;
-  background: #f4f4f4;
+  background: #f7f7f7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.page > * {
+  width: auto;
+  max-width: none;
 }
 
 .sidebar {
-  width: 200px;
-  padding: 20px;
-  background: #f5f5f5;
+  width: 230px;
+  background: #ffffff;
+  padding: 24px 16px;
+  border-right: 1px solid #eee;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
 }
 
 .logo {
-  margin-bottom: 30px;
+  color: #c62828;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 28px;
+  font-size: 24px;
 }
 
 .sidebar nav p {
+  margin: 4px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
   cursor: pointer;
-  margin: 20px 0;
+  color: #444;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar nav p:hover {
+  background: #fdecea;
+  color: #c62828;
 }
 
 .sidebar nav .active {
-  color: #d32f2f;
-  font-weight: bold;
+  background: #c62828;
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 .main {
   flex: 1;
-  padding: 30px;
+  padding: 32px 40px;
 }
 
 .back {
-  background: #d32f2f;
-  color: white;
-  border: none;
-  padding: 8px 14px;
+  background: #ffffff;
+  color: #c62828;
+  border: 2px solid #c62828;
+  padding: 8px 18px;
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.back:hover {
+  background: #c62828;
+  color: #ffffff;
 }
 
 .card {
   background: white;
   padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border-left: 5px solid #c62828;
   max-width: 700px;
 }
 
 .card h1 {
-  color: #c62828;
+  color: #222;
+  font-size: 26px;
+  font-weight: 800;
   margin-bottom: 25px;
 }
 
@@ -290,8 +328,9 @@ form {
 
 label {
   margin-bottom: 7px;
-  font-weight: bold;
+  font-weight: 700;
   color: #333;
+  font-size: 15px;
 }
 
 .select {
@@ -300,16 +339,32 @@ label {
   border-radius: 8px;
   margin-bottom: 20px;
   background: white;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #c62828;
 }
 
 .submit {
-  background: #d32f2f;
+  background: #c62828;
   color: white;
   border: none;
   padding: 12px;
   border-radius: 8px;
   cursor: pointer;
   margin-top: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  transition: background 0.15s;
+}
+
+.submit:hover:not(:disabled) {
+  background: #a91f1f;
 }
 
 .submit:disabled {
@@ -321,6 +376,7 @@ label {
   padding: 10px;
   border-radius: 8px;
   margin: 0 0 10px;
+  font-weight: 600;
 }
 
 .success {
