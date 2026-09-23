@@ -75,7 +75,6 @@
               <th>Aluno</th>
               <th>Turma</th>
               <th>Horário</th>
-              <th>ID da matrícula</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -88,7 +87,6 @@
               <td>{{ nomeAluno(matricula) }}</td>
               <td>{{ nomeTurma(matricula) }}</td>
               <td>{{ horarioTurma(matricula) }}</td>
-              <td :title="matricula.id || ''">{{ matricula.id ? matricula.id.slice(0, 8) + '...' : "Não informado" }}</td>
               <td>
                 <button
                   v-if="matricula.id"
@@ -102,7 +100,7 @@
             </tr>
 
             <tr v-if="matriculasFiltradas.length === 0">
-              <td colspan="5" class="empty-state">
+              <td colspan="4" class="empty-state">
                 Nenhuma matrícula encontrada.
               </td>
             </tr>
