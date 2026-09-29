@@ -6,6 +6,7 @@
       <nav>
         <p @click="goDashboard">Dashboard</p>
         <p @click="goTurmas">Turmas</p>
+        <p @click="goAlunos">Alunos</p>
         <p class="active">Matrículas</p>
         <p @click="logout">Logout</p>
       </nav>
@@ -19,26 +20,136 @@
       <div class="card">
         <h1>Nova matrícula</h1>
 
-        <form @submit.prevent="criarMatricula">
-          <label for="aluno">Aluno</label>
-
-          <select
-            id="aluno"
-            v-model="studentId"
-            class="select"
-            name="aluno"
-            required
+        <div class="mode-toggle">
+          <button
+            type="button"
+            :class="['mode-button', modo === 'existente' ? 'mode-active' : '']"
+            @click="selecionarModo('existente')"
           >
-            <option value="">Selecione um aluno</option>
+            Aluno já cadastrado
+          </button>
+          <button
+            type="button"
+            :class="['mode-button', modo === 'novo' ? 'mode-active' : '']"
+            @click="selecionarModo('novo')"
+          >
+            Cadastrar novo aluno
+          </button>
+        </div>
 
-            <option
-              v-for="aluno in alunos"
-              :key="aluno.id"
-              :value="aluno.id"
+        <form @submit.prevent="criarMatricula">
+          <template v-if="modo === 'existente'">
+            <label for="aluno">Aluno</label>
+
+            <select
+              id="aluno"
+              v-model="studentId"
+              class="select"
+              name="aluno"
+              required
             >
-              {{ aluno.name || aluno.nome }}
-            </option>
-          </select>
+              <option value="">Selecione um aluno</option>
+
+              <option
+                v-for="aluno in alunos"
+                :key="aluno.id"
+                :value="aluno.id"
+              >
+                {{ aluno.name || aluno.nome }}
+              </option>
+            </select>
+
+            <div v-if="studentId" class="info-panel">
+              <p v-if="carregandoInfo">Verificando matrículas deste aluno...</p>
+
+              <template v-else>
+                <p v-if="matriculasDoAluno.length === 0" class="info-ok">
+                  Este aluno não possui matrículas em nenhuma turma.
+                </p>
+
+                <div v-else class="info-warning">
+                  <p><strong>Este aluno já está matriculado em:</strong></p>
+                  <ul>
+                    <li v-for="m in matriculasDoAluno" :key="m.id">
+                      {{ m.turma }} — Professor: {{ m.professor }}
+                    </li>
+                  </ul>
+                </div>
+              </template>
+            </div>
+          </template>
+
+          <template v-else>
+            <label for="novoNome">Nome completo</label>
+            <input
+              id="novoNome"
+              v-model="novoNome"
+              class="select"
+              type="text"
+              placeholder="Nome do aluno"
+              required
+            />
+
+            <label for="novoCpf">CPF</label>
+            <input
+              id="novoCpf"
+              v-model="novoCpf"
+              class="select"
+              type="text"
+              placeholder="000.000.000-00"
+              maxlength="14"
+              required
+              @input="novoCpf = formatarCpf(novoCpf)"
+            />
+
+            <label for="novoEmail">Email</label>
+            <input
+              id="novoEmail"
+              v-model="novoEmail"
+              class="select"
+              type="email"
+              placeholder="email@exemplo.com"
+            />
+
+            <label for="novoTelefone">Telefone</label>
+            <input
+              id="novoTelefone"
+              v-model="novoTelefone"
+              class="select"
+              type="text"
+              placeholder="(00) 00000-0000"
+              maxlength="15"
+              @input="novoTelefone = formatarTelefone(novoTelefone)"
+            />
+
+            <label for="novoDn">Data de nascimento</label>
+            <input
+              id="novoDn"
+              v-model="novoDn"
+              class="select"
+              type="date"
+            />
+
+            <label for="novoResponsavelNome">Nome do responsável (opcional)</label>
+            <input
+              id="novoResponsavelNome"
+              v-model="novoResponsavelNome"
+              class="select"
+              type="text"
+              placeholder="Nome do responsável"
+            />
+
+            <label for="novoResponsavelTelefone">Telefone do responsável (opcional)</label>
+            <input
+              id="novoResponsavelTelefone"
+              v-model="novoResponsavelTelefone"
+              class="select"
+              type="text"
+              placeholder="(00) 00000-0000"
+              maxlength="15"
+              @input="novoResponsavelTelefone = formatarTelefone(novoResponsavelTelefone)"
+            />
+          </template>
 
           <label for="turma">Turma</label>
 
@@ -82,7 +193,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, watch } from "vue"
+
+useHead({ title: "Nova Matrícula" })
 
 interface Student {
   id: string
@@ -109,11 +222,10 @@ interface Course {
 
 interface Enrollment {
   id?: string
-  studentId: string
+  student_id?: string
+  studentId?: string
+  team_id?: string
   teamId?: string
-  classId?: string
-  startDate?: string
-  active?: boolean
   team?: Team
 }
 
@@ -122,8 +234,47 @@ const api = useApiClient()
 const alunos = ref<Student[]>([])
 const turmas = ref<Team[]>([])
 
+const modo = ref<"existente" | "novo">("existente")
+
 const studentId = ref("")
 const classId = ref("")
+
+const novoNome = ref("")
+
+function formatarTelefone(valor: string): string {
+  const digits = valor.replace(/\D/g, "").slice(0, 11)
+  let out = ""
+  if (digits.length > 0) out = "(" + digits.slice(0, 2)
+  if (digits.length >= 2) out += ") "
+  if (digits.length > 2) {
+    const rest = digits.slice(2)
+    if (rest.length <= 4) {
+      out += rest
+    } else if (rest.length <= 8) {
+      out += rest.slice(0, rest.length - 4) + "-" + rest.slice(-4)
+    } else {
+      out += rest.slice(0, 5) + "-" + rest.slice(5)
+    }
+  }
+  return out
+}
+
+function formatarCpf(valor: string): string {
+  const digits = valor.replace(/\D/g, "").slice(0, 11)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 6) return digits.replace(/(\d{3})(\d+)/, "$1.$2")
+  if (digits.length <= 9) return digits.replace(/(\d{3})(\d{3})(\d+)/, "$1.$2.$3")
+  return digits.replace(/(\d{3})(\d{3})(\d{3})(\d+)/, "$1.$2.$3-$4")
+}
+const novoCpf = ref("")
+const novoEmail = ref("")
+const novoTelefone = ref("")
+const novoDn = ref("")
+const novoResponsavelNome = ref("")
+const novoResponsavelTelefone = ref("")
+
+const matriculasDoAluno = ref<{ id: string; turma: string; professor: string }[]>([])
+const carregandoInfo = ref(false)
 
 const loading = ref(false)
 const mensagem = ref("")
@@ -146,32 +297,74 @@ async function carregarDados() {
   turmas.value = cursos.flatMap(curso => curso.teams || [])
 }
 
+function selecionarModo(novoModo: "existente" | "novo") {
+  modo.value = novoModo
+  mensagem.value = ""
+  studentId.value = ""
+  matriculasDoAluno.value = []
+}
+
+watch(studentId, async (novoId) => {
+  matriculasDoAluno.value = []
+
+  if (!novoId || modo.value !== "existente") {
+    return
+  }
+
+  carregandoInfo.value = true
+
+  try {
+    const response: any = await api.get(`/api/enrollments/student/${encodeURIComponent(novoId)}`)
+    const lista: Enrollment[] = Array.isArray(response)
+      ? response
+      : response?.data || response?.enrollments || []
+
+    matriculasDoAluno.value = lista.map((e) => ({
+      id: e.id || "",
+      turma: e.team?.title || e.team?.name || e.team?.nome || "Turma não identificada",
+      professor: e.team?.team_leader_id || "Não informado",
+    }))
+  } catch {
+    matriculasDoAluno.value = []
+  } finally {
+    carregandoInfo.value = false
+  }
+})
+
+function extrairMensagemErro(err: any, padrao: string) {
+  return (
+    err?.data?.message ||
+    err?.data?.statusMessage ||
+    err?.response?._data?.message ||
+    err?.response?._data?.statusMessage ||
+    padrao
+  )
+}
+
 async function criarMatricula() {
   mensagem.value = ""
   sucesso.value = false
-
-  if (!studentId.value) {
-    mensagem.value = "Selecione um aluno."
-    return
-  }
 
   if (!classId.value) {
     mensagem.value = "Selecione uma turma."
     return
   }
 
-  const alunoSelecionado = alunos.value.find(
-    aluno => String(aluno.id) === String(studentId.value)
-  )
+  if (modo.value === "existente" && !studentId.value) {
+    mensagem.value = "Selecione um aluno."
+    return
+  }
+
+  if (modo.value === "novo") {
+    if (!novoNome.value.trim() || !novoCpf.value.trim()) {
+      mensagem.value = "Preencha nome e CPF do novo aluno."
+      return
+    }
+  }
 
   const turmaSelecionada = turmas.value.find(
     turma => String(turma.id) === String(classId.value)
   )
-
-  if (!alunoSelecionado) {
-    mensagem.value = "Aluno inválido."
-    return
-  }
 
   if (!turmaSelecionada) {
     mensagem.value = "Turma inválida."
@@ -181,8 +374,25 @@ async function criarMatricula() {
   loading.value = true
 
   try {
+    let finalStudentId = studentId.value
+
+    if (modo.value === "novo") {
+      const novoAluno = await api.post<Student>("/api/students", {
+        name: novoNome.value.trim(),
+        cpf: novoCpf.value.trim(),
+        email: novoEmail.value.trim() || undefined,
+        phone: novoTelefone.value.trim() || undefined,
+        dn: novoDn.value ? new Date(novoDn.value).toISOString() : undefined,
+        responsable_name: novoResponsavelNome.value.trim() || undefined,
+        responsable_phone: novoResponsavelTelefone.value.trim() || undefined,
+      })
+
+      finalStudentId = novoAluno.id
+      alunos.value.push(novoAluno)
+    }
+
     await api.post<Enrollment>("/api/enrollments", {
-      student_id: studentId.value,
+      student_id: finalStudentId,
       team_id: classId.value
     })
 
@@ -193,17 +403,7 @@ async function criarMatricula() {
       navigateTo("/matriculas")
     }, 700)
   } catch (err: any) {
-    if (err?.data?.message) {
-      mensagem.value = err.data.message
-    } else if (err?.data?.statusMessage) {
-      mensagem.value = err.data.statusMessage
-    } else if (err?.response?._data?.message) {
-      mensagem.value = err.response._data.message
-    } else if (err?.response?._data?.statusMessage) {
-      mensagem.value = err.response._data.statusMessage
-    } else {
-      mensagem.value = "Não foi possível criar a matrícula."
-    }
+    mensagem.value = extrairMensagemErro(err, "Não foi possível criar a matrícula.")
   } finally {
     loading.value = false
   }
@@ -219,6 +419,10 @@ function goDashboard() {
 
 function goTurmas() {
   navigateTo("/turmas")
+}
+
+function goAlunos() {
+  navigateTo("/alunos")
 }
 
 function logout() {
@@ -318,7 +522,41 @@ await carregarDados()
   color: #222;
   font-size: 26px;
   font-weight: 800;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.mode-button {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  color: #555;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.mode-button:hover {
+  border-color: #c62828;
+  color: #c62828;
+}
+
+.mode-active {
+  background: #c62828;
+  border-color: #c62828;
+  color: #ffffff;
+}
+
+.mode-active:hover {
+  color: #ffffff;
 }
 
 form {
@@ -333,7 +571,8 @@ label {
   font-size: 15px;
 }
 
-.select {
+.select,
+input.select {
   padding: 11px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -342,12 +581,49 @@ label {
   font-size: 15px;
   font-weight: 600;
   color: #333;
+  font-family: inherit;
+}
+
+select.select {
   cursor: pointer;
 }
 
 .select:focus {
   outline: none;
   border-color: #c62828;
+}
+
+.info-panel {
+  margin: -6px 0 20px;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.info-ok {
+  background: #dff5e9;
+  color: #218838;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.info-warning {
+  background: #fff3cd;
+  color: #856404;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.info-warning p {
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+
+.info-warning ul {
+  margin: 0;
+  padding-left: 20px;
 }
 
 .submit {

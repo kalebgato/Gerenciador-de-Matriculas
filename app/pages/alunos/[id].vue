@@ -4,8 +4,9 @@
       <h2 class="logo">PRODAGIN</h2>
 
       <nav>
-        <p class="active" @click="voltar">Dashboard</p>
+        <p @click="goDashboard">Dashboard</p>
         <p @click="goTurmas">Turmas</p>
+        <p class="active" @click="goAlunos">Alunos</p>
         <p @click="goMatriculas">Matrículas</p>
         <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
@@ -14,7 +15,7 @@
     <main class="main">
       <header class="topbar">
         <h1>Detalhes do Aluno</h1>
-        <button class="back" @click="voltar">Voltar</button>
+        <button class="back" @click="goAlunos">Voltar</button>
       </header>
 
       <div v-if="pending" class="card loading">
@@ -23,15 +24,86 @@
 
       <div v-else-if="aluno" class="content">
         <div class="card">
-          <h2>{{ aluno.nome }}</h2>
-          <p><strong>Email:</strong> {{ aluno.email }}</p>
-          <p><strong>Telefone:</strong> {{ aluno.telefone }}</p>
-          <p>
-            <strong>Status Financeiro Geral:</strong>
-            <span :class="['status', aluno.isPendente ? 'pendente' : 'pago']">
-              {{ aluno.isPendente ? 'Pendente' : 'Em Dia' }}
-            </span>
-          </p>
+          <div class="card-header">
+            <h2>{{ aluno.nome }}</h2>
+            <div class="card-actions">
+              <span :class="['status', aluno.ativo ? 'pago' : 'inativo']">
+                {{ aluno.ativo ? "Cadastro Ativo" : "Cadastro Inativo" }}
+              </span>
+              <button v-if="!editando" class="edit-button" @click="entrarModoEdicao">
+                Editar
+              </button>
+            </div>
+          </div>
+
+          <template v-if="!editando">
+            <p><strong>Email:</strong> {{ aluno.email }}</p>
+            <p><strong>Telefone:</strong> {{ aluno.telefone }}</p>
+            <p>
+              <strong>Status Financeiro Geral:</strong>
+              <span :class="['status', aluno.isPendente ? 'pendente' : 'pago']">
+                {{ aluno.isPendente ? 'Pendente' : 'Em Dia' }}
+              </span>
+            </p>
+
+            <button
+              class="toggle-button"
+              :class="aluno.ativo ? 'toggle-danger' : 'toggle-ok'"
+              :disabled="alterandoStatus"
+              @click="alternarStatus"
+            >
+              {{ alterandoStatus ? "Atualizando..." : (aluno.ativo ? "Desativar aluno" : "Ativar aluno") }}
+            </button>
+          </template>
+
+          <form v-else class="edit-form" @submit.prevent="salvarEdicao">
+            <label for="editNome">Nome completo</label>
+            <input id="editNome" v-model="editNome" class="edit-input" type="text" required />
+
+            <label for="editEmail">Email</label>
+            <input id="editEmail" v-model="editEmail" class="edit-input" type="email" />
+
+            <label for="editTelefone">Telefone</label>
+            <input
+              id="editTelefone"
+              v-model="editTelefone"
+              class="edit-input"
+              type="text"
+              placeholder="(00) 00000-0000"
+              maxlength="15"
+              @input="editTelefone = formatarTelefone(editTelefone)"
+            />
+
+            <label for="editDn">Data de nascimento</label>
+            <input id="editDn" v-model="editDn" class="edit-input" type="date" />
+
+            <label for="editResponsavelNome">Nome do responsável</label>
+            <input id="editResponsavelNome" v-model="editResponsavelNome" class="edit-input" type="text" />
+
+            <label for="editResponsavelTelefone">Telefone do responsável</label>
+            <input
+              id="editResponsavelTelefone"
+              v-model="editResponsavelTelefone"
+              class="edit-input"
+              type="text"
+              placeholder="(00) 00000-0000"
+              maxlength="15"
+              @input="editResponsavelTelefone = formatarTelefone(editResponsavelTelefone)"
+            />
+
+            <p v-if="mensagemEdicao" :class="['message', erroEdicao ? 'error' : 'success']">
+              {{ mensagemEdicao }}
+            </p>
+
+            <div class="edit-buttons">
+              <button type="submit" class="save-button" :disabled="salvando">
+                {{ salvando ? "Salvando..." : "Salvar" }}
+              </button>
+              <button type="button" class="cancel-button" @click="cancelarEdicao">
+                Cancelar
+              </button>
+            </div>
+          </form>
         </div>
 
         <div class="card">
@@ -64,14 +136,16 @@
           <table class="table">
             <thead>
               <tr>
-                <th>ID da Cobrança</th>
+                <th>Vencimento</th>
+                <th>Data de Pagamento</th>
                 <th>Valor</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="cobranca in aluno.cobrancas" :key="cobranca.id">
-                <td>{{ cobranca.id }}</td>
+                <td>{{ cobranca.vencimento }}</td>
+                <td>{{ cobranca.dataPagamento }}</td>
                 <td>{{ cobranca.valor }}</td>
                 <td>
                   <span :class="['status', cobranca.status === 'Pendente' ? 'pendente' : 'pago']">
@@ -80,7 +154,7 @@
                 </td>
               </tr>
               <tr v-if="aluno.cobrancas.length === 0">
-                <td colspan="3" class="empty-state">Nenhum registro financeiro encontrado.</td>
+                <td colspan="4" class="empty-state">Nenhuma cobrança pendente encontrada.</td>
               </tr>
             </tbody>
           </table>
@@ -97,7 +171,7 @@
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 interface Team {
   id: string;
@@ -126,6 +200,7 @@ interface LateCharge {
   id: string;
   amount?: number;
   valor?: number;
+  due_date?: string;
   student_id?: string;
   studentId?: string;
   alunoId?: string;
@@ -138,7 +213,7 @@ const route = useRoute();
 const api = useApiClient();
 const idParam = String(route.params.id);
 
-const { data: rawStudent, pending, error: errStudent } = await useFetch<any>(`/api/students/${idParam}`);
+const { data: rawStudent, pending, error: errStudent, refresh: refreshStudent } = await useFetch<any>(`/api/students/${idParam}`);
 const { data: rawEnrollments } = await useFetch<any>(`/api/enrollments/student/${idParam}`);
 const { data: rawLateCharges } = await useFetch<any>("/api/billing/late");
 
@@ -171,15 +246,21 @@ const pendencias = computed(() => {
   });
 });
 
+function formatarData(data: any): string {
+  if (!data) return "—";
+  const d = new Date(data);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("pt-BR");
+}
+
 const cobrancas = computed(() => {
-  if (pendencias.value.length > 0) {
-    return pendencias.value.map((p: LateCharge) => ({
-      id: String(p.id),
-      valor: p.amount || p.valor ? `R$ ${p.amount || p.valor}` : "Valor não informado",
-      status: "Pendente",
-    }));
-  }
-  return [{ id: "REG-OK", valor: "R$ 0,00", status: "Pago" }];
+  return pendencias.value.map((p: LateCharge) => ({
+    id: String(p.id),
+    vencimento: formatarData(p.due_date),
+    dataPagamento: "—",
+    valor: p.amount || p.valor ? `R$ ${p.amount || p.valor}` : "Valor não informado",
+    status: "Pendente",
+  }));
 });
 
 const aluno = computed(() => {
@@ -191,18 +272,134 @@ const aluno = computed(() => {
     nome: student.name || student.nome || "Sem Nome",
     email: student.email || "-",
     telefone: student.phone || student.telefone || "-",
+    ativo: student.active !== false,
     isPendente: pendencias.value.length > 0,
     turmas: turmasMatriculadas.value,
     cobrancas: cobrancas.value,
   };
 });
 
-function voltar() {
+const editando = ref(false);
+const editNome = ref("");
+const editEmail = ref("");
+const editTelefone = ref("");
+const editDn = ref("");
+const editResponsavelNome = ref("");
+const editResponsavelTelefone = ref("");
+
+const salvando = ref(false);
+const mensagemEdicao = ref("");
+const erroEdicao = ref(false);
+
+const alterandoStatus = ref(false);
+
+function formatarTelefone(valor: string): string {
+  const digits = valor.replace(/\D/g, "").slice(0, 11);
+  let out = "";
+  if (digits.length > 0) out = "(" + digits.slice(0, 2);
+  if (digits.length >= 2) out += ") ";
+  if (digits.length > 2) {
+    const rest = digits.slice(2);
+    if (rest.length <= 4) {
+      out += rest;
+    } else if (rest.length <= 8) {
+      out += rest.slice(0, rest.length - 4) + "-" + rest.slice(-4);
+    } else {
+      out += rest.slice(0, 5) + "-" + rest.slice(5);
+    }
+  }
+  return out;
+}
+
+function formatarDataParaInput(dn: any): string {
+  if (!dn) return "";
+  const data = new Date(dn);
+  if (isNaN(data.getTime())) return "";
+  return data.toISOString().slice(0, 10);
+}
+
+function entrarModoEdicao() {
+  const student = rawStudent.value || {};
+  editNome.value = student.name || "";
+  editEmail.value = student.email || "";
+  editTelefone.value = student.phone || "";
+  editDn.value = formatarDataParaInput(student.dn);
+  editResponsavelNome.value = student.responsable_name || "";
+  editResponsavelTelefone.value = student.responsable_phone || "";
+  mensagemEdicao.value = "";
+  editando.value = true;
+}
+
+function cancelarEdicao() {
+  editando.value = false;
+  mensagemEdicao.value = "";
+}
+
+function extrairMensagemErro(err: any, padrao: string) {
+  return (
+    err?.data?.message ||
+    err?.data?.statusMessage ||
+    err?.response?._data?.message ||
+    err?.response?._data?.statusMessage ||
+    padrao
+  );
+}
+
+async function salvarEdicao() {
+  mensagemEdicao.value = "";
+  erroEdicao.value = false;
+  salvando.value = true;
+
+  try {
+    await api.put(`/api/students/${idParam}`, {
+      name: editNome.value.trim(),
+      email: editEmail.value.trim() || undefined,
+      phone: editTelefone.value.trim() || undefined,
+      dn: editDn.value ? new Date(editDn.value).toISOString() : undefined,
+      responsable_name: editResponsavelNome.value.trim() || undefined,
+      responsable_phone: editResponsavelTelefone.value.trim() || undefined,
+    });
+
+    await refreshStudent();
+    editando.value = false;
+  } catch (err: any) {
+    erroEdicao.value = true;
+    mensagemEdicao.value = extrairMensagemErro(err, "Não foi possível salvar as alterações.");
+  } finally {
+    salvando.value = false;
+  }
+}
+
+async function alternarStatus() {
+  if (!aluno.value) return;
+
+  alterandoStatus.value = true;
+
+  try {
+    await api.put(`/api/students/${idParam}`, {
+      active: !aluno.value.ativo,
+    });
+
+    await refreshStudent();
+  } catch {
+    // silencioso: o status exibido reflete o último estado confirmado pelo servidor
+  } finally {
+    alterandoStatus.value = false;
+  }
+}
+
+useHead({ title: computed(() => (aluno.value ? aluno.value.nome : "Detalhes do Aluno")) });
+
+function goDashboard() {
   navigateTo("/dashboard");
 }
 
 function goTurmas() {
   navigateTo("/turmas");
+}
+
+function goAlunos() {
+  navigateTo("/alunos");
 }
 
 function goMatriculas() {
@@ -303,8 +500,23 @@ function goMatriculas() {
   border-left: 5px solid #c62828;
 }
 
-.card h2 {
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card h2 {
+  margin-bottom: 0;
   font-size: 20px;
   font-weight: 700;
   color: #222;
@@ -328,6 +540,135 @@ function goMatriculas() {
   color: #666;
   font-style: italic;
   border-left: 5px solid #ddd;
+}
+
+.edit-button {
+  background: #ffffff;
+  color: #c62828;
+  border: 2px solid #c62828;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.edit-button:hover {
+  background: #c62828;
+  color: #ffffff;
+}
+
+.toggle-button {
+  margin-top: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  color: white;
+  transition: opacity 0.15s;
+}
+
+.toggle-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle-danger {
+  background: #c62828;
+}
+
+.toggle-ok {
+  background: #2e7d32;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.edit-form label {
+  margin-bottom: 5px;
+  font-weight: 700;
+  color: #333;
+  font-size: 14px;
+}
+
+.edit-input {
+  padding: 9px 11px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #c62828;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.save-button {
+  background: #c62828;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #a91f1f;
+}
+
+.save-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background: #ffffff;
+  color: #555;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.cancel-button:hover {
+  background: #f4f4f4;
+}
+
+.message {
+  padding: 10px;
+  border-radius: 8px;
+  margin: 0 0 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.success {
+  background: #dff5e9;
+  color: #218838;
+}
+
+.error {
+  background: #fde2e2;
+  color: #c62828;
 }
 
 .table {
@@ -370,6 +711,10 @@ function goMatriculas() {
 
 .pendente {
   background: #c62828;
+}
+
+.inativo {
+  background: #888888;
 }
 
 .empty-state {

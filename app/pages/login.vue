@@ -1,27 +1,34 @@
 <template>
-  <div class="container">
+  <div class="page">
     <form @submit.prevent="handleLogin" class="card">
-      
-      <h1 class="title">PRODAGIN</h1>
-      <p class="subtitle">Login</p>
+      <h1 class="logo">PRODAGIN</h1>
+      <p class="subtitle">Acesse sua conta</p>
 
-      <label class="label">E-mail</label>
+      <label class="label" for="email">E-mail</label>
       <input
+        id="email"
         v-model="email"
         type="email"
         placeholder="Digite seu e-mail"
         class="input"
+        required
       />
 
-      <label class="label">Senha</label>
+      <label class="label" for="senha">Senha</label>
       <input
+        id="senha"
         v-model="senha"
         type="password"
         placeholder="Digite sua senha"
         class="input"
+        required
       />
 
-      <button class="button" :disabled="loading">
+      <p v-if="mensagemErro" class="message error">
+        {{ mensagemErro }}
+      </p>
+
+      <button class="button" type="submit" :disabled="loading">
         {{ loading ? "Entrando..." : "Entrar" }}
       </button>
 
@@ -33,12 +40,17 @@
 <script setup lang='ts'>
 import { ref } from "vue";
 
+useHead({ title: "Login" });
+
 const email = ref("");
 const senha = ref("");
 const loading = ref(false);
+const mensagemErro = ref("");
 const { authEnabled, login } = useAuth();
 
 async function handleLogin() {
+  mensagemErro.value = "";
+
   if (!authEnabled.value) {
     navigateTo("/dashboard");
     return;
@@ -49,8 +61,7 @@ async function handleLogin() {
     await login(email.value, senha.value);
     navigateTo("/dashboard");
   } catch (error) {
-    const message = (error as any)?.data?.statusMessage ?? "Credenciais invalidas";
-    alert(message);
+    mensagemErro.value = (error as any)?.data?.statusMessage ?? "Credenciais inválidas";
   } finally {
     loading.value = false;
   }
@@ -58,34 +69,112 @@ async function handleLogin() {
 </script>
 
 <style scoped>
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f7f7f7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 20px;
+}
+
 .card {
   background: white;
   padding: 40px;
   border-radius: 16px;
-  width: 320px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border-top: 5px solid #c62828;
+  display: flex;
+  flex-direction: column;
 }
 
-.title {
+.logo {
   text-align: center;
   color: #c62828;
-  margin-bottom: 10px;
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: 0.5px;
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 24px;
+}
+
+.label {
+  font-weight: 700;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.input {
+  padding: 11px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #333;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #c62828;
+}
+
+.message {
+  padding: 10px;
+  border-radius: 8px;
+  margin: -6px 0 16px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.error {
+  background: #fde2e2;
+  color: #c62828;
 }
 
 .button {
   width: 100%;
-  margin-top: 20px;
   padding: 12px;
   border: none;
   border-radius: 8px;
-  background: #d32f2f;
+  background: #c62828;
   color: white;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.button:hover:not(:disabled) {
+  background: #a91f1f;
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.link {
+  text-align: center;
+  color: #c62828;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 16px 0 0;
   cursor: pointer;
 }
 
-.button:hover {
-  background: #b71c1c;
+.link:hover {
+  text-decoration: underline;
 }
-
 </style>

@@ -6,6 +6,7 @@
       <nav>
         <p @click="goDashboard">Dashboard</p>
         <p class="active" @click="goTurmas">Turmas</p>
+        <p @click="goAlunos">Alunos</p>
         <p @click="goMatriculas">Matrículas</p>
         <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
@@ -23,9 +24,58 @@
 
       <div v-else-if="turma">
         <div class="card">
-          <h2>{{ turma.nome }}</h2>
-          <p>{{ turma.dia }} - {{ turma.horario }}</p>
-          <p><strong>Professor:</strong> {{ turma.professor }}</p>
+          <div class="card-header">
+            <h2>{{ turma.nome }}</h2>
+            <div class="card-actions">
+              <button v-if="!editando" class="edit-button" @click="entrarModoEdicao">
+                Editar
+              </button>
+              <button
+                v-if="!editando"
+                class="delete-button"
+                :disabled="excluindo"
+                @click="excluirTurma"
+              >
+                {{ excluindo ? "Excluindo..." : "Excluir turma" }}
+              </button>
+            </div>
+          </div>
+
+          <p v-if="mensagemExclusao" class="message error">
+            {{ mensagemExclusao }}
+          </p>
+
+          <template v-if="!editando">
+            <p>{{ turma.dia }} - {{ turma.horario }}</p>
+            <p><strong>Professor:</strong> {{ turma.professor }}</p>
+          </template>
+
+          <form v-else class="edit-form" @submit.prevent="salvarEdicao">
+            <label for="editTitulo">Nome da turma</label>
+            <input id="editTitulo" v-model="editTitulo" class="edit-input" type="text" required />
+
+            <label for="editProfessor">Professor</label>
+            <input id="editProfessor" v-model="editProfessor" class="edit-input" type="text" />
+
+            <label for="editDias">Dias da semana</label>
+            <input id="editDias" v-model="editDias" class="edit-input" type="text" placeholder="Ex: Segunda,Quarta" />
+
+            <label for="editHorario">Horário</label>
+            <input id="editHorario" v-model="editHorario" class="edit-input" type="text" placeholder="Ex: 14:00-16:00" />
+
+            <p v-if="mensagemEdicao" :class="['message', erroEdicao ? 'error' : 'success']">
+              {{ mensagemEdicao }}
+            </p>
+
+            <div class="edit-buttons">
+              <button type="submit" class="save-button" :disabled="salvando">
+                {{ salvando ? "Salvando..." : "Salvar" }}
+              </button>
+              <button type="button" class="cancel-button" @click="cancelarEdicao">
+                Cancelar
+              </button>
+            </div>
+          </form>
         </div>
 
         <div class="card">
@@ -120,7 +170,7 @@ interface LateCharge {
 const route = useRoute();
 const api = useApiClient();
 
-const { data: rawTeams, pending } = await useFetch<any>("/api/teams");
+const { data: rawTeams, pending, refresh: refreshTeams } = await useFetch<any>("/api/teams");
 const { data: rawStudents } = await useFetch<any>("/api/students");
 const { data: rawLateCharges } = await useFetch<any>("/api/billing/late");
 
@@ -205,6 +255,101 @@ const turma = computed(() => {
   };
 });
 
+useHead({ title: computed(() => (turma.value ? `Turma - ${turma.value.nome}` : "Turma")) });
+
+const editando = ref(false);
+const editTitulo = ref("");
+const editProfessor = ref("");
+const editDias = ref("");
+const editHorario = ref("");
+
+const salvando = ref(false);
+const mensagemEdicao = ref("");
+const erroEdicao = ref(false);
+
+function entrarModoEdicao() {
+  const idParam = String(route.params.id);
+  const targetTeam = teams.value.find((t) => String(t.id) === idParam);
+  if (!targetTeam) return;
+
+  editTitulo.value = targetTeam.title || "";
+  editProfessor.value = targetTeam.team_leader_id || "";
+  editDias.value = targetTeam.days_of_week || "";
+  editHorario.value = targetTeam.horary || "";
+  mensagemEdicao.value = "";
+  editando.value = true;
+}
+
+function cancelarEdicao() {
+  editando.value = false;
+  mensagemEdicao.value = "";
+}
+
+function extrairMensagemErro(err: any, padrao: string) {
+  return (
+    err?.data?.message ||
+    err?.data?.statusMessage ||
+    err?.response?._data?.message ||
+    err?.response?._data?.statusMessage ||
+    padrao
+  );
+}
+
+async function salvarEdicao() {
+  const idParam = String(route.params.id);
+  mensagemEdicao.value = "";
+  erroEdicao.value = false;
+  salvando.value = true;
+
+  try {
+    await api.put(`/api/teams/${idParam}`, {
+      title: editTitulo.value.trim(),
+      team_leader_id: editProfessor.value.trim() || undefined,
+      days_of_week: editDias.value.trim() || undefined,
+      horary: editHorario.value.trim() || undefined,
+    });
+
+    await refreshTeams();
+    editando.value = false;
+  } catch (err: any) {
+    erroEdicao.value = true;
+    mensagemEdicao.value = extrairMensagemErro(err, "Não foi possível salvar as alterações.");
+  } finally {
+    salvando.value = false;
+  }
+}
+
+const excluindo = ref(false);
+const mensagemExclusao = ref("");
+
+async function excluirTurma() {
+  if (!turma.value) return;
+
+  const confirmado = confirm(
+    `Excluir a turma "${turma.value.nome}"? Essa ação não pode ser desfeita.`
+  );
+  if (!confirmado) return;
+
+  const idParam = String(route.params.id);
+  mensagemExclusao.value = "";
+  excluindo.value = true;
+
+  try {
+    await api.delete(`/api/teams/${idParam}`);
+    navigateTo("/turmas");
+  } catch (err: any) {
+    const bruto = extrairMensagemErro(err, "Não foi possível excluir a turma.");
+    if (/foreign key|enrollments_team_id_fkey/i.test(bruto)) {
+      mensagemExclusao.value =
+        "Não é possível excluir esta turma porque existem alunos matriculados nela. Cancele as matrículas primeiro (na tela de Matrículas).";
+    } else {
+      mensagemExclusao.value = bruto;
+    }
+  } finally {
+    excluindo.value = false;
+  }
+}
+
 function voltar() {
   navigateTo("/turmas");
 }
@@ -215,6 +360,10 @@ function goDashboard() {
 
 function goTurmas() {
   navigateTo("/turmas");
+}
+
+function goAlunos() {
+  navigateTo("/alunos");
 }
 
 function goMatriculas() {
@@ -320,6 +469,151 @@ function goMatriculas() {
   font-size: 20px;
   font-weight: 700;
   color: #222;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-header h2 {
+  margin-bottom: 0;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.delete-button {
+  background: #ffffff;
+  color: #888888;
+  border: 2px solid #ccc;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.delete-button:hover:not(:disabled) {
+  background: #c62828;
+  color: #ffffff;
+  border-color: #c62828;
+}
+
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.edit-button {
+  background: #ffffff;
+  color: #c62828;
+  border: 2px solid #c62828;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.edit-button:hover {
+  background: #c62828;
+  color: #ffffff;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.edit-form label {
+  margin-bottom: 5px;
+  font-weight: 700;
+  color: #333;
+  font-size: 14px;
+}
+
+.edit-input {
+  padding: 9px 11px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #c62828;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.save-button {
+  background: #c62828;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #a91f1f;
+}
+
+.save-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background: #ffffff;
+  color: #555;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.cancel-button:hover {
+  background: #f4f4f4;
+}
+
+.message {
+  padding: 10px;
+  border-radius: 8px;
+  margin: 0 0 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.success {
+  background: #dff5e9;
+  color: #218838;
+}
+
+.error {
+  background: #fde2e2;
+  color: #c62828;
 }
 
 .card h3 {

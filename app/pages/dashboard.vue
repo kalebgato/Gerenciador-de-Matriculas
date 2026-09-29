@@ -6,6 +6,8 @@
       <nav>
         <p class="active">Dashboard</p>
         <p @click="goTurmas">Turmas</p>
+        <p @click="goAlunos">Alunos</p>
+        <p @click="goMatriculas">Matrículas</p>
         <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
     </aside>
@@ -38,39 +40,27 @@
         </div>
       </section>
 
-      <section class="table-section">
-        <h3>Alunos</h3>
+      <section class="quick-links">
+        <div class="quick-card" @click="goTurmas">
+          <Icon name="lucide:book-open" class="quick-icon" />
+          <h3>Turmas</h3>
+          <p>Gerencie turmas, horários e professores</p>
+          <span class="quick-stat">{{ totalTurmas }} turmas</span>
+        </div>
 
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Turma</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
+        <div class="quick-card" @click="goAlunos">
+          <Icon name="lucide:graduation-cap" class="quick-icon" />
+          <h3>Alunos</h3>
+          <p>Cadastre, edite e ative/desative alunos</p>
+          <span class="quick-stat">{{ totalAlunos }} alunos</span>
+        </div>
 
-          <tbody>
-            <tr v-for="aluno in alunosProcessados" :key="aluno.id">
-              <td>{{ aluno.nome }}</td>
-              <td>{{ aluno.turma }}</td>
-
-              <td>
-                <span :class="['status', aluno.status === 'Pago' ? 'pago' : 'pendente']">
-                  {{ aluno.status }}
-                </span>
-              </td>
-
-              <td>
-                <button class="btn" @click="verDetalhes(aluno.id)">Ver detalhes</button>
-              </td>
-            </tr>
-            <tr v-if="alunosProcessados.length === 0">
-              <td colspan="4" class="empty-state">Nenhum aluno encontrado.</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="quick-card" @click="goMatriculas">
+          <Icon name="lucide:clipboard-list" class="quick-icon" />
+          <h3>Matrículas</h3>
+          <p>Vincule alunos às turmas e acompanhe status</p>
+          <span class="quick-stat">{{ totalMatriculas }} matrículas</span>
+        </div>
       </section>
     </main>
   </div>
@@ -78,6 +68,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+
+useHead({ title: "Dashboard" });
 
 interface Student {
   id: string;
@@ -115,6 +107,7 @@ const api = useApiClient();
 
 const { data: rawStudents } = await useFetch<any>("/api/students");
 const { data: rawLateCharges } = await useFetch<any>("/api/billing/late");
+const { data: rawTeams } = await useFetch<any>("/api/teams");
 
 function normalizeArray(res: any): any[] {
   if (!res) return [];
@@ -122,6 +115,7 @@ function normalizeArray(res: any): any[] {
   if (Array.isArray(res.data)) return res.data;
   if (Array.isArray(res.students)) return res.students;
   if (Array.isArray(res.lateCharges)) return res.lateCharges;
+  if (Array.isArray(res.teams)) return res.teams;
   if (Array.isArray(res.enrollments)) return res.enrollments;
   if (Array.isArray(res.inscricoes)) return res.inscricoes;
   return [];
@@ -150,37 +144,12 @@ const lateStudentIds = computed(() => {
 const totalAlunos = computed(() => students.value.length);
 const totalPendentes = computed(() => lateStudentIds.value.size);
 const totalPagos = computed(() => Math.max(0, totalAlunos.value - totalPendentes.value));
+const totalTurmas = computed(() => normalizeArray(rawTeams.value).length);
+const totalMatriculas = computed(() => enrollments.value.length);
 
 const taxaInadimplencia = computed(() => {
   if (!totalAlunos.value) return 0;
   return Math.round((totalPendentes.value / totalAlunos.value) * 100);
-});
-
-const enrollmentMap = computed(() => {
-  const map = new Map<string, string>();
-  for (const item of enrollments.value) {
-    const sId = item.student_id || item.studentId || item.alunoId;
-    const turmaNome = item.team?.title || item.team?.name;
-    if (sId && turmaNome) {
-      map.set(String(sId), turmaNome);
-    }
-  }
-  return map;
-});
-
-const alunosProcessados = computed(() => {
-  return students.value.map((student) => {
-    const sId = String(student.id);
-    const isPendente = lateStudentIds.value.has(sId);
-    const turmaNome = enrollmentMap.value.get(sId) || "Sem Turma";
-
-    return {
-      id: sId,
-      nome: student.name || student.nome || "Sem Nome",
-      turma: turmaNome,
-      status: isPendente ? "Pendente" : "Pago",
-    };
-  });
 });
 
 function logout() {
@@ -192,8 +161,12 @@ function goTurmas() {
   navigateTo("/turmas");
 }
 
-function verDetalhes(id: string) {
-  navigateTo(`/alunos/${id}`);
+function goAlunos() {
+  navigateTo("/alunos");
+}
+
+function goMatriculas() {
+  navigateTo("/matriculas");
 }
 </script>
 
@@ -294,6 +267,64 @@ function verDetalhes(id: string) {
   font-size: 30px;
   font-weight: 800;
   margin: 0;
+}
+
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.quick-card {
+  background: white;
+  padding: 26px;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border-left: 5px solid #c62828;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.quick-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(198, 40, 40, 0.15);
+}
+
+.quick-icon {
+  width: 30px;
+  height: 30px;
+  color: #c62828;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.quick-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 6px 0;
+}
+
+.quick-card p {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 14px 0;
+}
+
+.quick-stat {
+  display: inline-block;
+  background: #fdecea;
+  color: #c62828;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+@media (max-width: 900px) {
+  .quick-links {
+    grid-template-columns: 1fr;
+  }
 }
 
 .table-section {

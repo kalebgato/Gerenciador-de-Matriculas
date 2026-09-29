@@ -6,6 +6,7 @@
       <nav>
         <p @click="goDashboard">Dashboard</p>
         <p @click="goTurmas">Turmas</p>
+        <p @click="goAlunos">Alunos</p>
         <p class="active">Matrículas</p>
         <p @click="logout">Logout</p>
       </nav>
@@ -113,6 +114,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
+
+useHead({ title: "Matrículas" })
 
 interface Student {
   id: string
@@ -360,6 +363,10 @@ function goTurmas() {
   navigateTo("/turmas")
 }
 
+function goAlunos() {
+  navigateTo("/alunos")
+}
+
 function logout() {
   localStorage.removeItem("auth")
   navigateTo("/login")
@@ -539,6 +546,33 @@ await carregarDados()
 .table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th:nth-child(1),
+.table td:nth-child(1) {
+  width: 25%;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 25%;
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 25%;
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 25%;
+}
+
+.table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .table th {

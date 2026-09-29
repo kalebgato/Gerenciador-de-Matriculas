@@ -6,6 +6,7 @@
       <nav>
         <p @click="goDashboard">Dashboard</p>
         <p class="active">Turmas</p>
+        <p @click="goAlunos">Alunos</p>
         <p @click="goMatriculas">Matrículas</p>
         <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
@@ -14,7 +15,10 @@
     <main class="main">
       <header class="topbar">
         <h1>Turmas</h1>
-        <button class="back" @click="goDashboard">Voltar</button>
+        <div class="topbar-actions">
+          <button class="new-button" @click="novaTurma">Nova turma</button>
+          <button class="back" @click="goDashboard">Voltar</button>
+        </div>
       </header>
 
       <select v-model="filtroProfessor" class="select">
@@ -64,6 +68,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
+
+useHead({ title: "Turmas" });
 
 interface Student {
   id: string;
@@ -249,6 +255,14 @@ function goDashboard() {
   navigateTo("/dashboard");
 }
 
+function goAlunos() {
+  navigateTo("/alunos");
+}
+
+function novaTurma() {
+  navigateTo("/turmas/nova");
+}
+
 function goMatriculas() {
   navigateTo("/matriculas");
 }
@@ -318,6 +332,27 @@ function goMatriculas() {
   font-size: 30px;
   font-weight: 800;
   color: #222;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.new-button {
+  background: #c62828;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  transition: background 0.15s;
+}
+
+.new-button:hover {
+  background: #a91f1f;
 }
 
 .back {

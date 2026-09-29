@@ -149,3 +149,8 @@ vite.config.ts.timestamp-*
 
 # LOCK
 .lock
+
+
+echo cypress/screenshots/ >> .gitignore
+echo cypress/videos/ >> .gitignore
+echo cypress/downloads/ >> .gitignore

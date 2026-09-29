@@ -9,7 +9,9 @@
     "preview": "nuxt preview",
     "typecheck": "nuxi typecheck",
     "sync:opencollection": "tsx scripts/sync-opencollection.ts",
-    "postinstall": "prisma generate && nuxt prepare"
+    "postinstall": "prisma generate && nuxt prepare",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run"
   },
   "dependencies": {
     "@nuxt/a11y": "1.0.0-alpha.1",
@@ -31,6 +33,7 @@
     "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",
     "@vue/language-core": "^3.2.6",
+    "cypress": "^16.1.0",
     "dotenv": "^17.3.1",
     "prisma": "^7.5.0",
     "ts-node": "^10.9.2",
