@@ -21,21 +21,53 @@
         </div>
       </header>
 
-      <select v-model="filtroProfessor" class="select">
-        <option value="">Todos professores</option>
-        <option v-for="prof in professores" :key="prof" :value="prof">
-          {{ prof }}
-        </option>
-      </select>
+      <div class="filters">
+        <input
+          v-model="buscaTurma"
+          type="text"
+          class="search"
+          placeholder="Buscar turma pelo nome..."
+          aria-label="Buscar turma pelo nome"
+        />
 
-      <section class="cards">
-        <div class="turma-card" v-for="turma in turmasFiltradas" :key="turma.id" @click="selecionarTurma(turma)">
-          <h3>{{ turma.nome }}</h3>
+        <select v-model="filtroProfessor" class="select" aria-label="Filtrar turmas por professor">
+          <option value="">Todos professores</option>
+          <option v-for="prof in professores" :key="prof" :value="prof">
+            {{ prof }}
+          </option>
+        </select>
+      </div>
+
+      <section v-if="turmasPaginadas.length > 0" class="cards">
+        <div class="turma-card" v-for="turma in turmasPaginadas" :key="turma.id" @click="selecionarTurma(turma)">
+          <h2>{{ turma.nome }}</h2>
           <p>{{ turma.dia }} - {{ turma.horario }}</p>
           <p><strong>Professor:</strong> {{ turma.professor }}</p>
           <p><strong>{{ turma.alunos.length }} alunos</strong></p>
         </div>
       </section>
+
+      <p v-else class="empty-state">Nenhuma turma encontrada para esse filtro.</p>
+
+      <div v-if="totalPaginas > 1" class="pagination">
+        <button
+          class="page-button"
+          :disabled="paginaAtual === 1"
+          @click="paginaAtual = paginaAtual - 1"
+        >
+          ← Anterior
+        </button>
+
+        <span class="page-info">Página {{ paginaAtual }} de {{ totalPaginas }}</span>
+
+        <button
+          class="page-button"
+          :disabled="paginaAtual === totalPaginas"
+          @click="paginaAtual = paginaAtual + 1"
+        >
+          Próxima →
+        </button>
+      </div>
     </main>
 
     <div v-if="turmaSelecionada" class="overlay">
@@ -66,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
 useHead({ title: "Turmas" });
@@ -126,8 +158,12 @@ interface TurmaProcessada {
 }
 
 const filtroProfessor = ref("");
+const buscaTurma = ref("");
 const turmaSelecionada = ref<TurmaProcessada | null>(null);
 const loading = ref(false);
+
+const paginaAtual = ref(1);
+const itensPorPagina = 6;
 
 const api = useApiClient();
 
@@ -218,9 +254,50 @@ const professores = computed(() => {
   return Array.from(set).filter((p) => p !== "Não informado");
 });
 
+function normalizarTexto(valor: string): string {
+  return valor
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+}
+
 const turmasFiltradas = computed(() => {
-  if (!filtroProfessor.value) return turmas.value;
-  return turmas.value.filter((t) => t.professor === filtroProfessor.value);
+  let lista = turmas.value;
+
+  if (filtroProfessor.value) {
+    lista = lista.filter((t) => t.professor === filtroProfessor.value);
+  }
+
+  const termo = normalizarTexto(buscaTurma.value);
+  if (termo) {
+    lista = lista.filter((t) => normalizarTexto(t.nome).includes(termo));
+  }
+
+  return lista;
+});
+
+const totalPaginas = computed(() => {
+  return Math.max(1, Math.ceil(turmasFiltradas.value.length / itensPorPagina));
+});
+
+const turmasPaginadas = computed(() => {
+  const inicio = (paginaAtual.value - 1) * itensPorPagina;
+  return turmasFiltradas.value.slice(inicio, inicio + itensPorPagina);
+});
+
+// Sempre que o filtro ou a busca mudam, volta para a primeira página
+// (senão a página atual pode ficar vazia com uma lista menor).
+watch([filtroProfessor, buscaTurma], () => {
+  paginaAtual.value = 1;
+});
+
+// Se a lista encolher (ex: filtro aplicado) e a página atual deixar de existir,
+// volta pra última página válida.
+watch(totalPaginas, (novoTotal) => {
+  if (paginaAtual.value > novoTotal) {
+    paginaAtual.value = novoTotal;
+  }
 });
 
 function selecionarTurma(turma: TurmaProcessada) {
@@ -278,6 +355,7 @@ function goMatriculas() {
 
 .sidebar {
   width: 230px;
+  flex-shrink: 0;
   background: #ffffff;
   padding: 24px 16px;
   border-right: 1px solid #eee;
@@ -319,6 +397,7 @@ function goMatriculas() {
 .main {
   flex: 1;
   padding: 32px 40px;
+  min-width: 0;
 }
 
 .topbar {
@@ -326,6 +405,8 @@ function goMatriculas() {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .topbar h1 {
@@ -372,11 +453,35 @@ function goMatriculas() {
   color: #ffffff;
 }
 
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #ffffff;
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: inherit;
+}
+
+.search:focus {
+  outline: none;
+  border-color: #c62828;
+}
+
 .select {
   padding: 10px 16px;
   border-radius: 8px;
   border: 1px solid #ddd;
-  margin-bottom: 24px;
   background: #ffffff;
   color: #333;
   font-size: 15px;
@@ -410,7 +515,7 @@ function goMatriculas() {
   box-shadow: 0 8px 20px rgba(198, 40, 40, 0.15);
 }
 
-.turma-card h3 {
+.turma-card h2 {
   color: #222;
   font-size: 20px;
   font-weight: 700;
@@ -422,6 +527,50 @@ function goMatriculas() {
   margin: 4px 0;
   font-size: 15px;
   font-weight: 500;
+}
+
+.empty-state {
+  text-align: center;
+  color: #888;
+  padding: 30px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.page-button {
+  background: #ffffff;
+  color: #c62828;
+  border: 2px solid #c62828;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.page-button:hover:not(:disabled) {
+  background: #c62828;
+  color: #ffffff;
+}
+
+.page-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-weight: 600;
+  color: #444;
+  font-size: 14px;
 }
 
 .overlay {
@@ -513,5 +662,69 @@ function goMatriculas() {
 
 .close:hover {
   background: #f4f4f4;
+}
+
+@media (max-width: 800px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    box-shadow: none;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding: 16px;
+  }
+
+  .logo {
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar nav p,
+  .sidebar nav :deep(p) {
+    margin: 0;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .search,
+  .select {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 14px;
+  }
+
+  .topbar h1 {
+    font-size: 24px;
+  }
+
+  .panel {
+    width: 100%;
+  }
 }
 </style>
