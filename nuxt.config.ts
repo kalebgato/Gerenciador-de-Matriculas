@@ -19,6 +19,9 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      htmlAttrs: {
+        lang: 'pt-BR'
+      },
       titleTemplate: (titleChunk) => titleChunk ? `${titleChunk} · PRODAGIN` : 'PRODAGIN',
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: `data:image/svg+xml,${encodeURIComponent(faviconSvg)}` }
@@ -26,7 +29,7 @@ export default defineNuxtConfig({
     }
   },
 
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/dark-mode.css'],
 
   modules: [
     '@nuxt/a11y',
@@ -35,6 +38,14 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxtjs/color-mode',
   ],
+
+  colorMode: {
+    classPrefix: '',
+    classSuffix: '',
+    preference: 'system',
+    fallback: 'light',
+    storageKey: 'prodagin-color-mode',
+  },
 
   vite: {
     plugins: [
