@@ -20,37 +20,43 @@
       <div class="card">
         <h1>Novo aluno</h1>
 
-        <form @submit.prevent="criarAluno">
+        <form @submit.prevent="criarAluno" novalidate>
           <label for="nome">Nome completo</label>
           <input
             id="nome"
             v-model="nome"
-            class="select"
+            :class="['select', erroNome ? 'input-error' : '']"
             type="text"
             placeholder="Nome do aluno"
             required
+            @blur="validarNomeCampo"
           />
+          <p v-if="erroNome" class="field-error">{{ erroNome }}</p>
 
           <label for="cpf">CPF</label>
           <input
             id="cpf"
             v-model="cpf"
-            class="select"
+            :class="['select', erroCpf ? 'input-error' : '']"
             type="text"
             placeholder="000.000.000-00"
             maxlength="14"
             required
             @input="cpf = formatarCpf(cpf)"
+            @blur="validarCpfCampo"
           />
+          <p v-if="erroCpf" class="field-error">{{ erroCpf }}</p>
 
           <label for="email">Email</label>
           <input
             id="email"
             v-model="email"
-            class="select"
+            :class="['select', erroEmail ? 'input-error' : '']"
             type="email"
             placeholder="email@exemplo.com"
+            @blur="validarEmailCampo"
           />
+          <p v-if="erroEmail" class="field-error">{{ erroEmail }}</p>
 
           <label for="telefone">Telefone</label>
           <input
@@ -133,6 +139,32 @@ function formatarCpf(valor: string): string {
   if (digits.length <= 9) return digits.replace(/(\d{3})(\d{3})(\d+)/, "$1.$2.$3")
   return digits.replace(/(\d{3})(\d{3})(\d{3})(\d+)/, "$1.$2.$3-$4")
 }
+
+// Validação de CPF: confere os dois dígitos verificadores pelo algoritmo oficial.
+function cpfValido(valorFormatado: string): boolean {
+  const digits = valorFormatado.replace(/\D/g, "")
+  if (digits.length !== 11) return false
+  if (/^(\d)\1{10}$/.test(digits)) return false // todos os dígitos iguais
+
+  const calcularDigito = (base: string, pesoInicial: number): number => {
+    let soma = 0
+    for (let i = 0; i < base.length; i++) {
+      soma += parseInt(base[i], 10) * (pesoInicial - i)
+    }
+    const resto = (soma * 10) % 11
+    return resto === 10 ? 0 : resto
+  }
+
+  const digito1 = calcularDigito(digits.slice(0, 9), 10)
+  const digito2 = calcularDigito(digits.slice(0, 10), 11)
+
+  return digito1 === parseInt(digits[9], 10) && digito2 === parseInt(digits[10], 10)
+}
+
+function emailValido(valor: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor.trim())
+}
+
 const cpf = ref("")
 const email = ref("")
 const telefone = ref("")
@@ -140,9 +172,38 @@ const dn = ref("")
 const responsavelNome = ref("")
 const responsavelTelefone = ref("")
 
+const erroNome = ref("")
+const erroCpf = ref("")
+const erroEmail = ref("")
+
 const loading = ref(false)
 const mensagem = ref("")
 const sucesso = ref(false)
+
+function validarNomeCampo(): boolean {
+  erroNome.value = nome.value.trim() ? "" : "Informe o nome do aluno."
+  return !erroNome.value
+}
+
+function validarCpfCampo(): boolean {
+  if (!cpf.value.trim()) {
+    erroCpf.value = "Informe o CPF do aluno."
+  } else if (!cpfValido(cpf.value)) {
+    erroCpf.value = "CPF inválido. Confira os números digitados."
+  } else {
+    erroCpf.value = ""
+  }
+  return !erroCpf.value
+}
+
+function validarEmailCampo(): boolean {
+  if (email.value.trim() && !emailValido(email.value)) {
+    erroEmail.value = "Email em formato inválido (ex: nome@exemplo.com)."
+  } else {
+    erroEmail.value = ""
+  }
+  return !erroEmail.value
+}
 
 function extrairMensagemErro(err: any, padrao: string) {
   return (
@@ -158,8 +219,12 @@ async function criarAluno() {
   mensagem.value = ""
   sucesso.value = false
 
-  if (!nome.value.trim() || !cpf.value.trim()) {
-    mensagem.value = "Preencha nome e CPF."
+  const nomeOk = validarNomeCampo()
+  const cpfOk = validarCpfCampo()
+  const emailOk = validarEmailCampo()
+
+  if (!nomeOk || !cpfOk || !emailOk) {
+    mensagem.value = "Corrija os campos destacados antes de continuar."
     return
   }
 
@@ -228,6 +293,7 @@ function logout() {
 
 .sidebar {
   width: 230px;
+  flex-shrink: 0;
   background: #ffffff;
   padding: 24px 16px;
   border-right: 1px solid #eee;
@@ -267,6 +333,7 @@ function logout() {
 .main {
   flex: 1;
   padding: 32px 40px;
+  min-width: 0;
 }
 
 .back {
@@ -288,6 +355,7 @@ function logout() {
 }
 
 .card {
+  box-sizing: border-box;
   background: white;
   padding: 30px;
   border-radius: 14px;
@@ -316,6 +384,8 @@ label {
 }
 
 .select {
+  box-sizing: border-box;
+  width: 100%;
   padding: 11px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -330,6 +400,18 @@ label {
 .select:focus {
   outline: none;
   border-color: #c62828;
+}
+
+.input-error {
+  border-color: #c62828;
+  margin-bottom: 6px;
+}
+
+.field-error {
+  color: #c62828;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 16px;
 }
 
 .submit {
@@ -369,5 +451,59 @@ label {
 .error {
   background: #fde2e2;
   color: #c62828;
+}
+
+@media (max-width: 800px) {
+  .page {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    box-shadow: none;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding: 16px;
+  }
+
+  .logo {
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar nav p {
+    margin: 0;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .card {
+    max-width: 100%;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 14px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .card h1 {
+    font-size: 22px;
+  }
 }
 </style>
