@@ -80,6 +80,7 @@ async function handleLogin() {
 }
 
 .card {
+  box-sizing: border-box;
   background: white;
   padding: 40px;
   border-radius: 16px;
@@ -116,6 +117,8 @@ async function handleLogin() {
 }
 
 .input {
+  box-sizing: border-box;
+  width: 100%;
   padding: 11px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -176,5 +179,19 @@ async function handleLogin() {
 
 .link:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 380px) {
+  .page {
+    padding: 12px;
+  }
+
+  .card {
+    padding: 28px 22px;
+  }
+
+  .logo {
+    font-size: 22px;
+  }
 }
 </style>

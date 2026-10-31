@@ -106,58 +106,62 @@
           </form>
         </div>
 
-        <div class="card">
+        <div class="card table-card">
           <h3>Turmas Matriculadas</h3>
 
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Turma</th>
-                <th>Professor</th>
-                <th>Horário</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="turma in aluno.turmas" :key="turma.id">
-                <td>{{ turma.nome }}</td>
-                <td>{{ turma.professor }}</td>
-                <td>{{ turma.dia }} - {{ turma.horario }}</td>
-              </tr>
-              <tr v-if="aluno.turmas.length === 0">
-                <td colspan="3" class="empty-state">Nenhuma turma vinculada a este aluno.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Turma</th>
+                  <th>Professor</th>
+                  <th>Horário</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="turma in aluno.turmas" :key="turma.id">
+                  <td>{{ turma.nome }}</td>
+                  <td>{{ turma.professor }}</td>
+                  <td>{{ turma.dia }} - {{ turma.horario }}</td>
+                </tr>
+                <tr v-if="aluno.turmas.length === 0">
+                  <td colspan="3" class="empty-state">Nenhuma turma vinculada a este aluno.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="card">
+        <div class="card table-card">
           <h3>Histórico Financeiro e Cobranças</h3>
 
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Vencimento</th>
-                <th>Data de Pagamento</th>
-                <th>Valor</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="cobranca in aluno.cobrancas" :key="cobranca.id">
-                <td>{{ cobranca.vencimento }}</td>
-                <td>{{ cobranca.dataPagamento }}</td>
-                <td>{{ cobranca.valor }}</td>
-                <td>
-                  <span :class="['status', cobranca.status === 'Pendente' ? 'pendente' : 'pago']">
-                    {{ cobranca.status }}
-                  </span>
-                </td>
-              </tr>
-              <tr v-if="aluno.cobrancas.length === 0">
-                <td colspan="4" class="empty-state">Nenhuma cobrança pendente encontrada.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Vencimento</th>
+                  <th>Data de Pagamento</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="cobranca in aluno.cobrancas" :key="cobranca.id">
+                  <td>{{ cobranca.vencimento }}</td>
+                  <td>{{ cobranca.dataPagamento }}</td>
+                  <td>{{ cobranca.valor }}</td>
+                  <td>
+                    <span :class="['status', cobranca.status === 'Pendente' ? 'pendente' : 'pago']">
+                      {{ cobranca.status }}
+                    </span>
+                  </td>
+                </tr>
+                <tr v-if="aluno.cobrancas.length === 0">
+                  <td colspan="4" class="empty-state">Nenhuma cobrança pendente encontrada.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -417,6 +421,7 @@ function goMatriculas() {
 
 .sidebar {
   width: 230px;
+  flex-shrink: 0;
   background: #ffffff;
   padding: 24px 16px;
   border-right: 1px solid #eee;
@@ -458,6 +463,7 @@ function goMatriculas() {
 .main {
   flex: 1;
   padding: 32px 40px;
+  min-width: 0;
 }
 
 .topbar {
@@ -465,6 +471,8 @@ function goMatriculas() {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .topbar h1 {
@@ -491,6 +499,7 @@ function goMatriculas() {
 }
 
 .card {
+  box-sizing: border-box;
   background: white;
   padding: 24px;
   border-radius: 14px;
@@ -512,6 +521,7 @@ function goMatriculas() {
 .card-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -598,6 +608,8 @@ function goMatriculas() {
 }
 
 .edit-input {
+  box-sizing: border-box;
+  width: 100%;
   padding: 9px 11px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -613,6 +625,7 @@ function goMatriculas() {
 
 .edit-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 6px;
 }
@@ -671,8 +684,13 @@ function goMatriculas() {
   color: #c62828;
 }
 
+.table-wrap {
+  overflow-x: auto;
+}
+
 .table {
   width: 100%;
+  min-width: 420px;
   border-collapse: collapse;
 }
 
@@ -685,6 +703,7 @@ function goMatriculas() {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 2px solid #f0f0f0;
+  white-space: nowrap;
 }
 
 .table td {
@@ -693,6 +712,7 @@ function goMatriculas() {
   color: #333;
   font-size: 15px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .status {
@@ -721,5 +741,65 @@ function goMatriculas() {
   text-align: center;
   color: #888;
   padding: 20px;
+  white-space: normal;
+}
+
+@media (max-width: 800px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    box-shadow: none;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding: 16px;
+  }
+
+  .logo {
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar nav p,
+  .sidebar nav :deep(p) {
+    margin: 0;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .topbar h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 14px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .edit-buttons {
+    flex-direction: column;
+  }
+
+  .save-button,
+  .cancel-button {
+    width: 100%;
+  }
 }
 </style>

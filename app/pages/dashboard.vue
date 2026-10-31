@@ -180,6 +180,7 @@ function goMatriculas() {
 
 .sidebar {
   width: 230px;
+  flex-shrink: 0;
   background: #ffffff;
   padding: 24px 16px;
   border-right: 1px solid #eee;
@@ -221,6 +222,7 @@ function goMatriculas() {
 .main {
   flex: 1;
   padding: 32px 40px;
+  min-width: 0;
 }
 
 .topbar {
@@ -228,6 +230,8 @@ function goMatriculas() {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .topbar h1 {
@@ -321,12 +325,6 @@ function goMatriculas() {
   border-radius: 20px;
 }
 
-@media (max-width: 900px) {
-  .quick-links {
-    grid-template-columns: 1fr;
-  }
-}
-
 .table-section {
   background: white;
   padding: 24px;
@@ -418,5 +416,71 @@ function goMatriculas() {
   text-align: center;
   color: #888;
   padding: 20px;
+}
+
+/* --- Responsividade mobile --- */
+
+@media (max-width: 900px) {
+  .quick-links {
+    grid-template-columns: 1fr;
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    box-shadow: none;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding: 16px;
+  }
+
+  .logo {
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar nav p,
+  .sidebar nav :deep(p) {
+    margin: 0;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .topbar h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .main {
+    padding: 16px;
+  }
+
+  .card h2 {
+    font-size: 26px;
+  }
 }
 </style>

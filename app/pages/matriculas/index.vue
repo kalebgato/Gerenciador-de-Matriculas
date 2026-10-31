@@ -392,6 +392,7 @@ await carregarDados()
 
 .sidebar {
   width: 230px;
+  flex-shrink: 0;
   background: #ffffff;
   padding: 24px 16px;
   border-right: 1px solid #eee;
@@ -431,6 +432,7 @@ await carregarDados()
 .main {
   flex: 1;
   padding: 32px 40px;
+  min-width: 0;
 }
 
 .topbar {
@@ -612,6 +614,27 @@ await carregarDados()
 
   .sidebar {
     width: 100%;
+    box-shadow: none;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding: 16px;
+  }
+
+  .logo {
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar nav p {
+    margin: 0;
+    font-size: 14px;
+    padding: 8px 12px;
   }
 
   .main {
@@ -630,6 +653,32 @@ await carregarDados()
 
   .select {
     width: 100%;
+    min-width: 0;
+  }
+
+  .table th,
+  .table td {
+    font-size: 13px;
+    padding: 10px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 14px;
+  }
+
+  .topbar h1 {
+    font-size: 24px;
+  }
+
+  .new-button {
+    width: 100%;
+  }
+
+  .cancel-button {
+    font-size: 11px;
+    padding: 5px 10px;
   }
 }
 </style>

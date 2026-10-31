@@ -450,6 +450,7 @@ await carregarDados()
 
 .sidebar {
   width: 230px;
+  flex-shrink: 0;
   background: #ffffff;
   padding: 24px 16px;
   border-right: 1px solid #eee;
@@ -489,6 +490,7 @@ await carregarDados()
 .main {
   flex: 1;
   padding: 32px 40px;
+  min-width: 0;
 }
 
 .back {
@@ -510,6 +512,7 @@ await carregarDados()
 }
 
 .card {
+  box-sizing: border-box;
   background: white;
   padding: 30px;
   border-radius: 14px;
@@ -573,6 +576,8 @@ label {
 
 .select,
 input.select {
+  box-sizing: border-box;
+  width: 100%;
   padding: 11px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -663,5 +668,63 @@ select.select {
 .error {
   background: #fde2e2;
   color: #c62828;
+}
+
+@media (max-width: 800px) {
+  .page {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    box-shadow: none;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding: 16px;
+  }
+
+  .logo {
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar nav p {
+    margin: 0;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .card {
+    max-width: 100%;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 14px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .card h1 {
+    font-size: 22px;
+  }
+
+  .mode-toggle {
+    flex-direction: column;
+  }
 }
 </style>
