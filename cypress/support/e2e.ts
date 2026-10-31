@@ -14,17 +14,31 @@ Cypress.Commands.add("clickAndWaitForUrl", (buttonText: string, urlFragment: str
 });
 
 Cypress.Commands.add("login", (email = "admin@admin.com", senha = "123") => {
-  cy.visit("/login");
-  cy.get("#senha", { timeout: 15000 }).should("be.visible");
-  cy.wait(3000);
+  const attempt = (retriesLeft: number) => {
+    cy.visit("/login");
+    cy.get("#senha", { timeout: 15000 }).should("be.visible");
+    cy.wait(3000);
 
-  cy.get("#email").clear().type(email, { delay: 50 });
-  cy.get("#senha").clear().type(senha, { delay: 50 });
+    cy.get("#email").clear().type(email, { delay: 50 });
+    cy.get("#senha").clear().type(senha, { delay: 50 });
 
-  cy.get("#email").should("have.value", email);
-  cy.get("#senha").should("have.value", senha);
+    cy.get("#email").should("have.value", email);
+    cy.get("#senha").should("have.value", senha);
 
-  cy.contains("button", "Entrar").click();
+    cy.contains("button", "Entrar").click();
+
+    // dá tempo real pro login + redirect terminarem antes de checar a URL,
+    // pra não disparar uma tentativa extra enquanto o redirect ainda está em andamento
+    cy.wait(3000);
+
+    cy.url().then((url) => {
+      if (!url.includes("/dashboard") && retriesLeft > 0) {
+        attempt(retriesLeft - 1);
+      }
+    });
+  };
+
+  attempt(3);
 
   cy.url({ timeout: 15000 }).should("include", "/dashboard");
 });

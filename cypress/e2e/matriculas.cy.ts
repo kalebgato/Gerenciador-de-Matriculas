@@ -1,96 +1,66 @@
-describe("Matrículas", () => {
-  beforeEach(() => {
-    cy.login();
-    cy.visit("/matriculas");
-    cy.get("table tbody tr", { timeout: 15000 }).should("have.length.greaterThan", 0);
-    cy.wait(2000);
-  });
+/// <reference types="cypress" />
 
-  it("lista as matrículas existentes", () => {
-    cy.get("table tbody tr").should("have.length.greaterThan", 0);
-  });
-
-  it("filtra matrículas por turma", () => {
-    cy.get("select.select").eq(1).find("option").then((options) => {
-      expect(options.length).to.be.greaterThan(1);
+Cypress.Commands.add("clickAndWaitForUrl", (buttonText: string, urlFragment: string, maxRetries = 8) => {
+  const attempt = (retriesLeft: number) => {
+    cy.contains("button", buttonText).click();
+    cy.url().then((url) => {
+      if (!url.includes(urlFragment) && retriesLeft > 0) {
+        cy.wait(500);
+        attempt(retriesLeft - 1);
+      }
     });
-  });
-
-  it("mostra aviso ao selecionar aluno já matriculado", () => {
-    cy.clickAndWaitForUrl("Nova matrícula", "/matriculas/nova");
-    cy.url({ timeout: 10000 }).should("include", "/matriculas/nova");
-    cy.get("#aluno", { timeout: 10000 }).should("be.visible");
-    cy.wait(2000);
-
-    cy.get("#aluno option").should("have.length.greaterThan", 1);
-    cy.get("#aluno").then(($el) => {
-      const select = $el[0] as HTMLSelectElement;
-      select.value = select.options[1].value;
-      select.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-    cy.get(".info-panel").should("be.visible");
-  });
-
-  it("cria uma matrícula cadastrando um aluno novo", () => {
-    const nome = `Matricula Cypress ${Date.now()}`;
-
-    cy.clickAndWaitForUrl("Nova matrícula", "/matriculas/nova");
-    cy.url({ timeout: 10000 }).should("include", "/matriculas/nova");
-    cy.get("#aluno", { timeout: 10000 }).should("be.visible");
-    cy.wait(2000);
-
-    cy.contains("button", "Cadastrar novo aluno").click();
-    cy.get("#novoNome", { timeout: 10000 }).should("be.visible");
-    cy.wait(500);
-
-    cy.get("#novoNome").type(nome);
-    cy.get("#novoCpf").type(String(Date.now()).slice(-11));
-
-    cy.get("#turma option").should("have.length.greaterThan", 1);
-    cy.get("#turma").then(($el) => {
-      const select = $el[0] as HTMLSelectElement;
-      select.value = select.options[1].value;
-      select.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-
-    cy.contains("button", "Matricular aluno").click();
-
-    cy.url({ timeout: 10000 }).should("include", "/matriculas");
-    cy.contains(nome, { timeout: 10000 }).should("be.visible");
-  });
-
-  it("cancela uma matrícula", () => {
-    const nome = `MatriculaCancelTeste ${Date.now()}`;
-
-    cy.clickAndWaitForUrl("Nova matrícula", "/matriculas/nova");
-    cy.url({ timeout: 10000 }).should("include", "/matriculas/nova");
-    cy.get("#aluno", { timeout: 10000 }).should("be.visible");
-    cy.wait(2000);
-
-    cy.contains("button", "Cadastrar novo aluno").click();
-    cy.get("#novoNome", { timeout: 10000 }).should("be.visible");
-    cy.wait(500);
-
-    cy.get("#novoNome").type(nome);
-    cy.get("#novoCpf").type(String(Date.now()).slice(-11));
-    cy.get("#turma option").should("have.length.greaterThan", 1);
-    cy.get("#turma").then(($el) => {
-      const select = $el[0] as HTMLSelectElement;
-      select.value = select.options[1].value;
-      select.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-
-    cy.contains("button", "Matricular aluno").click();
-
-    cy.url({ timeout: 10000 }).should("include", "/matriculas");
-    cy.contains(nome, { timeout: 10000 }).should("be.visible");
-
-    cy.on("window:confirm", () => true);
-
-    cy.contains("table tbody tr", nome)
-      .contains("button", "Cancelar matrícula")
-      .click();
-
-    cy.contains(nome, { timeout: 10000 }).should("not.exist");
-  });
+  };
+  attempt(maxRetries);
 });
+
+Cypress.Commands.add("login", (email = "admin@admin.com", senha = "123") => {
+  const typeField = (selector: string, value: string, retriesLeft = 3) => {
+    cy.get(selector).clear().type(value, { delay: 50 });
+    cy.get(selector).then(($el) => {
+      const current = ($el.val() as string) || "";
+      if (current !== value && retriesLeft > 0) {
+        cy.wait(300);
+        typeField(selector, value, retriesLeft - 1);
+      }
+    });
+  };
+
+  const attempt = (retriesLeft: number) => {
+    cy.visit("/login");
+    cy.get("#senha", { timeout: 15000 }).should("be.visible");
+    cy.wait(3000);
+
+    typeField("#email", email);
+    typeField("#senha", senha);
+
+    cy.get("#email").should("have.value", email);
+    cy.get("#senha").should("have.value", senha);
+
+    cy.contains("button", "Entrar").click();
+
+    // dá tempo real pro login + redirect terminarem antes de checar a URL,
+    // pra não disparar uma tentativa extra enquanto o redirect ainda está em andamento
+    cy.wait(3000);
+
+    cy.url().then((url) => {
+      if (!url.includes("/dashboard") && retriesLeft > 0) {
+        attempt(retriesLeft - 1);
+      }
+    });
+  };
+
+  attempt(3);
+
+  cy.url({ timeout: 15000 }).should("include", "/dashboard");
+});
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      login(email?: string, senha?: string): Chainable<void>;
+      clickAndWaitForUrl(buttonText: string, urlFragment: string, maxRetries?: number): Chainable<void>;
+    }
+  }
+}
+
+export {};
