@@ -36,6 +36,7 @@ html.dark .card,
 html.dark .panel,
 html.dark .quick-card,
 html.dark .turma-card,
+html.dark .summary-card,
 html.dark .table-section {
   background: #1e1e1e !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
@@ -56,7 +57,9 @@ html.dark .panel h3 {
   color: #f1f1f1 !important;
 }
 
+html.dark .panel p:not(.warning):not(.message):not(.feedback):not(.modal-info),
 html.dark .card p,
+html.dark .summary-card p,
 html.dark .turma-card p,
 html.dark .quick-card p,
 html.dark .message,
@@ -94,6 +97,7 @@ html.dark .cancel-button,
 html.dark .close,
 html.dark .page-button,
 html.dark .mode-button,
+html.dark .view-button,
 html.dark .logout-btn {
   background: #1e1e1e !important;
   color: #ff6b6b !important;
@@ -148,7 +152,7 @@ html.dark .info-warning {
 /* Botão de alternar tema (adicionado no app.vue) */
 .theme-toggle {
   position: fixed;
-  top: 16px;
+  bottom: 16px;
   right: 16px;
   z-index: 100;
   width: 40px;
@@ -178,7 +182,7 @@ html.dark .theme-toggle {
 
 @media (max-width: 480px) {
   .theme-toggle {
-    top: 10px;
+    bottom: 10px;
     right: 10px;
     width: 34px;
     height: 34px;

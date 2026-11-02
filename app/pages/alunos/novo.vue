@@ -8,6 +8,7 @@
         <p @click="goTurmas">Turmas</p>
         <p class="active">Alunos</p>
         <p @click="goMatriculas">Matrículas</p>
+        <p @click="goInadimplentes">Inadimplentes</p>
         <p @click="logout">Logout</p>
       </nav>
     </aside>
@@ -256,6 +257,10 @@ async function criarAluno() {
 
 function voltar() {
   navigateTo("/alunos")
+}
+
+function goInadimplentes() {
+  navigateTo("/inadimplentes")
 }
 
 function goDashboard() {

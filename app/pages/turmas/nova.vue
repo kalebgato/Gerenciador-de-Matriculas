@@ -8,6 +8,7 @@
         <p class="active">Turmas</p>
         <p @click="goAlunos">Alunos</p>
         <p @click="goMatriculas">Matrículas</p>
+        <p @click="goInadimplentes">Inadimplentes</p>
         <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
     </aside>
@@ -170,6 +171,10 @@ async function criarTurma() {
 
 function voltar() {
   navigateTo("/turmas")
+}
+
+function goInadimplentes() {
+  navigateTo("/inadimplentes")
 }
 
 function goDashboard() {

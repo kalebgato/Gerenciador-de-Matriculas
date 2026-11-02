@@ -8,6 +8,7 @@
         <p @click="goTurmas">Turmas</p>
         <p @click="goAlunos">Alunos</p>
         <p class="active">Matrículas</p>
+        <p @click="goInadimplentes">Inadimplentes</p>
         <p @click="logout">Logout</p>
       </nav>
     </aside>
@@ -88,15 +89,24 @@
               <td>{{ nomeAluno(matricula) }}</td>
               <td>{{ nomeTurma(matricula) }}</td>
               <td>{{ horarioTurma(matricula) }}</td>
-              <td>
-                <button
-                  v-if="matricula.id"
-                  class="cancel-button"
-                  :disabled="cancelandoIds.has(matricula.id)"
-                  @click="cancelarMatricula(matricula)"
-                >
-                  {{ cancelandoIds.has(matricula.id) ? "Cancelando..." : "Cancelar matrícula" }}
-                </button>
+              <td class="acoes-cell">
+                <div class="acoes-wrap">
+                  <button
+                    v-if="matricula.id"
+                    class="charge-button"
+                    @click="abrirGerarCobrancas(matricula)"
+                  >
+                    Gerar cobranças
+                  </button>
+                  <button
+                    v-if="matricula.id"
+                    class="cancel-button"
+                    :disabled="cancelandoIds.has(matricula.id)"
+                    @click="cancelarMatricula(matricula)"
+                  >
+                    {{ cancelandoIds.has(matricula.id) ? "Cancelando..." : "Cancelar matrícula" }}
+                  </button>
+                </div>
               </td>
             </tr>
 
@@ -109,11 +119,64 @@
         </table>
       </section>
     </main>
+
+    <div v-if="matriculaCobranca" class="overlay" @click.self="fecharGerarCobrancas">
+      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="cobrancas-titulo">
+        <h2 id="cobrancas-titulo">Gerar cobranças do ano</h2>
+        <p>
+          <strong>{{ nomeAluno(matriculaCobranca) }}</strong> — {{ nomeTurma(matriculaCobranca) }}
+        </p>
+
+        <form class="modal-form" @submit.prevent="confirmarGerarCobrancas">
+          <label for="genAno">Ano</label>
+          <input
+            id="genAno"
+            v-model="genAno"
+            class="select"
+            type="number"
+            min="2000"
+            max="2100"
+            step="1"
+            required
+          />
+
+          <label for="genValor">Valor mensal (R$)</label>
+          <input
+            id="genValor"
+            v-model="genValor"
+            class="select"
+            type="number"
+            min="0.01"
+            step="0.01"
+            required
+          />
+
+          <p class="modal-info">
+            Serão criadas 12 cobranças (janeiro a dezembro), todas com vencimento no dia 10.
+          </p>
+
+          <p v-if="mesesJaVencidos > 0" class="warning">
+            {{ mesesJaVencidos }} dos 12 meses de {{ genAno }} já venceram e aparecerão como atrasados assim que forem geradas.
+          </p>
+
+          <p v-if="erroGeracao" class="feedback feedback-error">{{ erroGeracao }}</p>
+
+          <div class="modal-buttons">
+            <button type="submit" class="new-button" :disabled="gerandoCobrancas">
+              {{ gerandoCobrancas ? "Gerando..." : "Gerar cobranças" }}
+            </button>
+            <button type="button" class="modal-cancel" @click="fecharGerarCobrancas">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 
 useHead({ title: "Matrículas" })
 
@@ -132,6 +195,7 @@ interface Team {
   horary?: string
   schedule?: string
   days_of_week?: string
+  price?: number | string
 }
 
 interface Course {
@@ -351,8 +415,100 @@ async function cancelarMatricula(matricula: Enrollment) {
   }
 }
 
+// --- Geração de cobranças do ano ---
+const matriculaCobranca = ref<Enrollment | null>(null)
+const genAno = ref(String(new Date().getFullYear()))
+const genValor = ref("")
+const gerandoCobrancas = ref(false)
+const erroGeracao = ref("")
+
+const mesesJaVencidos = computed(() => {
+  const ano = Number(genAno.value)
+  if (!ano) return 0
+
+  const agora = new Date()
+  let total = 0
+
+  for (let mes = 0; mes < 12; mes++) {
+    if (new Date(ano, mes, 10) < agora) total++
+  }
+
+  return total
+})
+
+function precoDaTurma(matricula: Enrollment) {
+  const turma = turmas.value.find(
+    item => String(item.id) === String(idTurma(matricula))
+  )
+  const preco = Number(turma?.price ?? matricula.team?.price ?? 0)
+
+  return preco > 0 ? String(preco) : ""
+}
+
+function abrirGerarCobrancas(matricula: Enrollment) {
+  matriculaCobranca.value = matricula
+  genAno.value = String(new Date().getFullYear())
+  genValor.value = precoDaTurma(matricula)
+  erroGeracao.value = ""
+}
+
+function fecharGerarCobrancas() {
+  if (gerandoCobrancas.value) return
+  matriculaCobranca.value = null
+  erroGeracao.value = ""
+}
+
+async function confirmarGerarCobrancas() {
+  const matricula = matriculaCobranca.value
+  if (!matricula?.id) return
+
+  const ano = Number(genAno.value)
+  const valor = Number(genValor.value)
+
+  if (!Number.isInteger(ano) || ano < 2000) {
+    erroGeracao.value = "Informe um ano válido."
+    return
+  }
+
+  if (!(valor > 0)) {
+    erroGeracao.value = "Informe um valor mensal maior que zero."
+    return
+  }
+
+  gerandoCobrancas.value = true
+  erroGeracao.value = ""
+
+  try {
+    await api.post("/api/billing", {
+      action: "generate",
+      enrollmentId: matricula.id,
+      year: ano,
+      amount: valor,
+    })
+
+    const resumo = `${nomeAluno(matricula)} em ${nomeTurma(matricula)}`
+    matriculaCobranca.value = null
+
+    feedbackErro.value = false
+    feedbackMsg.value = `Cobranças de ${ano} geradas para ${resumo}.`
+  } catch (err: any) {
+    erroGeracao.value =
+      err?.data?.statusMessage ||
+      err?.data?.message ||
+      err?.response?._data?.statusMessage ||
+      err?.response?._data?.message ||
+      "Não foi possível gerar as cobranças."
+  } finally {
+    gerandoCobrancas.value = false
+  }
+}
+
 function novaMatricula() {
   navigateTo("/matriculas/nova")
+}
+
+function goInadimplentes() {
+  navigateTo("/inadimplentes")
 }
 
 function goDashboard() {
@@ -372,7 +528,9 @@ function logout() {
   navigateTo("/login")
 }
 
-await carregarDados()
+// Carrega só no navegador: no servidor a requisição volta vazia (sem a sessão do
+// usuário) e isso causava conflito de hidratação, deixando uma linha da tabela torta.
+onMounted(carregarDados)
 </script>
 
 <style scoped>
@@ -553,22 +711,51 @@ await carregarDados()
 
 .table th:nth-child(1),
 .table td:nth-child(1) {
-  width: 25%;
+  width: 20%;
 }
 
 .table th:nth-child(2),
 .table td:nth-child(2) {
-  width: 25%;
+  width: 22%;
 }
 
 .table th:nth-child(3),
 .table td:nth-child(3) {
-  width: 25%;
+  width: 18%;
 }
 
 .table th:nth-child(4),
 .table td:nth-child(4) {
-  width: 25%;
+  width: 40%;
+}
+
+.table td.acoes-cell {
+  overflow: visible;
+  white-space: normal;
+  text-overflow: unset;
+}
+
+.acoes-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.charge-button {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.charge-button:hover {
+  background: #256628;
 }
 
 .table td {
@@ -605,6 +792,106 @@ await carregarDados()
   text-align: center;
   color: #888;
   padding: 25px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 420px;
+  max-height: 100%;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 14px;
+  border-top: 5px solid #c62828;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.panel h2 {
+  color: #c62828;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.panel p {
+  margin: 4px 0;
+  color: #555;
+  font-size: 15px;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+}
+
+.modal-form label {
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #333;
+  font-size: 14px;
+}
+
+.modal-form .select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 14px;
+}
+
+.modal-info {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.modal-form .warning {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #856404;
+}
+
+.modal-form .feedback-error {
+  margin-bottom: 12px;
+  color: #c62828;
+}
+
+.modal-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.modal-buttons .new-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.modal-cancel {
+  background: #ffffff;
+  color: #555;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.modal-cancel:hover {
+  background: #f4f4f4;
 }
 
 @media (max-width: 800px) {

@@ -8,6 +8,7 @@
         <p class="active">Turmas</p>
         <p @click="goAlunos">Alunos</p>
         <p @click="goMatriculas">Matrículas</p>
+        <p @click="goInadimplentes">Inadimplentes</p>
         <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
     </aside>
@@ -326,6 +327,10 @@ onBeforeRouteLeave(() => {
 function logout() {
   localStorage.removeItem("auth");
   navigateTo("/login");
+}
+
+function goInadimplentes() {
+  navigateTo("/inadimplentes");
 }
 
 function goDashboard() {

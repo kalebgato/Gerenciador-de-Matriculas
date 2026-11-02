@@ -8,6 +8,7 @@
         <p @click="goTurmas">Turmas</p>
         <p class="active" @click="goAlunos">Alunos</p>
         <p @click="goMatriculas">Matrículas</p>
+        <p @click="goInadimplentes">Inadimplentes</p>
         <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
     </aside>
@@ -135,33 +136,49 @@
         <div class="card table-card">
           <h3>Histórico Financeiro e Cobranças</h3>
 
+          <p v-if="feedbackPagamento" :class="['message', feedbackPagamentoErro ? 'error' : 'success']">
+            {{ feedbackPagamento }}
+          </p>
+
           <div class="table-wrap">
-            <table class="table">
+            <table class="table table-wide">
               <thead>
                 <tr>
+                  <th>Referência</th>
+                  <th>Turma</th>
                   <th>Vencimento</th>
-                  <th>Data de Pagamento</th>
                   <th>Valor</th>
                   <th>Status</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="cobranca in aluno.cobrancas" :key="cobranca.id">
+                  <td>{{ cobranca.referencia }}</td>
+                  <td>{{ cobranca.turma }}</td>
                   <td>{{ cobranca.vencimento }}</td>
-                  <td>{{ cobranca.dataPagamento }}</td>
                   <td>{{ cobranca.valor }}</td>
                   <td>
-                    <span :class="['status', cobranca.status === 'Pendente' ? 'pendente' : 'pago']">
-                      {{ cobranca.status }}
+                    <span class="status pendente">
+                      {{ cobranca.diasAtraso > 0 ? `Atrasada (${cobranca.diasAtraso}d)` : "Pendente" }}
                     </span>
+                  </td>
+                  <td>
+                    <button class="pay-button" @click="abrirPagamento(cobranca)">
+                      Registrar pagamento
+                    </button>
                   </td>
                 </tr>
                 <tr v-if="aluno.cobrancas.length === 0">
-                  <td colspan="4" class="empty-state">Nenhuma cobrança pendente encontrada.</td>
+                  <td colspan="6" class="empty-state">Nenhuma cobrança em atraso encontrada.</td>
                 </tr>
               </tbody>
             </table>
           </div>
+
+          <p class="hint">
+            Esta lista mostra apenas cobranças em atraso. O sistema ainda não disponibiliza o histórico de pagamentos já realizados.
+          </p>
         </div>
       </div>
 
@@ -170,6 +187,51 @@
         <p>Não foi possível carregar os dados. Verifique a conexão com o banco ou o ID do aluno.</p>
       </div>
     </main>
+
+    <div v-if="cobrancaSelecionada" class="overlay" @click.self="fecharPagamento">
+      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pagamento-titulo">
+        <h2 id="pagamento-titulo">Registrar pagamento</h2>
+        <p>
+          <strong>{{ cobrancaSelecionada.turma }}</strong> — referência {{ cobrancaSelecionada.referencia }}
+        </p>
+        <p>Valor da cobrança: <strong>{{ cobrancaSelecionada.valor }}</strong></p>
+
+        <form class="pay-form" @submit.prevent="confirmarPagamento">
+          <label for="pagValor">Valor pago (R$)</label>
+          <input
+            id="pagValor"
+            v-model="pagValor"
+            class="edit-input"
+            type="number"
+            min="0.01"
+            step="0.01"
+            required
+          />
+
+          <label for="pagMetodo">Forma de pagamento</label>
+          <select id="pagMetodo" v-model="pagMetodo" class="edit-input">
+            <option v-for="m in metodosPagamento" :key="m.valor" :value="m.valor">
+              {{ m.rotulo }}
+            </option>
+          </select>
+
+          <p v-if="pagamentoParcial" class="message warning">
+            Pagamento parcial: a cobrança continuará em aberto com o valor integral, porque o sistema ainda não exibe o saldo restante.
+          </p>
+
+          <p v-if="erroPagamento" class="message error">{{ erroPagamento }}</p>
+
+          <div class="edit-buttons">
+            <button type="submit" class="save-button" :disabled="registrandoPagamento">
+              {{ registrandoPagamento ? "Registrando..." : "Confirmar pagamento" }}
+            </button>
+            <button type="button" class="cancel-button" @click="fecharPagamento">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -205,11 +267,14 @@ interface LateCharge {
   amount?: number;
   valor?: number;
   due_date?: string;
+  month?: number;
+  year?: number;
   student_id?: string;
   studentId?: string;
   alunoId?: string;
   enrollment?: {
     student?: { id?: string };
+    team?: Team;
   };
 }
 
@@ -219,7 +284,7 @@ const idParam = String(route.params.id);
 
 const { data: rawStudent, pending, error: errStudent, refresh: refreshStudent } = await useFetch<any>(`/api/students/${idParam}`);
 const { data: rawEnrollments } = await useFetch<any>(`/api/enrollments/student/${idParam}`);
-const { data: rawLateCharges } = await useFetch<any>("/api/billing/late");
+const { data: rawLateCharges, refresh: refreshLateCharges } = await useFetch<any>("/api/billing/late");
 
 function normalizeArray(res: any): any[] {
   if (!res) return [];
@@ -257,15 +322,37 @@ function formatarData(data: any): string {
   return d.toLocaleDateString("pt-BR");
 }
 
+function formatarMoeda(valor: number): string {
+  return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function diasEmAtraso(vencimento: any): number {
+  if (!vencimento) return 0;
+  const d = new Date(vencimento);
+  if (isNaN(d.getTime())) return 0;
+  const diff = Math.floor((Date.now() - d.getTime()) / 86400000);
+  return diff > 0 ? diff : 0;
+}
+
 const cobrancas = computed(() => {
-  return pendencias.value.map((p: LateCharge) => ({
-    id: String(p.id),
-    vencimento: formatarData(p.due_date),
-    dataPagamento: "—",
-    valor: p.amount || p.valor ? `R$ ${p.amount || p.valor}` : "Valor não informado",
-    status: "Pendente",
-  }));
+  return pendencias.value.map((p: LateCharge) => {
+    const valorNumero = Number(p.amount ?? p.valor ?? 0);
+    const team = p.enrollment?.team;
+    const mes = p.month ? String(p.month).padStart(2, "0") : "--";
+
+    return {
+      id: String(p.id),
+      referencia: `${mes}/${p.year ?? "----"}`,
+      turma: team?.title || team?.name || team?.nome || "Turma não identificada",
+      vencimento: formatarData(p.due_date),
+      diasAtraso: diasEmAtraso(p.due_date),
+      valorNumero,
+      valor: valorNumero > 0 ? formatarMoeda(valorNumero) : "Valor não informado",
+    };
+  });
 });
+
+type Cobranca = (typeof cobrancas.value)[number];
 
 const aluno = computed(() => {
   const student = rawStudent.value;
@@ -296,6 +383,74 @@ const mensagemEdicao = ref("");
 const erroEdicao = ref(false);
 
 const alterandoStatus = ref(false);
+
+// --- Registro de pagamento ---
+const metodosPagamento = [
+  { valor: "PIX", rotulo: "PIX" },
+  { valor: "BOLETO", rotulo: "Boleto" },
+  { valor: "CREDIT_CARD", rotulo: "Cartão de crédito" },
+  { valor: "DEBIT_CARD", rotulo: "Cartão de débito" },
+];
+
+const cobrancaSelecionada = ref<Cobranca | null>(null);
+const pagValor = ref("");
+const pagMetodo = ref("PIX");
+const registrandoPagamento = ref(false);
+const erroPagamento = ref("");
+const feedbackPagamento = ref("");
+const feedbackPagamentoErro = ref(false);
+
+const pagamentoParcial = computed(() => {
+  if (!cobrancaSelecionada.value) return false;
+  const pago = Number(pagValor.value);
+  return pago > 0 && pago < cobrancaSelecionada.value.valorNumero;
+});
+
+function abrirPagamento(cobranca: Cobranca) {
+  cobrancaSelecionada.value = cobranca;
+  pagValor.value = cobranca.valorNumero > 0 ? String(cobranca.valorNumero) : "";
+  pagMetodo.value = "PIX";
+  erroPagamento.value = "";
+}
+
+function fecharPagamento() {
+  if (registrandoPagamento.value) return;
+  cobrancaSelecionada.value = null;
+  erroPagamento.value = "";
+}
+
+async function confirmarPagamento() {
+  if (!cobrancaSelecionada.value) return;
+
+  const valorPago = Number(pagValor.value);
+  if (!(valorPago > 0)) {
+    erroPagamento.value = "Informe um valor maior que zero.";
+    return;
+  }
+
+  registrandoPagamento.value = true;
+  erroPagamento.value = "";
+
+  try {
+    await api.post("/api/billing", {
+      action: "pay",
+      charge_id: cobrancaSelecionada.value.id,
+      amount: valorPago,
+      method: pagMetodo.value,
+    });
+
+    const referencia = cobrancaSelecionada.value.referencia;
+    cobrancaSelecionada.value = null;
+    await refreshLateCharges();
+
+    feedbackPagamentoErro.value = false;
+    feedbackPagamento.value = `Pagamento da cobrança ${referencia} registrado com sucesso.`;
+  } catch (err: any) {
+    erroPagamento.value = extrairMensagemErro(err, "Não foi possível registrar o pagamento.");
+  } finally {
+    registrandoPagamento.value = false;
+  }
+}
 
 function formatarTelefone(valor: string): string {
   const digits = valor.replace(/\D/g, "").slice(0, 11);
@@ -393,6 +548,10 @@ async function alternarStatus() {
 }
 
 useHead({ title: computed(() => (aluno.value ? aluno.value.nome : "Detalhes do Aluno")) });
+
+function goInadimplentes() {
+  navigateTo("/inadimplentes");
+}
 
 function goDashboard() {
   navigateTo("/dashboard");
@@ -742,6 +901,88 @@ function goMatriculas() {
   color: #888;
   padding: 20px;
   white-space: normal;
+}
+
+.table-wide {
+  min-width: 680px;
+}
+
+.hint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #888;
+}
+
+.pay-button {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.pay-button:hover {
+  background: #256628;
+}
+
+.message.warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 420px;
+  max-height: 100%;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 14px;
+  border-top: 5px solid #c62828;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.panel h2 {
+  color: #c62828;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.panel p {
+  margin: 4px 0;
+  color: #555;
+  font-size: 15px;
+}
+
+.pay-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+}
+
+.pay-form label {
+  margin-bottom: 5px;
+  font-weight: 700;
+  color: #333;
+  font-size: 14px;
 }
 
 @media (max-width: 800px) {

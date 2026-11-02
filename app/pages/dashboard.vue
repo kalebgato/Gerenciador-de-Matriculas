@@ -8,6 +8,7 @@
         <p @click="goTurmas">Turmas</p>
         <p @click="goAlunos">Alunos</p>
         <p @click="goMatriculas">Matrículas</p>
+        <p @click="goInadimplentes">Inadimplentes</p>
         <AuthLogoutAction as="p">Logout</AuthLogoutAction>
       </nav>
     </aside>
@@ -29,14 +30,16 @@
           <h2>{{ totalPagos }}</h2>
         </div>
 
-        <div class="card red">
+        <div class="card red clickable" role="link" tabindex="0" @click="goInadimplentes" @keydown.enter="goInadimplentes">
           <p>Pendentes</p>
           <h2>{{ totalPendentes }}</h2>
+          <span class="card-link">Ver inadimplentes →</span>
         </div>
 
-        <div class="card orange">
+        <div class="card orange clickable" role="link" tabindex="0" @click="goInadimplentes" @keydown.enter="goInadimplentes">
           <p>% Inadimplência</p>
           <h2>{{ taxaInadimplencia }}%</h2>
+          <span class="card-link">Ver inadimplentes →</span>
         </div>
       </section>
 
@@ -168,6 +171,10 @@ function goAlunos() {
 function goMatriculas() {
   navigateTo("/matriculas");
 }
+
+function goInadimplentes() {
+  navigateTo("/inadimplentes");
+}
 </script>
 
 <style scoped>
@@ -271,6 +278,18 @@ function goMatriculas() {
   font-size: 30px;
   font-weight: 800;
   margin: 0;
+}
+
+.card.clickable {
+  cursor: pointer;
+}
+
+.card-link {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.9;
 }
 
 .quick-links {
