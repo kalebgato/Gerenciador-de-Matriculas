@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="dashboard">
     <aside class="sidebar">
       <h2 class="logo">PRODAGIN</h2>
 
@@ -534,7 +534,7 @@ onMounted(carregarDados)
 </script>
 
 <style scoped>
-.page {
+.dashboard {
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -543,7 +543,7 @@ onMounted(carregarDados)
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.page > * {
+.dashboard > * {
   width: auto;
   max-width: none;
 }
@@ -895,7 +895,7 @@ onMounted(carregarDados)
 }
 
 @media (max-width: 800px) {
-  .page {
+  .dashboard {
     flex-direction: column;
   }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="dashboard">
     <aside class="sidebar">
       <h2 class="logo">PRODAGIN</h2>
 
@@ -193,7 +193,7 @@ await carregarCursos()
 </script>
 
 <style scoped>
-.page {
+.dashboard {
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -202,7 +202,7 @@ await carregarCursos()
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.page > * {
+.dashboard > * {
   width: auto;
   max-width: none;
 }
@@ -364,7 +364,7 @@ select.select {
 }
 
 @media (max-width: 800px) {
-  .page {
+  .dashboard {
     flex-direction: column;
   }
 

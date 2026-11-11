@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="dashboard">
     <aside class="sidebar">
       <h2 class="logo">PRODAGIN</h2>
 
@@ -282,7 +282,7 @@ function logout() {
 </script>
 
 <style scoped>
-.page {
+.dashboard {
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -291,7 +291,7 @@ function logout() {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.page > * {
+.dashboard > * {
   width: auto;
   max-width: none;
 }
@@ -459,7 +459,7 @@ label {
 }
 
 @media (max-width: 800px) {
-  .page {
+  .dashboard {
     flex-direction: column;
   }
 

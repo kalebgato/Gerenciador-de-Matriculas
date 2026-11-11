@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="dashboard">
     <aside class="sidebar">
       <h2 class="logo">PRODAGIN</h2>
 
@@ -8,6 +8,7 @@
         <p @click="goTurmas">Turmas</p>
         <p @click="goAlunos">Alunos</p>
         <p class="active">Matrículas</p>
+        <p @click="goInadimplentes">Inadimplentes</p>
         <p @click="logout">Logout</p>
       </nav>
     </aside>
@@ -413,6 +414,10 @@ function voltar() {
   navigateTo("/matriculas")
 }
 
+function goInadimplentes() {
+  navigateTo("/inadimplentes")
+}
+
 function goDashboard() {
   navigateTo("/dashboard")
 }
@@ -434,7 +439,7 @@ await carregarDados()
 </script>
 
 <style scoped>
-.page {
+.dashboard {
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -443,7 +448,7 @@ await carregarDados()
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.page > * {
+.dashboard > * {
   width: auto;
   max-width: none;
 }
@@ -671,7 +676,7 @@ select.select {
 }
 
 @media (max-width: 800px) {
-  .page {
+  .dashboard {
     flex-direction: column;
   }
 
